@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 10a6fa24c4a56084e879241ffaa48521
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - dialogFrame: {instanceID: 0}
+  - textField: {instanceID: 0}
+  - speakerField: {instanceID: 0}
+  - inputActionAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  - _freezeCommandSo: {fileID: 11400000, guid: 45a467b68ae495242a8f900fcb2b1de3, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

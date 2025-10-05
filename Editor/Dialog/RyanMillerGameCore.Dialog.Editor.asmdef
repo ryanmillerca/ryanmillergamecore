@@ -1,0 +1,18 @@
+{
+    "name": "RyanMillerGameCore.Dialog.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8faefa0433e434d22a839278d226727e"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
