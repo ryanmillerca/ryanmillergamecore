@@ -5,6 +5,10 @@
   "unity": "6000.0",
   "description": "Ryan's Framework for games like Krog",
   "author": { "name": "Ryan Miller" },
-  "dependencies": {},
+  "dependencies": {
+    "com.unity.textmeshpro": "2.0.0",
+    "com.unity.inputsystem": "1.1.4",
+    "com.unity.render-pipelines.universal": "17.0.4"
+  },
   "keywords": ["unity", "scripts", "tooling"]
 }
