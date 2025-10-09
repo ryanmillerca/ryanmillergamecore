@@ -6,7 +6,6 @@ namespace RyanMillerGameCore.Animation
     public class CharacterAnimation : MonoBehaviour
     {
         [SerializeField] private Animator animator;
-        [SerializeField] private AnimationClip testAnim;
         [SerializeField] private int cosmeticAnimLayer = 1;
         [SerializeField] private float cosmeticAnimDuration = 5;
         [SerializeField] private float blendTime = 0.25f;
@@ -75,12 +74,6 @@ namespace RyanMillerGameCore.Animation
                 }
             }
             return 1;
-        }
-        
-        [ContextMenu("Test Animation")]
-        private void TestAnim()
-        {
-            PlayAnimation(testAnim, cosmeticAnimDuration);
         }
     }
 }
