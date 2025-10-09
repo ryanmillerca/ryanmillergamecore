@@ -213,9 +213,11 @@ namespace RyanMillerGameCore.Character
             // Movement command
             Vector3 moveDir = next - startPos;
             moveDir.y = 0f;
-            if (moveDir.sqrMagnitude <= 0.0001f) moveDir = Vector3.zero;
+            if (moveDir.sqrMagnitude <= 0.0001f) {
+                moveDir = Vector3.zero;
+            }
 
-            if (references != null && references.movement != null)
+            if (references && references.movement)
             {
                 if (_forceful)
                 {
