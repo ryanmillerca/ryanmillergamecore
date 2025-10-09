@@ -112,7 +112,7 @@ namespace RyanMillerGameCore.Character
             }
             checkpointData ??= DataManager.Instance.TryGetCheckpoint();
             if (checkpointData == null) {
-                Debug.LogWarning("GoToCheckpoint failed: No checkpoint data found");
+                //Debug.LogWarning("GoToCheckpoint failed: No checkpoint data found");
                 return;
             }
             //Debug.Log("GoToCheckpoint: Found a checkpoint at " + checkpointData.position + ", teleporting player");
