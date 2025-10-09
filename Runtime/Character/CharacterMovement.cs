@@ -231,6 +231,7 @@ namespace RyanMillerGameCore.Character
 
             _rb.MovePosition(pos + step);
             _targetVelocity = step / Mathf.Max(0.0001f, dt); // for any listeners
+            OnMoveInDirection?.Invoke(_targetVelocity);
         }
 
         #endregion
