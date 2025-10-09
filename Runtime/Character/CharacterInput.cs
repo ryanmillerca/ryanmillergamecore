@@ -1,316 +1,288 @@
-namespace RyanMillerGameCore.Character
-{
-    using System;
-    using UnityEngine;
-    using UnityEngine.InputSystem;
-    using Camera;
-    using UnityEngine.EventSystems;
+namespace RyanMillerGameCore.Character {
+	using System;
+	using UnityEngine;
+	using UnityEngine.InputSystem;
+	using Camera;
+	using UnityEngine.EventSystems;
 
-    public class CharacterInput : MonoBehaviour
-    {
-        [Header("References")] 
-        
-        [SerializeField] private InputActionAsset inputActionAsset;
-        [SerializeField] private bool syncMoveDirectionWithCamera = true;
-        [SerializeField] private Camera playerCamera;
-        
-        [NonSerialized] private bool _inputEnabled = true;
-        [NonSerialized] private bool _hasPlayerCamera = false;
-        [NonSerialized] private Vector2 _movementInput;
-        [NonSerialized] private CharacterBrain _characterBrain;
-        [NonSerialized] private InputAction _moveAction;
-        [NonSerialized] private InputAction _attackAction;
-        [NonSerialized] private InputAction _interactAction;
-        [NonSerialized] private InputAction _pauseAction;
+	public class CharacterInput : MonoBehaviour {
+		[Header("References")]
+		[SerializeField] private bool syncMoveDirectionWithCamera = true;
+		[SerializeField] private InputActionReference inputActionMove;
+		[SerializeField] private InputActionReference inputActionAttack;
+		[SerializeField] private InputActionReference inputActionInteract;
+		[SerializeField] private InputActionReference inputActionPause;
+		[SerializeField] private InputActionReference inputActionPointerDown;
+		[SerializeField] private InputActionReference inputActionPointerPosition;
 
-        // pointer only
-        private InputAction _pointerDown;
-        private InputAction _pointerPosition;
-        private bool _pointerIsDown;
-        private bool _isPointerOverGameObject;
-        
-        public bool IsMoving()
-        {
-            return Mathf.Abs(_movementInput.magnitude) > 0;
-        }
+		[NonSerialized] private bool _inputEnabled = true;
+		[NonSerialized] private bool _hasPlayerCamera = false;
+		[NonSerialized] private Vector2 _movementInput;
+		[NonSerialized] private CharacterBrain _characterBrain;
+		[NonSerialized] private bool _pointerIsDown;
+		[NonSerialized] private bool _isPointerOverGameObject;
+		[NonSerialized] private Camera _playerCamera;
 
-        public void SetInputEnabled(bool inputEnabled)
-        {
-            _inputEnabled = inputEnabled;
-            if (!inputEnabled)
-            {
-                _movementInput = Vector2.zero;
-                _characterBrain.MoveInDirection(Vector3.zero);
-            }
-        }
+		private Camera playerCamera {
+			get {
+				if (_playerCamera) {
+					return _playerCamera;
+				}
+				if (PlayerCamera.Instance) {
+					if (PlayerCamera.Instance.Camera) {
+						_playerCamera = PlayerCamera.Instance.Camera;
+						_hasPlayerCamera = true;
+						return _playerCamera;
+					}
+				}
+				if (Camera.main) {
+					_playerCamera = Camera.main;
+					_hasPlayerCamera = true;
+					return _playerCamera;
+				}
+				_hasPlayerCamera = false;
+				return null;
+			}
+		}
 
-        public void SetMovementEnabled(bool movementEnabled)
-        {
-            if (movementEnabled)
-            {
-                _moveAction.Enable();
-            }
-            else
-            {
-                _moveAction.Disable();
-            }
-        }
-        
-        public void SetAttackEnabled(bool attackEnabled)
-        {
-            if (attackEnabled)
-            {
-                _attackAction.Enable();
-            }
-            else
-            {
-                _attackAction.Disable();
-            }
-        }
+		private bool IsMoving() {
+			return Mathf.Abs(_movementInput.magnitude) > 0;
+		}
 
-        public void SetInteractEnabled(bool interactEnabled)
-        {
-            if (interactEnabled)
-            {
-                _interactAction.Enable();
-            }
-            else
-            {
-                _interactAction.Disable();
-            }
-        }
+		public void SetInputEnabled(bool inputEnabled) {
+			_inputEnabled = inputEnabled;
+			if (!inputEnabled) {
+				_movementInput = Vector2.zero;
+				_characterBrain.MoveInDirection(Vector3.zero);
+			}
+		}
 
-        public void FireInteractFromUI()
-        {
-            DoInteract();
-        }
+		public void SetMovementEnabled(bool movementEnabled) {
+			if (movementEnabled) {
+				inputActionMove.action.Enable();
+			}
+			else {
+				inputActionMove.action.Disable();
+			}
+		}
 
-        private void OnEnable()
-        {
-            _characterBrain = GetComponent<CharacterBrain>();
-            var actionMap = inputActionAsset.FindActionMap("Player", true);
-            if (GameStateManager.Instance)
-            {
-                GameStateManager.Instance.OnGameStateChanged += OnGameStateChanged;
-            }
+		public void SetAttackEnabled(bool attackEnabled) {
+			if (attackEnabled) {
+				inputActionAttack.action.Enable();
+			}
+			else {
+				inputActionAttack.action.Disable();
+			}
+		}
 
-            _moveAction = actionMap.FindAction("Move", true);
-            _moveAction.Enable();
+		public void SetInteractEnabled(bool interactEnabled) {
+			if (interactEnabled) {
+				inputActionInteract.action.Enable();
+			}
+			else {
+				inputActionInteract.action.Disable();
+			}
+		}
 
-            _attackAction = actionMap.FindAction("Attack", true);
-            _attackAction.performed += OnAttack;
-            _attackAction.Enable();
+		public void FireInteractFromUI() {
+			DoInteract();
+		}
 
-            _interactAction = actionMap.FindAction("Interact", true);
-            _interactAction.performed += OnInteract;
-            _interactAction.Enable();
+		private void OnEnable() {
+			_characterBrain = GetComponent<CharacterBrain>();
+			if (GameStateManager.Instance) {
+				GameStateManager.Instance.OnGameStateChanged += OnGameStateChanged;
+			}
 
-            _pauseAction = actionMap.FindAction("Pause", true);
-            _pauseAction.performed += OnPauseAction;
-            _pauseAction.Enable();
+			if (inputActionMove != null) {
+				inputActionMove.action.Enable();
+			}
 
-            _pointerDown = actionMap.FindAction("PointerDown",true);
-            _pointerDown.performed += OnPointerDown;
-            _pointerDown.canceled += OnPointerDown;
-            _pointerDown.Enable();
+			if (inputActionAttack != null) {
+				inputActionAttack.action.Enable();
+				inputActionAttack.action.performed += OnAttack;
+			}
 
-            _pointerPosition = actionMap.FindAction("PointerPosition",true);
-            _pointerPosition.performed += OnPointerPosition;
-            _pointerPosition.Enable();
-        }
+			if (inputActionInteract != null) {
+				inputActionInteract.action.Enable();
+				inputActionInteract.action.performed += OnInteract;
+			}
 
-        private void OnGameStateChanged(GameState newGameState)
-        {
-            SetInputActionsEnabled(newGameState == GameState.Gameplay);
-            if (newGameState == GameState.Paused)
-            {
-                _pauseAction.Enable();
-            }
-        }
-        
-        private void SetInputActionsEnabled(bool inputEnabled){
-            if (inputEnabled)
-            {
-                _moveAction.Enable();
-                _pointerDown.Enable();
-                _pointerPosition.Enable();
-                _attackAction.Enable();
-                _interactAction.Enable();
-                _pauseAction.Enable();
-            }
-            else
-            {
-                _moveAction.Disable();
-                _pointerDown.Disable();
-                _pointerPosition.Disable();
-                _attackAction.Disable();
-                _interactAction.Disable();
-                _pauseAction.Disable();
-            }
-        }
+			if (inputActionPause != null) {
+				inputActionPause.action.Enable();
+				inputActionPause.action.performed += OnPauseAction;
+			}
 
-        private void Start()
-        {
-            if (playerCamera == null && PlayerCamera.Instance)
-            {
-                playerCamera = PlayerCamera.Instance.Camera;
-            }
-            _hasPlayerCamera = playerCamera != null;
-        }
+			if (inputActionPointerDown != null) {
+				inputActionPointerDown.action.Enable();
+				inputActionPointerDown.action.performed += OnPointerDown;
+				inputActionPointerDown.action.canceled += OnPointerDown;
+			}
 
-        private void OnDisable()
-        {
-            if (GameStateManager.Instance)
-            {
-                GameStateManager.Instance.OnGameStateChanged -= OnGameStateChanged;
-            }
+			if (inputActionPointerPosition != null) {
+				inputActionPointerPosition.action.Enable();
+				inputActionPointerPosition.action.performed += OnPointerPosition;
+			}
+		}
 
-            SetInputActionsEnabled(false);
-            _pointerDown.performed -= OnPointerDown;
-            _pointerDown.canceled -= OnPointerDown;
-            _pointerPosition.performed -= OnPointerPosition;
-            _attackAction.performed -= OnAttack;
-            _interactAction.performed -= OnInteract;
-            _pauseAction.performed -= OnPauseAction;
-        }
+		private void Start() {
+			_playerCamera = playerCamera;
+		}
 
-        private void UpdateMovementDirection()
-        {
-            if (_movementInput.sqrMagnitude > 0)
-            {
-                Vector3 moveDirection = new Vector3(_movementInput.x, 0, _movementInput.y);
-                if (_hasPlayerCamera)
-                {
-                    Vector3 cameraForward = playerCamera.transform.forward;
-                    Vector3 cameraRight = playerCamera.transform.right;
-                    cameraForward.y = 0;
-                    cameraRight.y = 0;
-                    cameraForward.Normalize();
-                    cameraRight.Normalize();
-                    moveDirection = cameraForward * _movementInput.y + cameraRight * _movementInput.x;
-                }
-                _characterBrain.MoveInDirection(moveDirection);
-            }
-        }
+		private void OnGameStateChanged(GameState newGameState) {
+			SetInputActionsEnabled(newGameState == GameState.Gameplay);
+			if (newGameState == GameState.Paused) {
+				inputActionPause.action.Enable();
+			}
+		}
 
-        private void OnMove(InputAction.CallbackContext context) { }
-        
-        private void ProcessMove() {
+		private void SetInputActionsEnabled(bool inputEnabled) {
+			if (inputEnabled) {
+				inputActionMove.action.Enable();
+				inputActionPointerDown.action.Enable();
+				inputActionPointerPosition.action.Enable();
+				inputActionAttack.action.Enable();
+				inputActionInteract.action.Enable();
+				inputActionPause.action.Enable();
+			}
+			else {
+				inputActionMove.action.Disable();
+				inputActionPointerDown.action.Disable();
+				inputActionPointerPosition.action.Disable();
+				inputActionAttack.action.Disable();
+				inputActionInteract.action.Disable();
+				inputActionPause.action.Disable();
+			}
+		}
 
-            Vector2 move = _moveAction.ReadValue<Vector2>();
-            _movementInput = Vector2.zero;
-            
-            if (_inputEnabled == false || _isPointerOverGameObject)
-            {
-                return;
-            }
-            if (move.sqrMagnitude <= 0)
-            {
-                _characterBrain.GoToIdle();
-                return;
-            }
+		private void OnDisable() {
+			if (GameStateManager.Instance) {
+				GameStateManager.Instance.OnGameStateChanged -= OnGameStateChanged;
+			}
 
-            _movementInput = move;
-            _characterBrain.GoToMove();
+			SetInputActionsEnabled(false);
+			inputActionPointerDown.action.performed -= OnPointerDown;
+			inputActionPointerDown.action.canceled -= OnPointerDown;
+			inputActionPointerPosition.action.performed -= OnPointerPosition;
+			inputActionAttack.action.performed -= OnAttack;
+			inputActionInteract.action.performed -= OnInteract;
+			inputActionPause.action.performed -= OnPauseAction;
+		}
 
-            if (!syncMoveDirectionWithCamera)
-            {
-                UpdateMovementDirection();
-            }
-        }
+		private void UpdateMovementDirection() {
+			if (_movementInput.sqrMagnitude > 0) {
+				Vector3 moveDirection = new Vector3(_movementInput.x, 0, _movementInput.y);
+				if (_hasPlayerCamera) {
+					Vector3 cameraForward = playerCamera.transform.forward;
+					Vector3 cameraRight = playerCamera.transform.right;
+					cameraForward.y = 0;
+					cameraRight.y = 0;
+					cameraForward.Normalize();
+					cameraRight.Normalize();
+					moveDirection = cameraForward * _movementInput.y + cameraRight * _movementInput.x;
+				}
+				_characterBrain.MoveInDirection(moveDirection);
+			}
+		}
 
-        private void OnPointerPosition(InputAction.CallbackContext context) {
-            if (_inputEnabled == false)
-            {
-                return;
-            }
-            if (_pointerIsDown == false)
-            {
-                return;
-            }
-            Vector2 posInput = context.ReadValue<Vector2>();
-            Vector3 screenPosOfTransform = Camera.main.WorldToScreenPoint(transform.position);
-            Vector2 direction = posInput - (Vector2)screenPosOfTransform;
+		private void OnMove(InputAction.CallbackContext context) { }
 
-            // Normalize for joystick-style vector (-1 to 1 range)
-            _movementInput = direction.normalized;
-            _characterBrain.GoToMove(); 
+		private void ProcessMove() {
 
-            // only calling this here will result in the movement directions not updating when the camera rotates
-            if (!syncMoveDirectionWithCamera)
-            {
-                UpdateMovementDirection();
-            }
-        }
+			Vector2 move = inputActionMove.action.ReadValue<Vector2>();
+			_movementInput = Vector2.zero;
 
-        private void OnPointerDown(InputAction.CallbackContext context) {
-            if (context.performed) {
-                if (_isPointerOverGameObject)
-                {
-                    return;
-                }
-                _pointerIsDown = true;
-            }
-            else if (context.canceled) {
-                _movementInput = Vector2.zero;
-                _pointerIsDown = false;
-                _characterBrain.GoToIdle();
-            }
-        }
+			if (_inputEnabled == false || _isPointerOverGameObject) {
+				return;
+			}
+			if (move.sqrMagnitude <= 0) {
+				_characterBrain.GoToIdle();
+				return;
+			}
 
-        private void Update()
-        {
-            ProcessMove();
-            if (IsMoving())
-            {
-                // calling this here will result in movement directions that stay synced with the camera
-                if (syncMoveDirectionWithCamera)
-                {
-                    UpdateMovementDirection();
-                }
-            }
-            _isPointerOverGameObject = EventSystem.current.IsPointerOverGameObject();
-        }
+			_movementInput = move;
+			_characterBrain.GoToMove();
 
-        private void OnAttack(InputAction.CallbackContext context)
-        {
-            if (_inputEnabled == false)
-            {
-                return;
-            }
-            if (context.performed)
-            {
-                _characterBrain.Attack();
-            }
-        }
+			if (!syncMoveDirectionWithCamera) {
+				UpdateMovementDirection();
+			}
+		}
 
-        private void OnInteract(InputAction.CallbackContext context)
-        {
-            if (context.performed)
-            {
-                DoInteract();
-            }
-        }
+		private void OnPointerPosition(InputAction.CallbackContext context) {
+			if (_inputEnabled == false) {
+				return;
+			}
+			if (_pointerIsDown == false) {
+				return;
+			}
+			Vector2 posInput = context.ReadValue<Vector2>();
+			Vector3 screenPosOfTransform = playerCamera.WorldToScreenPoint(transform.position);
+			Vector2 direction = posInput - (Vector2)screenPosOfTransform;
 
-        private void DoInteract()
-        {
-            if (_inputEnabled == false)
-            {
-                return;
-            }
-            _characterBrain.Interact();
-        }
+			// Normalize for joystick-style vector (-1 to 1 range)
+			_movementInput = direction.normalized;
+			_characterBrain.GoToMove();
 
-        private void OnPauseAction(InputAction.CallbackContext context)
-        {
-            if (_inputEnabled == false)
-            {
-                return;
-            }
-            if (context.performed)
-            {
-                GameStateManager.Instance.TogglePause();
-            }
-        }
-    }
+			// only calling this here will result in the movement directions not updating when the camera rotates
+			if (!syncMoveDirectionWithCamera) {
+				UpdateMovementDirection();
+			}
+		}
+
+		private void OnPointerDown(InputAction.CallbackContext context) {
+			if (context.performed) {
+				if (_isPointerOverGameObject) {
+					return;
+				}
+				_pointerIsDown = true;
+			}
+			else if (context.canceled) {
+				_movementInput = Vector2.zero;
+				_pointerIsDown = false;
+				_characterBrain.GoToIdle();
+			}
+		}
+
+		private void Update() {
+			ProcessMove();
+			if (IsMoving()) {
+				// calling this here will result in movement directions that stay synced with the camera
+				if (syncMoveDirectionWithCamera) {
+					UpdateMovementDirection();
+				}
+			}
+			_isPointerOverGameObject = EventSystem.current.IsPointerOverGameObject();
+		}
+
+		private void OnAttack(InputAction.CallbackContext context) {
+			if (_inputEnabled == false) {
+				return;
+			}
+			if (context.performed) {
+				_characterBrain.Attack();
+			}
+		}
+
+		private void OnInteract(InputAction.CallbackContext context) {
+			if (context.performed) {
+				DoInteract();
+			}
+		}
+
+		private void DoInteract() {
+			if (_inputEnabled == false) {
+				return;
+			}
+			_characterBrain.Interact();
+		}
+
+		private void OnPauseAction(InputAction.CallbackContext context) {
+			if (_inputEnabled == false) {
+				return;
+			}
+			if (context.performed) {
+				GameStateManager.Instance.TogglePause();
+			}
+		}
+	}
 }
