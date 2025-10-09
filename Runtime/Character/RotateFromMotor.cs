@@ -10,11 +10,19 @@ namespace RyanMillerGameCore.Character
         [SerializeField] private float minThreshold = 0.001f;
         [SerializeField] private float lerpSpeed = 6;
         [SerializeField] private UpdateMode runMode = UpdateMode.Update;
+        [SerializeField] private bool allowTilting = true;
+        
         [NonSerialized] private Quaternion _targetRotation;
         [NonSerialized] private CharacterMovement _characterMovement;
 
+        
         private void Awake() {
-            _targetRotation = transform.localRotation;
+            if (allowTilting) {
+                _targetRotation = transform.localRotation;
+            }
+            else {
+                _targetRotation = transform.rotation;
+            }
         }
         
         private void OnEnable()
@@ -66,8 +74,12 @@ namespace RyanMillerGameCore.Character
         {
             if (lerpSpeed > 0)
             {
-                transform.localRotation =
-                    Quaternion.Lerp(transform.localRotation, _targetRotation, DeltaTimeValue() * lerpSpeed);
+                if (allowTilting) {
+                    transform.localRotation = Quaternion.Lerp(transform.localRotation, _targetRotation, DeltaTimeValue() * lerpSpeed);
+                }
+                else {
+                    transform.rotation = Quaternion.Lerp(transform.rotation, _targetRotation, DeltaTimeValue() * lerpSpeed);
+                }
             }
         }
 
@@ -85,7 +97,12 @@ namespace RyanMillerGameCore.Character
             _targetRotation = targetRot;
             if (immediately || lerpSpeed <= 0)
             {
-                transform.localRotation = _targetRotation;
+                if (allowTilting) {
+                    transform.localRotation = _targetRotation;
+                }
+                else {
+                    transform.rotation = _targetRotation;
+                }
             }
         }
     }
