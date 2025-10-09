@@ -66,6 +66,7 @@ namespace RyanMillerGameCore.Camera {
 			if (!defaultTarget && !_target) {
 				if (CharacterManager.Instance) {
 					Target = CharacterManager.Instance.Player.transform;
+					defaultTarget = Target;
 					_readyToTrack = true;
 				}
 			}
