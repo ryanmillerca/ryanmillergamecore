@@ -14,7 +14,7 @@ namespace RyanMillerGameCore.Character
         [NonSerialized] private CharacterMovement _characterMovement;
 
         private void Awake() {
-            _targetRotation = transform.rotation;
+            _targetRotation = transform.localRotation;
         }
         
         private void OnEnable()
@@ -66,8 +66,8 @@ namespace RyanMillerGameCore.Character
         {
             if (lerpSpeed > 0)
             {
-                transform.rotation =
-                    Quaternion.Lerp(transform.rotation, _targetRotation, DeltaTimeValue() * lerpSpeed);
+                transform.localRotation =
+                    Quaternion.Lerp(transform.localRotation, _targetRotation, DeltaTimeValue() * lerpSpeed);
             }
         }
 
@@ -85,7 +85,7 @@ namespace RyanMillerGameCore.Character
             _targetRotation = targetRot;
             if (immediately || lerpSpeed <= 0)
             {
-                transform.rotation = _targetRotation;
+                transform.localRotation = _targetRotation;
             }
         }
     }
