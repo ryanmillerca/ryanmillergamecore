@@ -1,2 +1,16 @@
 fileFormatVersion: 2
 guid: 3ba620d73dfb245d6a109d1654e64674
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - tileObjectManager: {instanceID: 0}
+  - worldCamera: {instanceID: 0}
+  - uiPoint: {fileID: -1654692200621890270, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  - uiPlaceTile: {fileID: 2663622381166474787, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  - uiRemoveTile: {fileID: 7404482986924587696, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -10,6 +10,8 @@ namespace RyanMillerGameCore.LevelToys
 
     public class Breakable : MonoBehaviour, ITakesDamage
     {
+        [SerializeField] private UnityEvent OnBroken;
+        
         #pragma warning disable CS0067
         public event Action Died;
         public event Action Spawned;
@@ -18,11 +20,11 @@ namespace RyanMillerGameCore.LevelToys
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private Collider _collider;
         [SerializeField] private float maxDurability = 1;
-        [SerializeField] private UnityEvent OnBroken;
         [SerializeField] private Rigidbody[] passOnForceToThese;
         [SerializeField] private bool unparentForceTakers = true;
         [SerializeField] private float randomAngularForce = 100;
         [SerializeField] private WeightedIDTable dropTable;
+        
         private EnableDisabler _enableDisabler;
         private float currentDurability;
         private Vector3 _storedVelocity;
