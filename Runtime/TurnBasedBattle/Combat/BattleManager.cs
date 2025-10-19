@@ -49,43 +49,29 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				// Tick gauges
 				foreach (var c in m_Combatants.Where(c => c.isAlive)) {
 					c.m_TurnGauge += c.m_Speed * m_TickRate;
-					//c.m_TurnGauge = Mathf.Min(c.m_TurnGauge, m_GaugeThreshold);
 				}
 
-				// Process ready combatants
-				var readyToAct = m_Combatants
-				.Where(c => c.isAlive && c.m_TurnGauge >= m_GaugeThreshold)
-				.OrderByDescending(c => c.m_TurnGauge)
-				.ToList();
-
-				// Process ready combatants (dynamic, recalculated each iteration)
-				while (true) {
-					// stop early if battle ended
-					if (!EnemiesAreAlive() || !CombatantsAreAlive()) break;
-
-					// choose the next combatant with gauge >= threshold
+				// Process turns one at a time until no one is ready
+				bool processedTurn;
+				do {
+					processedTurn = false;
+            
+					// Find the combatant with the highest gauge that's ready
 					var next = m_Combatants
 					.Where(c => c.isAlive && c.m_TurnGauge >= m_GaugeThreshold)
 					.OrderByDescending(c => c.m_TurnGauge)
 					.FirstOrDefault();
 
-					if (next == null) break;
-
-					// Let the selected combatant act as many times as they have whole thresholds
-					while (next != null && next.isAlive && next.m_TurnGauge >= m_GaugeThreshold) {
-						Debug.Log($"Starting turn coroutine for {next.m_CombatantName} (gauge={next.m_TurnGauge})");
+					if (next != null) {
+						if (!EnemiesAreAlive() || !CombatantsAreAlive()) break;
+                
+//						Debug.Log($"Starting turn coroutine for {next.m_CombatantName} (gauge={next.m_TurnGauge})");
 						yield return StartCoroutine(TakeTurn(next));
-
-						// subtract one threshold per action
 						next.m_TurnGauge -= m_GaugeThreshold;
-
-						// if battle ended by this action stop everything
-						if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
-							Debug.Log("Battle condition met after action — stopping further turns this tick.");
-							break;
-						}
+						processedTurn = true;
 					}
-				}
+				} while (processedTurn);
+
 				DisplayTurnOrder();
 				yield return new WaitForSeconds(m_TickRate);
 			}
@@ -142,7 +128,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			// Diagnostics: how many results, how many dealt damage/healing
 			int damageCount = results?.Count(r => r.DamageDealt > 0) ?? 0;
 			int healCount = results?.Count(r => r.HealingDone > 0) ?? 0;
-			Debug.Log($"[Resolve] Results={results?.Count ?? 0}, DamageResults={damageCount}, HealResults={healCount}, AliveCombatants={m_Combatants.Count(x => x.isAlive)}, EnemiesAlive={m_Combatants.Count(x => x.isAlive && !x.m_IsPlayer)}");
+//			Debug.Log($"[Resolve] Results={results?.Count ?? 0}, DamageResults={damageCount}, HealResults={healCount}, AliveCombatants={m_Combatants.Count(x => x.isAlive)}, EnemiesAlive={m_Combatants.Count(x => x.isAlive && !x.m_IsPlayer)}");
 
 			// If resolve somehow killed the last enemy, bail out early (prevents further processing)
 			if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
