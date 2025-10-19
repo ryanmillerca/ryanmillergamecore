@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RyanMillerGameCore.TurnBasedBattle
+namespace RyanMillerGameCore.TurnBasedCombat
 {
     public static class MoveResolver
     {
@@ -126,7 +126,7 @@ namespace RyanMillerGameCore.TurnBasedBattle
             }
         }
 
-        private static void ApplyBuff(Combatant target, BattleActionDef action)
+        private static void ApplyBuff(Combatant target, BattleAction action)
         {
             if (action.m_AttackModifier != 0) target.m_Attack += Mathf.RoundToInt(target.m_Attack * action.m_AttackModifier);
             if (action.m_DefenseModifier != 0) target.m_Defense += Mathf.RoundToInt(target.m_Defense * action.m_DefenseModifier);
@@ -134,7 +134,7 @@ namespace RyanMillerGameCore.TurnBasedBattle
             // Duration tracking would be handled by another system
         }
 
-        private static void ApplyDebuff(Combatant target, BattleActionDef action)
+        private static void ApplyDebuff(Combatant target, BattleAction action)
         {
             if (action.m_AttackModifier != 0) target.m_Attack -= Mathf.RoundToInt(target.m_Attack * action.m_AttackModifier);
             if (action.m_DefenseModifier != 0) target.m_Defense -= Mathf.RoundToInt(target.m_Defense * action.m_DefenseModifier);

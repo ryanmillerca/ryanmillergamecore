@@ -1,4 +1,4 @@
-namespace RyanMillerGameCore.TurnBasedBattle
+namespace RyanMillerGameCore.TurnBasedCombat
 {
     using System.Collections;
     using System.Collections.Generic;

@@ -1,4 +1,4 @@
-namespace RyanMillerGameCore.TurnBasedBattle {
+namespace RyanMillerGameCore.TurnBasedCombat {
 	using System.Collections.Generic;
 	using UnityEngine;
 
@@ -9,7 +9,7 @@ namespace RyanMillerGameCore.TurnBasedBattle {
 		public int m_Defense = 10;
 		public int m_Speed = 10;
 		public int m_CurrentHp = 100;
-		public List<BattleActionDef> m_Moves;
+		public List<BattleAction> m_Moves;
 
 		[HideInInspector] public float m_TurnGauge = 0f; // 0-100 gauge
 

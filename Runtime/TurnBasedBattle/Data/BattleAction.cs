@@ -1,9 +1,8 @@
-
-namespace RyanMillerGameCore.TurnBasedBattle {
+namespace RyanMillerGameCore.TurnBasedCombat {
 	using UnityEngine;
 
 	[CreateAssetMenu(menuName = "Battle/Action")]
-	public class BattleActionDef : ScriptableObject {
+	public class BattleAction : ScriptableObject {
 		[Header("Basic Info")]
 		public string m_ActionName = "Tackle";
 		public ActionType m_ActionType = ActionType.Damage;
@@ -40,5 +39,4 @@ namespace RyanMillerGameCore.TurnBasedBattle {
 		Debuff,
 		Item
 	}
-
 }

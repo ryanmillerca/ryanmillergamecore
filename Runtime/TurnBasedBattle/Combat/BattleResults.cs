@@ -1,10 +1,10 @@
-namespace RyanMillerGameCore.TurnBasedBattle
+namespace RyanMillerGameCore.TurnBasedCombat
 {
 	public class BattleResult
 	{
 		public Combatant Actor;
 		public Combatant Target;
-		public BattleActionDef BattleAction;
+		public BattleAction BattleAction;
 
 		public int DamageDealt;
 		public int HealingDone;
