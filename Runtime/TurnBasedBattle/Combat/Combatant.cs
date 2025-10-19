@@ -26,6 +26,13 @@ namespace RyanMillerGameCore.TurnBasedCombat
         [HideInInspector] public MultiTurnActionState currentMultiTurnAction;
         [HideInInspector] public bool isCharging = false;
 
+        [HideInInspector] public bool isDefending = false;
+        [HideInInspector] public int defendTurnsRemaining = 0;
+        [HideInInspector] public float defendDamageReduction = 1f;
+        [HideInInspector] public float counterAttackChance = 0f;
+        [HideInInspector] public float counterAttackMultiplier = 1f;
+        [HideInInspector] public Combatant lastAttacker = null;
+
         public delegate void OnCombatantEvent(CombatantEventData eventData);
         public event OnCombatantEvent CombatantEvent;
 
@@ -50,6 +57,104 @@ namespace RyanMillerGameCore.TurnBasedCombat
                 Amount = amount,
                 Timestamp = Time.time
             });
+        }
+
+        public void StartDefend(BattleAction defendAction)
+        {
+            isDefending = true;
+            defendTurnsRemaining = defendAction.m_DefendDuration;
+            defendDamageReduction = defendAction.m_DamageReduction;
+            counterAttackChance = defendAction.m_CounterChance;
+            counterAttackMultiplier = defendAction.m_CounterMultiplier;
+
+            RaiseCombatantEvent(CombatantEventType.DefendStarted,
+                $"{m_CombatantName} takes a defensive stance! Damage reduced by {((1f - defendDamageReduction) * 100f):0}% for {defendTurnsRemaining} turn(s).");
+        }
+
+        public void EndDefend()
+        {
+            if (isDefending)
+            {
+                isDefending = false;
+                defendTurnsRemaining = 0;
+                defendDamageReduction = 1f;
+                counterAttackChance = 0f;
+                counterAttackMultiplier = 1f;
+                lastAttacker = null;
+
+                RaiseCombatantEvent(CombatantEventType.DefendEnded,
+                    $"{m_CombatantName} drops defensive stance.");
+            }
+        }
+
+        public void AdvanceDefendTurn()
+        {
+            if (isDefending)
+            {
+                defendTurnsRemaining--;
+                if (defendTurnsRemaining <= 0)
+                {
+                    EndDefend();
+                }
+            }
+        }
+
+        public bool TryCounterAttack(Combatant attacker)
+        {
+            if (!isDefending || !isAlive || !attacker.isAlive)
+                return false;
+
+            if (Random.value <= counterAttackChance)
+            {
+                lastAttacker = attacker;
+                return true;
+            }
+            return false;
+        }
+
+        public void TakeDamage(int dmg, Combatant attacker = null)
+        {
+            int originalDamage = dmg;
+            
+            if (isDefending)
+            {
+                dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * defendDamageReduction));
+            }
+
+            int previousHp = m_CurrentHp;
+            m_CurrentHp -= dmg;
+            if (m_CurrentHp < 0)
+            {
+                m_CurrentHp = 0;
+            }
+
+            string defendText = isDefending ? $" (reduced from {originalDamage} due to defense)" : "";
+            RaiseCombatantEvent(CombatantEventType.DamageTaken,
+                $"{m_CombatantName} takes {dmg} damage{defendText}. (HP: {m_CurrentHp}/{m_MaxHp})", dmg);
+
+            if (isDefending && attacker != null && dmg > 0)
+            {
+                if (TryCounterAttack(attacker))
+                {
+                    RaiseCombatantEvent(CombatantEventType.CounterAttack,
+                        $"{m_CombatantName} prepares a counter attack against {attacker.m_CombatantName}!");
+                }
+            }
+
+            if (m_CurrentHp == 0 && previousHp > 0)
+            {
+                if (isCharging && currentMultiTurnAction != null)
+                {
+                    CancelMultiTurnAction();
+                }
+                EndDefend();
+                Die();
+            }
+        }
+
+        public void TakeDamage(int dmg)
+        {
+            TakeDamage(dmg, null);
         }
 
         public void StartMultiTurnAction(BattleAction action, Combatant target)
@@ -168,29 +273,6 @@ namespace RyanMillerGameCore.TurnBasedCombat
             }
         }
 
-        public void TakeDamage(int dmg)
-        {
-            int previousHp = m_CurrentHp;
-            m_CurrentHp -= dmg;
-            if (m_CurrentHp < 0)
-            {
-                m_CurrentHp = 0;
-            }
-
-            RaiseCombatantEvent(CombatantEventType.DamageTaken,
-                $"{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})", dmg);
-
-            if (m_CurrentHp == 0 && previousHp > 0)
-            {
-                // Only cancel multi-turn action if we were actually charging one
-                if (isCharging && currentMultiTurnAction != null)
-                {
-                    CancelMultiTurnAction();
-                }
-                Die();
-            }
-        }
-
         public void Die()
         {
             RaiseCombatantEvent(CombatantEventType.Died, $"{m_CombatantName} died!");
@@ -269,7 +351,10 @@ namespace RyanMillerGameCore.TurnBasedCombat
         Charging,
         ChargeComplete,
         ChargeCancelled,
-        ChargeDamage
+        ChargeDamage,
+        DefendStarted,
+        DefendEnded,
+        CounterAttack
     }
 
     public struct CombatantEventData

@@ -1,10 +1,8 @@
 using UnityEngine;
 
-namespace RyanMillerGameCore.TurnBasedCombat
-{
+namespace RyanMillerGameCore.TurnBasedCombat {
 	[CreateAssetMenu(menuName = "Battle/Action")]
-	public class BattleAction : ScriptableObject
-	{
+	public class BattleAction : ScriptableObject {
 		[Header("Basic Info")]
 		public string m_ActionName = "Tackle";
 		public ActionType m_ActionType = ActionType.Damage;
@@ -22,6 +20,16 @@ namespace RyanMillerGameCore.TurnBasedCombat
 		public float m_DefenseModifier = 0f;
 		public float m_SpeedModifier = 0f;
 
+		[Header("Defend Action")]
+		[Tooltip("Damage reduction multiplier when defending (0.5 = 50% damage taken)")]
+		public float m_DamageReduction = 0.5f;
+		[Tooltip("Turns the defend state lasts")]
+		public int m_DefendDuration = 1;
+		[Tooltip("Counter attack chance when defending")]
+		public float m_CounterChance = 0f;
+		[Tooltip("Counter attack power multiplier")]
+		public float m_CounterMultiplier = 1f;
+
 		[Header("Multi-Turn Actions")]
 		public bool m_IsMultiTurn = false;
 		[Tooltip("How many turns this action takes to complete")]
@@ -37,8 +45,7 @@ namespace RyanMillerGameCore.TurnBasedCombat
 		public bool m_TargetSelf = false;
 	}
 
-	public enum ActionTargetType
-	{
+	public enum ActionTargetType {
 		Self,
 		SingleEnemy,
 		AllEnemies,
@@ -46,17 +53,16 @@ namespace RyanMillerGameCore.TurnBasedCombat
 		AllAllies
 	}
 
-	public enum ActionType
-	{
+	public enum ActionType {
 		Damage,
 		Heal,
 		Buff,
 		Debuff,
-		Item
+		Item,
+		Defend
 	}
 
-	public enum ChargeTurnBehavior
-	{
+	public enum ChargeTurnBehavior {
 		Nothing,
 		ApplyDefenseBuff,
 		ApplySpeedDebuff,

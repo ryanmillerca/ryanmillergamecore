@@ -154,15 +154,19 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			RaiseTurnEvent(TurnEventType.TurnStarted, c);
 
-			// Check if combatant is charging a multi-turn action
+			// Advance defend turns for all combatants at the start of each turn
+			foreach (var combatant in m_Combatants) {
+				if (combatant.isAlive) {
+					combatant.AdvanceDefendTurn();
+				}
+			}
+
 			if (c.isCharging && c.currentMultiTurnAction != null) {
 				bool actionReady = c.AdvanceMultiTurnAction();
 
 				if (actionReady) {
-					// Execute the charged action
 					var multiTurnAction = c.currentMultiTurnAction;
 
-					// Check if the original target is still alive, if not find a new target
 					Combatant finalTarget = multiTurnAction.target;
 					if (finalTarget == null || !finalTarget.isAlive) {
 						var validTargets = GetValidTargets(c);
@@ -172,7 +176,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 								$"{c.m_CombatantName}'s {multiTurnAction.action.m_ActionName} retargeted to {finalTarget.m_CombatantName}!", c, finalTarget);
 						}
 						else {
-							// No valid targets available, cancel the action
 							RaiseBattleEvent(BattleEventType.NoValidTargets,
 								$"{c.m_CombatantName}'s {multiTurnAction.action.m_ActionName} has no valid targets! Action wasted.", c);
 							c.CompleteMultiTurnAction();
@@ -184,7 +187,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 					RaiseTurnEvent(TurnEventType.ActionSelected, c, finalTarget, multiTurnAction.action);
 
-					// Resolve the move with multi-turn context
 					List<BattleResult> results = null;
 					try {
 						results = MoveResolver.Resolve(cmd, m_Combatants, true, multiTurnAction.action.m_ChargeMultiplier);
@@ -195,10 +197,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 						yield break;
 					}
 
-					// Clean up multi-turn state
 					c.CompleteMultiTurnAction();
 
-					// Fire events for results
 					if (results != null) {
 						foreach (var result in results) {
 							try {
@@ -210,10 +210,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 						}
 					}
 				}
-				// If not ready, just continue (combatant spent turn charging)
 			}
 			else {
-				// Normal turn logic (existing code remains the same)
 				var validTargets = GetValidTargets(c);
 				if (validTargets.Count == 0) {
 					RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {c.m_CombatantName}. Ending turn.", c);
@@ -266,7 +264,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				}
 			}
 
-			// Check battle end conditions
 			if (!PlayersAreAlive() || !EnemiesAreAlive()) {
 				RaiseBattleEvent(BattleEventType.BattleEndConditionMet, $"After {c.m_CombatantName}'s action, battle end condition met.", c);
 				yield break;
@@ -324,8 +321,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 	}
 
-	public enum BattleEventType
-	{
+	public enum BattleEventType {
 		BattleStarted,
 		BattleEnded,
 		TurnSkipped,

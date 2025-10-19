@@ -24,7 +24,32 @@ namespace RyanMillerGameCore.TurnBasedCombat
                 return results;
             }
 
-            // Check if target is null (can happen with delayed actions)
+            if (!cmd.Actor.isAlive)
+            {
+                results.Add(new BattleResult
+                {
+                    Message = $"{cmd.Actor.m_CombatantName} is down and cannot act.",
+                    Success = false
+                });
+                return results;
+            }
+
+            if (cmd.BattleAction.m_ActionType == ActionType.Defend)
+            {
+                var result = new BattleResult
+                {
+                    Actor = cmd.Actor,
+                    Target = cmd.Actor,
+                    BattleAction = cmd.BattleAction,
+                    Success = true
+                };
+
+                cmd.Actor.StartDefend(cmd.BattleAction);
+                result.Message = $"{cmd.Actor.m_CombatantName} defends!";
+                results.Add(result);
+                return results;
+            }
+
             if (!cmd.Target)
             {
                 results.Add(new BattleResult
@@ -59,6 +84,16 @@ namespace RyanMillerGameCore.TurnBasedCombat
                     Message = $"{cmd.Actor.m_CombatantName} used {cmd.BattleAction.m_ActionName} but missed!"
                 });
                 return results;
+            }
+
+            if (cmd.Target != null && cmd.Target.lastAttacker == cmd.Actor && cmd.Target.isDefending)
+            {
+                var counterResult = ResolveCounterAttack(cmd.Target, cmd.Actor);
+                if (counterResult != null)
+                {
+                    results.Add(counterResult);
+                }
+                cmd.Target.lastAttacker = null;
             }
 
             var targets = GetTargets(cmd, allCombatants);
@@ -120,6 +155,31 @@ namespace RyanMillerGameCore.TurnBasedCombat
             return results;
         }
 
+        private static BattleResult ResolveCounterAttack(Combatant defender, Combatant attacker)
+        {
+            if (!defender.isAlive || !attacker.isAlive)
+                return null;
+
+            var counterAction = ScriptableObject.CreateInstance<BattleAction>();
+            counterAction.m_ActionName = "Counter Attack";
+            counterAction.m_ActionType = ActionType.Damage;
+            counterAction.m_Power = Mathf.RoundToInt(defender.m_Attack * defender.counterAttackMultiplier);
+            counterAction.m_Accuracy = 1f;
+
+            var counterCmd = new BattleCommand(defender, counterAction, attacker);
+            var counterResult = CalculateDamage(counterCmd, attacker, new BattleResult
+            {
+                Actor = defender,
+                Target = attacker,
+                BattleAction = counterAction,
+                Success = true
+            }, false, 1f);
+
+            counterResult.Message = $"{defender.m_CombatantName} counter attacks {attacker.m_CombatantName} for {counterResult.DamageDealt} damage!";
+
+            return counterResult;
+        }
+
         private static BattleResult CalculateDamage(BattleCommand cmd, Combatant target, BattleResult result, bool isChargedAction, float chargeMultiplier)
         {
             float attack = cmd.Actor.m_Attack * cmd.BattleAction.m_StatMultiplier;
@@ -143,7 +203,7 @@ namespace RyanMillerGameCore.TurnBasedCombat
                 result.CriticalChance = critChance;
             }
 
-            target.TakeDamage(damage);
+            target.TakeDamage(damage, cmd.Actor);
             result.DamageDealt = damage;
 
             string critText = isCritical ? " (CRITICAL HIT!)" : "";
