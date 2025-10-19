@@ -1,15 +1,15 @@
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace RyanMillerGameCore.TurnBasedCombat
 {
+    using System.Collections.Generic;
+    using UnityEngine;
+
     public static class MoveResolver
     {
         public static List<BattleResult> Resolve(BattleCommand cmd, List<Combatant> allCombatants = null)
         {
             var results = new List<BattleResult>();
 
-            if (cmd.Actor == null || cmd.BattleAction == null || cmd.Target == null)
+            if (!cmd.Actor || !cmd.BattleAction || !cmd.Target)
             {
                 results.Add(new BattleResult { Message = "Invalid command." });
                 return results;
