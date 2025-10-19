@@ -26,11 +26,30 @@ namespace RyanMillerGameCore.TurnBasedCombat
             StartCoroutine(BattleLoop());
         }
 
+        bool EnemiesAreAlive() {
+            foreach (Combatant c in m_Combatants) {
+                if (c.isAlive && c.m_IsPlayer == false) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool CombatantsAreAlive() {
+            int aliveCombatants = 0;
+            foreach (Combatant c in m_Combatants) {
+                if (c.isAlive) {
+                    aliveCombatants++;
+                }
+            }
+            return aliveCombatants > 1;
+        }
+
         private IEnumerator BattleLoop()
         {
             m_BattleActive = true;
 
-            while (m_Combatants.Any(c => c.isAlive))
+            while (EnemiesAreAlive() && CombatantsAreAlive())
             {
                 // Tick gauges
                 foreach (var c in m_Combatants.Where(c => c.isAlive))
@@ -63,13 +82,17 @@ namespace RyanMillerGameCore.TurnBasedCombat
         {
             // Pick first alive target that is not self
             var target = m_Combatants.FirstOrDefault(t => t.isAlive && t != c);
-            if (!target) yield break;
+            if (!target) {
+                yield break;
+            }
 
             var cmd = new BattleCommand(c, c.m_Moves[0], target);
-
+            
             // Pass full combatant list for AoE / group actions
             List<BattleResult> results = MoveResolver.Resolve(cmd, m_Combatants);
 
+            Debug.Log($"It's {c.m_CombatantName}'s turn. They {cmd.BattleAction.m_ActionName} with target {cmd.Target.m_CombatantName}.");
+            
             // Fire events for each affected target
             foreach (var result in results)
             {
@@ -83,7 +106,7 @@ namespace RyanMillerGameCore.TurnBasedCombat
         {
             var upcoming = GetUpcomingTurns();
             string queue = string.Join(" -> ", upcoming.Select(c => $"{c.m_CombatantName} ({c.m_TurnGauge:0})"));
-            Debug.Log("Upcoming Turns: " + queue);
+       //     Debug.Log("Upcoming Turns: " + queue);
         }
 
         public List<Combatant> GetUpcomingTurns()
