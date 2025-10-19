@@ -1,8 +1,10 @@
-namespace RyanMillerGameCore.TurnBasedCombat {
-	using UnityEngine;
+using UnityEngine;
 
+namespace RyanMillerGameCore.TurnBasedCombat
+{
 	[CreateAssetMenu(menuName = "Battle/Action")]
-	public class BattleAction : ScriptableObject {
+	public class BattleAction : ScriptableObject
+	{
 		[Header("Basic Info")]
 		public string m_ActionName = "Tackle";
 		public ActionType m_ActionType = ActionType.Damage;
@@ -11,20 +13,32 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public float m_CritChance = 0f;
 
 		[Header("Damage / Heal")]
-		public int m_Power = 10; // Used for damage or heal
-		public float m_StatMultiplier = 1f; // Multiplier for attack stat
+		public int m_Power = 10;
+		public float m_StatMultiplier = 1f;
 
 		[Header("Buff / Debuff (optional)")]
-		public float m_Duration = 0f; // in turns
-		public float m_AttackModifier = 0f; // e.g. +0.2 = +20% attack
+		public float m_Duration = 0f;
+		public float m_AttackModifier = 0f;
 		public float m_DefenseModifier = 0f;
 		public float m_SpeedModifier = 0f;
 
+		[Header("Multi-Turn Actions")]
+		public bool m_IsMultiTurn = false;
+		[Tooltip("How many turns this action takes to complete")]
+		public int m_TurnCost = 1;
+		[Tooltip("What happens during charge turns")]
+		public ChargeTurnBehavior m_ChargeTurnBehavior = ChargeTurnBehavior.Nothing;
+		[Tooltip("Message displayed during charge turns")]
+		public string m_ChargeMessage = " is charging...";
+		[Tooltip("Bonus multiplier when fully charged (applies to final damage/healing)")]
+		public float m_ChargeMultiplier = 1.5f;
+
 		[Header("Other")]
-		public bool m_TargetSelf = false; // override TargetType if true
+		public bool m_TargetSelf = false;
 	}
 
-	public enum ActionTargetType {
+	public enum ActionTargetType
+	{
 		Self,
 		SingleEnemy,
 		AllEnemies,
@@ -32,11 +46,21 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		AllAllies
 	}
 
-	public enum ActionType {
+	public enum ActionType
+	{
 		Damage,
 		Heal,
 		Buff,
 		Debuff,
 		Item
+	}
+
+	public enum ChargeTurnBehavior
+	{
+		Nothing,
+		ApplyDefenseBuff,
+		ApplySpeedDebuff,
+		TakeDamage,
+		CustomEffect
 	}
 }

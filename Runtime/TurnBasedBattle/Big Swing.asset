@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 01970ece3270a462d96a2d9a82ffdf69, type: 3}
-  m_Name: Fight
+  m_Name: Big Swing
   m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.BattleAction
   m_ActionName: Fight
   m_ActionType: 0
