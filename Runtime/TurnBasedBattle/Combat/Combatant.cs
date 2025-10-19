@@ -29,14 +29,21 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				m_CurrentHp = 0;
 			}
 			Debug.Log($"{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})");
+			if (isAlive == false) {
+				Debug.Log($"{m_CombatantName} died!");
+			}
 		}
 
 		public void Heal(int amount) {
 			m_CurrentHp += amount;
 			if (m_CurrentHp > m_MaxHp) {
+				Debug.Log($"{m_CombatantName} heals {amount}. (HP: {m_CurrentHp}/{m_MaxHp})");
 				m_CurrentHp = m_MaxHp;
 			}
 			Debug.Log($"{m_CombatantName} heals {amount}. (HP: {m_CurrentHp}/{m_MaxHp})");
+			if (m_CurrentHp == m_MaxHp) {
+				Debug.Log($"{m_CombatantName} is at full health!");
+			}
 		}
 	}
 }
