@@ -10,7 +10,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public int m_Speed = 10;
 		public int m_CurrentHp = 100;
 		public List<BattleAction> m_Moves;
-
+		public bool m_IsPlayer = false;
 		[HideInInspector] public float m_TurnGauge = 0f; // 0-100 gauge
 
 		private void Awake() {
