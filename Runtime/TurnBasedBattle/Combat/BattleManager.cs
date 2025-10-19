@@ -16,14 +16,44 @@ namespace RyanMillerGameCore.TurnBasedCombat {
         #pragma warning disable CS0414
 		private bool m_BattleActive = false;
 
+		// Event declarations
 		public delegate void OnMoveResolved(BattleResult result);
 		public event OnMoveResolved MoveResolved;
+
+		public delegate void OnBattleEvent(BattleEventData eventData);
+		public event OnBattleEvent BattleEvent;
+
+		public delegate void OnTurnEvent(TurnEventData eventData);
+		public event OnTurnEvent TurnEvent;
+
+		public delegate void OnBattleOutcome(BattleOutcome outcome);
+		public event OnBattleOutcome BattleEnded;
 
 		private void Start() {
 			StartCoroutine(BattleLoop());
 		}
 
-		// New team-based victory conditions
+		private void RaiseBattleEvent(BattleEventType eventType, string message, Combatant combatant = null, Combatant target = null) {
+			BattleEvent?.Invoke(new BattleEventData {
+				EventType = eventType,
+				Message = message,
+				Combatant = combatant,
+				Target = target,
+				Timestamp = Time.time
+			});
+		}
+
+		private void RaiseTurnEvent(TurnEventType eventType, Combatant combatant, Combatant target = null, BattleAction action = null) {
+			TurnEvent?.Invoke(new TurnEventData {
+				EventType = eventType,
+				Combatant = combatant,
+				Target = target,
+				Action = action,
+				Timestamp = Time.time
+			});
+		}
+
+		// Team-based victory conditions
 		bool PlayersAreAlive() {
 			foreach (Combatant c in m_Combatants) {
 				if (c.isAlive && c.m_Team == Team.Player) {
@@ -44,6 +74,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 		private IEnumerator BattleLoop() {
 			m_BattleActive = true;
+			RaiseBattleEvent(BattleEventType.BattleStarted, "Battle started!");
 
 			var turnQueue = new Queue<Combatant>();
 
@@ -66,17 +97,23 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 
 			m_BattleActive = false;
-			
+
 			// Determine battle outcome
+			BattleOutcome outcome;
 			if (PlayersAreAlive() && !EnemiesAreAlive()) {
-				Debug.Log("Victory! All enemies defeated!");
+				outcome = BattleOutcome.Victory;
+				RaiseBattleEvent(BattleEventType.BattleEnded, "Victory! All enemies defeated!");
 			}
 			else if (!PlayersAreAlive() && EnemiesAreAlive()) {
-				Debug.Log("Defeat! All players are down!");
+				outcome = BattleOutcome.Defeat;
+				RaiseBattleEvent(BattleEventType.BattleEnded, "Defeat! All players are down!");
 			}
 			else {
-				Debug.Log("Battle ended unexpectedly!");
+				outcome = BattleOutcome.Undefined;
+				RaiseBattleEvent(BattleEventType.BattleEnded, "Battle ended unexpectedly!");
 			}
+
+			BattleEnded?.Invoke(outcome);
 		}
 
 		private void FillTurnQueueEvenly(Queue<Combatant> turnQueue) {
@@ -125,37 +162,39 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			if (c == null) yield break;
 
 			if (!c.isAlive) {
-				Debug.LogWarning($"<color={c.ColorAsHex}>TakeTurn: {c?.m_CombatantName ?? "NULL"} was dead at turn start — skipping.<color>");
+				RaiseBattleEvent(BattleEventType.TurnSkipped, $"{c.m_CombatantName} was dead at turn start — skipping.", c);
 				yield break;
 			}
+
+			RaiseTurnEvent(TurnEventType.TurnStarted, c);
 
 			// Get valid targets based on team affiliation
 			var validTargets = GetValidTargets(c);
 			if (validTargets.Count == 0) {
-				Debug.LogWarning($"<color={c.ColorAsHex}>TakeTurn: no valid targets found for {c.m_CombatantName}. Ending turn.</color>");
+				RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {c.m_CombatantName}. Ending turn.", c);
 				yield break;
 			}
 
 			// Safety: make sure there is at least one move
 			if (c.m_Moves == null || c.m_Moves.Count == 0) {
-				Debug.LogWarning($"<color={c.ColorAsHex}>TakeTurn: {c.m_CombatantName} has no moves. Ending turn.</color>");
+				RaiseBattleEvent(BattleEventType.NoMovesAvailable, $"{c.m_CombatantName} has no moves. Ending turn.", c);
 				yield break;
 			}
 
 			// Pick a random valid target
 			var target = validTargets[Random.Range(0, validTargets.Count)];
-			
+			var action = c.m_Moves[0];
+
 			BattleCommand cmd;
 			try {
-				cmd = new BattleCommand(c, c.m_Moves[0], target);
+				cmd = new BattleCommand(c, action, target);
 			}
 			catch (System.Exception ex) {
-				Debug.LogError($"TakeTurn: exception constructing BattleCommand for {c.m_CombatantName}: {ex}");
+				RaiseBattleEvent(BattleEventType.CommandError, $"Exception constructing BattleCommand for {c.m_CombatantName}: {ex}", c);
 				yield break;
 			}
 
-			// LOG: show the player's intention before Resolve so logs read intuitively
-			Debug.Log($"<color={c.ColorAsHex}>It's {c.m_CombatantName}'s turn. They {cmd.BattleAction?.m_ActionName ?? "NULL ACTION"} with target {cmd.Target?.m_CombatantName ?? "NULL"}.</color>");
+			RaiseTurnEvent(TurnEventType.ActionSelected, c, target, action);
 
 			// Resolve the move (this is where damage/heal/buffs are applied)
 			List<BattleResult> results = null;
@@ -163,13 +202,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				results = MoveResolver.Resolve(cmd, m_Combatants);
 			}
 			catch (System.Exception ex) {
-				Debug.LogError($"TakeTurn: MoveResolver.Resolve threw for {c.m_CombatantName}: {ex}");
+				RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {c.m_CombatantName}: {ex}", c);
 				yield break;
 			}
 
 			// If resolve somehow killed the last enemy, bail out early (prevents further processing)
 			if (!PlayersAreAlive() || !EnemiesAreAlive()) {
-				Debug.Log($"After {c.m_CombatantName}'s action, battle end condition met. Ending turn early.");
+				RaiseBattleEvent(BattleEventType.BattleEndConditionMet, $"After {c.m_CombatantName}'s action, battle end condition met. Ending turn early.", c);
 				yield break;
 			}
 
@@ -180,37 +219,38 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 						MoveResolved?.Invoke(result);
 					}
 					catch (System.Exception ex) {
-						Debug.LogError($"MoveResolved handler threw for {c.m_CombatantName}: {ex}");
+						RaiseBattleEvent(BattleEventType.EventHandlerError, $"MoveResolved handler threw for {c.m_CombatantName}: {ex}", c);
 						// continue so one bad subscriber doesn't kill the coroutine
 					}
 				}
 			}
 
+			RaiseTurnEvent(TurnEventType.TurnEnded, c);
 			yield return new WaitForSeconds(0.5f); // placeholder for animations
 		}
 
-		// New method to get valid targets based on team
+		// Method to get valid targets based on team
 		private List<Combatant> GetValidTargets(Combatant attacker) {
 			var validTargets = new List<Combatant>();
-			
+
 			foreach (var combatant in m_Combatants) {
-				if (!combatant.isAlive || combatant == attacker) 
+				if (!combatant.isAlive || combatant == attacker)
 					continue;
-					
+
 				// Players attack enemies, enemies attack players
 				// Same team members don't attack each other
 				if (attacker.m_Team != combatant.m_Team) {
 					validTargets.Add(combatant);
 				}
 			}
-			
+
 			return validTargets;
 		}
 
 		private void DisplayTurnOrder() {
 			var upcoming = GetUpcomingTurns();
 			string queue = string.Join(" -> ", upcoming.Select(c => $"{c.m_CombatantName} ({c.m_TurnGauge:0})"));
-			// Debug.Log("Upcoming Turns: " + queue);
+			RaiseBattleEvent(BattleEventType.TurnOrderUpdated, $"Upcoming Turns: {queue}");
 		}
 
 		public List<Combatant> GetUpcomingTurns() {
@@ -238,5 +278,47 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			return upcoming;
 		}
+	}
+
+	// Event data structures
+	public enum BattleEventType {
+		BattleStarted,
+		BattleEnded,
+		TurnSkipped,
+		NoValidTargets,
+		NoMovesAvailable,
+		CommandError,
+		ResolutionError,
+		EventHandlerError,
+		BattleEndConditionMet,
+		TurnOrderUpdated
+	}
+
+	public enum TurnEventType {
+		TurnStarted,
+		ActionSelected,
+		TurnEnded
+	}
+
+	public enum BattleOutcome {
+		Victory,
+		Defeat,
+		Undefined
+	}
+
+	public struct BattleEventData {
+		public BattleEventType EventType;
+		public string Message;
+		public Combatant Combatant;
+		public Combatant Target;
+		public float Timestamp;
+	}
+
+	public struct TurnEventData {
+		public TurnEventType EventType;
+		public Combatant Combatant;
+		public Combatant Target;
+		public BattleAction Action;
+		public float Timestamp;
 	}
 }

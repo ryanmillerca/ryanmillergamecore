@@ -20,15 +20,29 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public Team m_Team = Team.Enemy; // Replace m_IsPlayer with Team
 		[HideInInspector] public float m_TurnGauge = 0f; // 0-100 gauge
 		public Color m_Color;
-		
+
+		// Events for combatant-specific actions
+		public delegate void OnCombatantEvent(CombatantEventData eventData);
+		public event OnCombatantEvent CombatantEvent;
+
 		// Backwards compatibility property
 		public bool m_IsPlayer {
 			get { return m_Team == Team.Player; }
 			set { m_Team = value ? Team.Player : Team.Enemy; }
 		}
-		
+
 		private void Awake() {
 			m_CurrentHp = Mathf.Clamp(m_CurrentHp, 0, m_MaxHp);
+		}
+
+		private void RaiseCombatantEvent(CombatantEventType eventType, string message, int amount = 0) {
+			CombatantEvent?.Invoke(new CombatantEventData {
+				EventType = eventType,
+				Combatant = this,
+				Message = message,
+				Amount = amount,
+				Timestamp = Time.time
+			});
 		}
 
 		public string ColorAsHex {
@@ -44,31 +58,54 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		public void TakeDamage(int dmg) {
+			int previousHp = m_CurrentHp;
 			m_CurrentHp -= dmg;
 			if (m_CurrentHp < 0) {
 				m_CurrentHp = 0;
-				Die();
 			}
-			Debug.Log($"{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})");
-			if (isAlive == false) {
-				Debug.Log($"{m_CombatantName} died!");
+
+			RaiseCombatantEvent(CombatantEventType.DamageTaken,
+				$"{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})", dmg);
+
+			if (m_CurrentHp == 0 && previousHp > 0) {
+				Die();
 			}
 		}
 
 		public void Die() {
-			
+			RaiseCombatantEvent(CombatantEventType.Died, $"{m_CombatantName} died!");
 		}
 
 		public void Heal(int amount) {
+			int previousHp = m_CurrentHp;
 			m_CurrentHp += amount;
 			if (m_CurrentHp > m_MaxHp) {
-				Debug.Log($"<color={ColorAsHex}>{m_CombatantName} heals {amount}. (HP: {m_CurrentHp}/{m_MaxHp})</color>");
 				m_CurrentHp = m_MaxHp;
 			}
-			Debug.Log($"<color={ColorAsHex}>{m_CombatantName} heals {amount}. (HP: {m_CurrentHp}/{m_MaxHp})<color>");
+
+			int actualHeal = m_CurrentHp - previousHp;
+			RaiseCombatantEvent(CombatantEventType.HealingReceived,
+				$"{m_CombatantName} heals {actualHeal}. (HP: {m_CurrentHp}/{m_MaxHp})", actualHeal);
+
 			if (m_CurrentHp == m_MaxHp) {
-				Debug.Log($"<color={ColorAsHex}>{m_CombatantName} is at full health!<color>");
+				RaiseCombatantEvent(CombatantEventType.FullHealth, $"{m_CombatantName} is at full health!");
 			}
 		}
+	}
+
+	// Combatant event data structures
+	public enum CombatantEventType {
+		DamageTaken,
+		HealingReceived,
+		Died,
+		FullHealth
+	}
+
+	public struct CombatantEventData {
+		public CombatantEventType EventType;
+		public Combatant Combatant;
+		public string Message;
+		public int Amount;
+		public float Timestamp;
 	}
 }
