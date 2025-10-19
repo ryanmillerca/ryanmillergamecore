@@ -56,7 +56,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					var next = turnQueue.Dequeue();
 
 					if (next.isAlive) {
-						Debug.Log($"Starting turn coroutine for {next.m_CombatantName}");
+//						Debug.Log($"<color={next.ColorAsHex}>Starting turn coroutine for {next.m_CombatantName}</color>");
 						yield return StartCoroutine(TakeTurn(next));
 					}
 				}
@@ -119,7 +119,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield break;
 			}
 
-			Debug.Log($"<color={c.ColorAsHex}>TakeTurn started for {c.m_CombatantName} (alive={c.isAlive}).</color>");
+//			Debug.Log($"<color={c.ColorAsHex}>TakeTurn started for {c.m_CombatantName} (alive={c.isAlive}).</color>");
 
 			// Pick first alive target that is not self (snapshot target for this action)
 			var target = m_Combatants.FirstOrDefault(t => t.isAlive && t != c);
