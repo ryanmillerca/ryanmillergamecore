@@ -58,17 +58,40 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				.OrderByDescending(c => c.m_TurnGauge)
 				.ToList();
 
-				foreach (var c in readyToAct) {
-					if (!c.isAlive) {
-						Debug.Log($"{c.m_CombatantName} died before their turn; skipping.");
-						continue;
+				// Process ready combatants (dynamic, recalculated each iteration)
+				while (true) {
+					// If no enemies or not enough combatants, stop before selecting anyone
+					if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
+						Debug.Log("Battle condition met before selecting next actor — stopping action processing.");
+						break;
 					}
 
-					Debug.Log($"Starting turn coroutine for {c.m_CombatantName} (gauge={c.m_TurnGauge})");
-					yield return StartCoroutine(TakeTurn(c));
+					// pick the next ready-to-act combatant (highest gauge, alive, >= threshold)
+					var next = m_Combatants
+					.Where(c => c.isAlive && c.m_TurnGauge >= m_GaugeThreshold)
+					.OrderByDescending(c => c.m_TurnGauge)
+					.FirstOrDefault();
 
-					// make sure they still exist/alive? subtract gauge regardless, or only if alive?
-					c.m_TurnGauge -= m_GaugeThreshold;
+					if (next == null) {
+						// Nothing ready right now
+						break;
+					}
+
+					Debug.Log($"[BattleLoop] Next actor: {next.m_CombatantName} (gauge={next.m_TurnGauge}, alive={next.isAlive}). EnemiesAlive={EnemiesAreAlive()}. CombatantsAliveCount={m_Combatants.Count(c => c.isAlive)}");
+
+					// Start their turn
+					yield return StartCoroutine(TakeTurn(next));
+
+					// After the action resolved, check if the battle ended
+					if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
+						Debug.Log("Battle condition met after action — stopping further turns this tick.");
+						break;
+					}
+
+					// Subtract gauge only if they still exist (defensive)
+					if (next != null) {
+						next.m_TurnGauge -= m_GaugeThreshold;
+					}
 				}
 
 				DisplayTurnOrder();
@@ -80,18 +103,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private IEnumerator TakeTurn(Combatant c) {
-			if (c == null) {
-				yield break;
-			}
+			if (c == null) yield break;
 
 			if (!c.isAlive) {
-				Debug.LogWarning($"TakeTurn: {c.m_CombatantName} was dead at turn start — skipping.");
+				Debug.LogWarning($"TakeTurn: {c?.m_CombatantName ?? "NULL"} was dead at turn start — skipping.");
 				yield break;
 			}
 
-			Debug.Log($"TakeTurn started for {c?.m_CombatantName ?? "NULL"} (alive={c?.isAlive}).");
+			Debug.Log($"TakeTurn started for {c.m_CombatantName} (alive={c.isAlive}).");
 
-			// Pick first alive target that is not self
+			// Pick first alive target that is not self (snapshot target for this action)
 			var target = m_Combatants.FirstOrDefault(t => t.isAlive && t != c);
 			if (target == null) {
 				Debug.LogWarning($"TakeTurn: no valid target found for {c.m_CombatantName}. Ending turn.");
@@ -113,6 +134,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield break;
 			}
 
+			// LOG: show the player's intention before Resolve so logs read intuitively
+			Debug.Log($"It's {c.m_CombatantName}'s turn. They {cmd.BattleAction?.m_ActionName ?? "NULL ACTION"} with target {cmd.Target?.m_CombatantName ?? "NULL"}.");
+
+			// Resolve the move (this is where damage/heal/buffs are applied)
 			List<BattleResult> results = null;
 			try {
 				results = MoveResolver.Resolve(cmd, m_Combatants);
@@ -122,8 +147,18 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield break;
 			}
 
-			// This log should always run after Resolve (unless an exception happened)
-			Debug.Log($"It's {c.m_CombatantName}'s turn. They {cmd.BattleAction?.m_ActionName ?? "NULL ACTION"} with target {cmd.Target?.m_CombatantName ?? "NULL"}.");
+			// Diagnostics: how many results, how many dealt damage/healing
+			int damageCount = results?.Count(r => r.DamageDealt > 0) ?? 0;
+			int healCount = results?.Count(r => r.HealingDone > 0) ?? 0;
+			Debug.Log($"[Resolve] Results={results?.Count ?? 0}, DamageResults={damageCount}, HealResults={healCount}, AliveCombatants={m_Combatants.Count(x => x.isAlive)}, EnemiesAlive={m_Combatants.Count(x => x.isAlive && !x.m_IsPlayer)}");
+
+			// If resolve somehow killed the last enemy, bail out early (prevents further processing)
+			if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
+				Debug.Log($"After {c.m_CombatantName}'s action, battle end condition met. Ending turn early.");
+				// subtract gauge because they did act (optional—choose your rule)
+				c.m_TurnGauge -= m_GaugeThreshold;
+				yield break;
+			}
 
 			// Fire events for each affected target — guard subscriber exceptions so the coroutine continues
 			if (results != null) {
@@ -137,6 +172,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					}
 				}
 			}
+
+			// Subtract gauge after everything finished for this actor
+			c.m_TurnGauge -= m_GaugeThreshold;
 
 			yield return new WaitForSeconds(0.5f); // placeholder for animations
 		}

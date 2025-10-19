@@ -27,11 +27,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			m_CurrentHp -= dmg;
 			if (m_CurrentHp < 0) {
 				m_CurrentHp = 0;
+				Die();
 			}
 			Debug.Log($"{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})");
 			if (isAlive == false) {
 				Debug.Log($"{m_CombatantName} died!");
 			}
+		}
+
+		public void Die() {
+			
 		}
 
 		public void Heal(int amount) {
