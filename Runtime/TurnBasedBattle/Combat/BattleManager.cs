@@ -45,32 +45,21 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		private IEnumerator BattleLoop() {
 			m_BattleActive = true;
 
+			var turnQueue = new Queue<Combatant>();
+
 			while (EnemiesAreAlive() && CombatantsAreAlive()) {
-				// Tick gauges
-				foreach (var c in m_Combatants.Where(c => c.isAlive)) {
-					c.m_TurnGauge += c.m_Speed * m_TickRate;
-				}
+				// Recalculate and fill turn queue every cycle
+				FillTurnQueueEvenly(turnQueue);
 
-				// Process turns one at a time until no one is ready
-				bool processedTurn;
-				do {
-					processedTurn = false;
-            
-					// Find the combatant with the highest gauge that's ready
-					var next = m_Combatants
-					.Where(c => c.isAlive && c.m_TurnGauge >= m_GaugeThreshold)
-					.OrderByDescending(c => c.m_TurnGauge)
-					.FirstOrDefault();
+				// Process turns from the queue
+				while (turnQueue.Count > 0 && EnemiesAreAlive() && CombatantsAreAlive()) {
+					var next = turnQueue.Dequeue();
 
-					if (next != null) {
-						if (!EnemiesAreAlive() || !CombatantsAreAlive()) break;
-                
-//						Debug.Log($"Starting turn coroutine for {next.m_CombatantName} (gauge={next.m_TurnGauge})");
+					if (next.isAlive) {
+						Debug.Log($"Starting turn coroutine for {next.m_CombatantName}");
 						yield return StartCoroutine(TakeTurn(next));
-						next.m_TurnGauge -= m_GaugeThreshold;
-						processedTurn = true;
 					}
-				} while (processedTurn);
+				}
 
 				DisplayTurnOrder();
 				yield return new WaitForSeconds(m_TickRate);
@@ -78,6 +67,48 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			m_BattleActive = false;
 			Debug.Log("Battle ended!");
+		}
+
+		private void FillTurnQueueEvenly(Queue<Combatant> turnQueue) {
+			var aliveCombatants = m_Combatants.Where(c => c.isAlive).ToList();
+			if (aliveCombatants.Count == 0) return;
+
+			// Calculate total speed and create combatant data
+			int totalSpeed = aliveCombatants.Sum(c => c.m_Speed);
+
+			// Create a list to hold combatant data with position tracking
+			var combatantList = new List<CombatantData>();
+			foreach (var combatant in aliveCombatants) {
+				combatantList.Add(new CombatantData {
+					Combatant = combatant,
+					Speed = combatant.m_Speed,
+					Step = (double)totalSpeed / combatant.m_Speed, // Ideal spacing between turns
+					Position = 0.0
+				});
+			}
+
+			// Initialize positions in the middle of their first segment
+			foreach (var data in combatantList) {
+				data.Position = data.Step / 2;
+			}
+
+			// Generate turns
+			for (int i = 0; i < totalSpeed; i++) {
+				// Find combatant with the smallest position (should act next)
+				var nextData = combatantList.OrderBy(d => d.Position).First();
+				turnQueue.Enqueue(nextData.Combatant);
+
+				// Move this combatant to their next turn position
+				nextData.Position += nextData.Step;
+			}
+		}
+
+		// Helper class to track combatant turn data
+		private class CombatantData {
+			public Combatant Combatant { get; set; }
+			public int Speed { get; set; }
+			public double Step { get; set; }
+			public double Position { get; set; }
 		}
 
 		private IEnumerator TakeTurn(Combatant c) {
@@ -128,13 +159,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			// Diagnostics: how many results, how many dealt damage/healing
 			int damageCount = results?.Count(r => r.DamageDealt > 0) ?? 0;
 			int healCount = results?.Count(r => r.HealingDone > 0) ?? 0;
-//			Debug.Log($"[Resolve] Results={results?.Count ?? 0}, DamageResults={damageCount}, HealResults={healCount}, AliveCombatants={m_Combatants.Count(x => x.isAlive)}, EnemiesAlive={m_Combatants.Count(x => x.isAlive && !x.m_IsPlayer)}");
 
 			// If resolve somehow killed the last enemy, bail out early (prevents further processing)
 			if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
 				Debug.Log($"After {c.m_CombatantName}'s action, battle end condition met. Ending turn early.");
-				// subtract gauge because they did act (optional—choose your rule)
-				c.m_TurnGauge -= m_GaugeThreshold;
 				yield break;
 			}
 
@@ -151,16 +179,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				}
 			}
 
-			// Subtract gauge after everything finished for this actor
-			c.m_TurnGauge -= m_GaugeThreshold;
-
 			yield return new WaitForSeconds(0.5f); // placeholder for animations
 		}
 
 		private void DisplayTurnOrder() {
 			var upcoming = GetUpcomingTurns();
 			string queue = string.Join(" -> ", upcoming.Select(c => $"{c.m_CombatantName} ({c.m_TurnGauge:0})"));
-			//     Debug.Log("Upcoming Turns: " + queue);
+			// Debug.Log("Upcoming Turns: " + queue);
 		}
 
 		public List<Combatant> GetUpcomingTurns() {

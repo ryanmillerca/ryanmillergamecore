@@ -36,9 +36,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				m_CurrentHp = 0;
 				Die();
 			}
-			Debug.Log($"<color={ColorAsHex}>{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})</color>");
+			Debug.Log($"{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})");
 			if (isAlive == false) {
-				Debug.Log($"<color={ColorAsHex}>{m_CombatantName} died!</color>");
+				Debug.Log($"{m_CombatantName} died!");
 			}
 		}
 
