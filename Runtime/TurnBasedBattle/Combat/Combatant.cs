@@ -1,7 +1,7 @@
-namespace RyanMillerGameCore.TurnBasedCombat {
-	using System.Collections.Generic;
-	using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine;
 
+namespace RyanMillerGameCore.TurnBasedCombat {
 	public enum Team {
 		Player,
 		Enemy,
@@ -19,6 +19,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public Team m_Team = Team.Enemy;
 		[HideInInspector] public float m_TurnGauge = 0f;
 		public Color m_Color;
+
+		[Header("AI Behavior")]
+		public EnemyAIBrain m_AIBrain;
 
 		[HideInInspector] public MultiTurnActionState currentMultiTurnAction;
 		[HideInInspector] public bool isCharging = false;
@@ -48,6 +51,20 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			originalAttack = m_Attack;
 		}
 
+		public (BattleAction action, Combatant target) DecideAIAction(List<Combatant> validTargets) {
+			if (m_AIBrain != null) {
+				return m_AIBrain.ChooseAction(this, validTargets, m_Moves);
+			}
+			else {
+				if (m_Moves.Count == 0 || validTargets.Count == 0)
+					return (null, null);
+
+				var randomAction = m_Moves[Random.Range(0, m_Moves.Count)];
+				var randomTarget = validTargets[Random.Range(0, validTargets.Count)];
+				return (randomAction, randomTarget);
+			}
+		}
+
 		private void RaiseCombatantEvent(CombatantEventType eventType, string message, int amount = 0) {
 			CombatantEvent?.Invoke(new CombatantEventData {
 				EventType = eventType,
@@ -65,7 +82,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			counterAttackChance = defendAction.m_CounterChance;
 			counterAttackMultiplier = defendAction.m_CounterMultiplier;
 
-			// Apply attack buff if specified
 			if (defendAction.m_DefendAttackBuff > 1f) {
 				ApplyAttackBuff(defendAction.m_DefendAttackBuff, defendAction.m_AttackBuffDuration);
 			}
@@ -82,7 +98,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			attackBuffTurnsRemaining = duration;
 			attackBuffMultiplier = multiplier;
 
-			// Store original attack and apply buff
 			originalAttack = m_Attack;
 			m_Attack = Mathf.RoundToInt(m_Attack * multiplier);
 

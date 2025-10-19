@@ -1,9 +1,9 @@
-namespace RyanMillerGameCore.TurnBasedCombat {
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
+namespace RyanMillerGameCore.TurnBasedCombat {
 	public class BattleManager : MonoBehaviour {
 		[Header("Combatants")]
 		public List<Combatant> m_Combatants = new List<Combatant>();
@@ -15,6 +15,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 #pragma warning disable CS0414
 		private bool m_BattleActive = false;
+
+		private bool m_WaitingForPlayerInput = false;
+		private Combatant m_CurrentPlayerActor = null;
+		private List<Combatant> m_CurrentValidTargets = null;
 
 		public delegate void OnMoveResolved(BattleResult result);
 		public event OnMoveResolved MoveResolved;
@@ -28,8 +32,29 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public delegate void OnBattleOutcome(BattleOutcome outcome);
 		public event OnBattleOutcome BattleEnded;
 
+		public delegate void OnPlayerInputRequired(PlayerInputData inputData);
+		public event OnPlayerInputRequired PlayerInputRequired;
+
+		public delegate void OnPlayerInputReceived(PlayerInputResponse response);
+		public event OnPlayerInputReceived PlayerInputReceived;
+
 		private void Start() {
 			StartCoroutine(BattleLoop());
+		}
+
+		public void SubmitPlayerInput(PlayerInputResponse response) {
+			if (m_WaitingForPlayerInput && m_CurrentPlayerActor != null) {
+				m_WaitingForPlayerInput = false;
+				PlayerInputReceived?.Invoke(response);
+			}
+		}
+
+		public void CancelPlayerInput() {
+			if (m_WaitingForPlayerInput) {
+				m_WaitingForPlayerInput = false;
+				m_CurrentPlayerActor = null;
+				m_CurrentValidTargets = null;
+			}
 		}
 
 		private void RaiseBattleEvent(BattleEventType eventType, string message, Combatant combatant = null, Combatant target = null) {
@@ -154,7 +179,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			RaiseTurnEvent(TurnEventType.TurnStarted, c);
 
-			// Advance defend and attack buff turns for all combatants at the start of each turn
 			foreach (var combatant in m_Combatants) {
 				if (combatant.isAlive) {
 					combatant.AdvanceDefendTurn();
@@ -162,107 +186,11 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				}
 			}
 
-			if (c.isCharging && c.currentMultiTurnAction != null) {
-				bool actionReady = c.AdvanceMultiTurnAction();
-
-				if (actionReady) {
-					var multiTurnAction = c.currentMultiTurnAction;
-
-					Combatant finalTarget = multiTurnAction.target;
-					if (finalTarget == null || !finalTarget.isAlive) {
-						var validTargets = GetValidTargets(c);
-						if (validTargets.Count > 0) {
-							finalTarget = validTargets[Random.Range(0, validTargets.Count)];
-							RaiseBattleEvent(BattleEventType.TargetChanged,
-								$"{c.m_CombatantName}'s {multiTurnAction.action.m_ActionName} retargeted to {finalTarget.m_CombatantName}!", c, finalTarget);
-						}
-						else {
-							RaiseBattleEvent(BattleEventType.NoValidTargets,
-								$"{c.m_CombatantName}'s {multiTurnAction.action.m_ActionName} has no valid targets! Action wasted.", c);
-							c.CompleteMultiTurnAction();
-							yield break;
-						}
-					}
-
-					BattleCommand cmd = new BattleCommand(c, multiTurnAction.action, finalTarget);
-
-					RaiseTurnEvent(TurnEventType.ActionSelected, c, finalTarget, multiTurnAction.action);
-
-					List<BattleResult> results = null;
-					try {
-						results = MoveResolver.Resolve(cmd, m_Combatants, true, multiTurnAction.action.m_ChargeMultiplier);
-					}
-					catch (System.Exception ex) {
-						RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {c.m_CombatantName}: {ex}", c);
-						c.CompleteMultiTurnAction();
-						yield break;
-					}
-
-					c.CompleteMultiTurnAction();
-
-					if (results != null) {
-						foreach (var result in results) {
-							try {
-								MoveResolved?.Invoke(result);
-							}
-							catch (System.Exception ex) {
-								RaiseBattleEvent(BattleEventType.EventHandlerError, $"MoveResolved handler threw for {c.m_CombatantName}: {ex}", c);
-							}
-						}
-					}
-				}
+			if (c.m_Team == Team.Player) {
+				yield return StartCoroutine(HandlePlayerTurn(c));
 			}
 			else {
-				var validTargets = GetValidTargets(c);
-				if (validTargets.Count == 0) {
-					RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {c.m_CombatantName}. Ending turn.", c);
-					yield break;
-				}
-
-				if (c.m_Moves == null || c.m_Moves.Count == 0) {
-					RaiseBattleEvent(BattleEventType.NoMovesAvailable, $"{c.m_CombatantName} has no moves. Ending turn.", c);
-					yield break;
-				}
-
-				var action = c.m_Moves[Random.Range(0, c.m_Moves.Count)];
-				var target = validTargets[Random.Range(0, validTargets.Count)];
-
-				if (action.m_IsMultiTurn && action.m_TurnCost > 1) {
-					c.StartMultiTurnAction(action, target);
-					RaiseTurnEvent(TurnEventType.MultiTurnStarted, c, target, action);
-				}
-				else {
-					BattleCommand cmd;
-					try {
-						cmd = new BattleCommand(c, action, target);
-					}
-					catch (System.Exception ex) {
-						RaiseBattleEvent(BattleEventType.CommandError, $"Exception constructing BattleCommand for {c.m_CombatantName}: {ex}", c);
-						yield break;
-					}
-
-					RaiseTurnEvent(TurnEventType.ActionSelected, c, target, action);
-
-					List<BattleResult> results = null;
-					try {
-						results = MoveResolver.Resolve(cmd, m_Combatants);
-					}
-					catch (System.Exception ex) {
-						RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {c.m_CombatantName}: {ex}", c);
-						yield break;
-					}
-
-					if (results != null) {
-						foreach (var result in results) {
-							try {
-								MoveResolved?.Invoke(result);
-							}
-							catch (System.Exception ex) {
-								RaiseBattleEvent(BattleEventType.EventHandlerError, $"MoveResolved handler threw for {c.m_CombatantName}: {ex}", c);
-							}
-						}
-					}
-				}
+				yield return StartCoroutine(HandleAITurn(c));
 			}
 
 			if (!PlayersAreAlive() || !EnemiesAreAlive()) {
@@ -272,6 +200,105 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			RaiseTurnEvent(TurnEventType.TurnEnded, c);
 			yield return new WaitForSeconds(0.5f);
+		}
+
+		private IEnumerator HandlePlayerTurn(Combatant player) {
+			var availableMoves = player.m_Moves?.Where(m => m != null).ToList() ?? new List<BattleAction>();
+			var validTargets = GetValidTargets(player);
+
+			if (availableMoves.Count == 0) {
+				RaiseBattleEvent(BattleEventType.NoMovesAvailable, $"{player.m_CombatantName} has no moves. Ending turn.", player);
+				yield break;
+			}
+
+			if (validTargets.Count == 0) {
+				RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {player.m_CombatantName}. Ending turn.", player);
+				yield break;
+			}
+
+			var inputData = new PlayerInputData {
+				Actor = player,
+				AvailableMoves = availableMoves,
+				ValidTargets = validTargets
+			};
+
+			m_WaitingForPlayerInput = true;
+			m_CurrentPlayerActor = player;
+			m_CurrentValidTargets = validTargets;
+
+			PlayerInputRequired?.Invoke(inputData);
+
+			yield return new WaitUntil(() => !m_WaitingForPlayerInput);
+
+			yield return StartCoroutine(ExecutePlayerAction(player, availableMoves, validTargets));
+		}
+
+		private IEnumerator ExecutePlayerAction(Combatant player, List<BattleAction> availableMoves, List<Combatant> validTargets) {
+			var action = availableMoves[Random.Range(0, availableMoves.Count)];
+			var target = validTargets[Random.Range(0, validTargets.Count)];
+
+			yield return StartCoroutine(ExecuteAction(player, action, target));
+		}
+
+		private IEnumerator HandleAITurn(Combatant ai) {
+			var validTargets = GetValidTargets(ai);
+			if (validTargets.Count == 0) {
+				RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {ai.m_CombatantName}. Ending turn.", ai);
+				yield break;
+			}
+
+			if (ai.m_Moves == null || ai.m_Moves.Count == 0) {
+				RaiseBattleEvent(BattleEventType.NoMovesAvailable, $"{ai.m_CombatantName} has no moves. Ending turn.", ai);
+				yield break;
+			}
+
+			var (action, target) = ai.DecideAIAction(validTargets);
+
+			if (action == null || target == null) {
+				RaiseBattleEvent(BattleEventType.NoValidTargets, $"AI could not decide action for {ai.m_CombatantName}. Ending turn.", ai);
+				yield break;
+			}
+
+			yield return StartCoroutine(ExecuteAction(ai, action, target));
+		}
+
+		private IEnumerator ExecuteAction(Combatant actor, BattleAction action, Combatant target) {
+			if (action.m_IsMultiTurn && action.m_TurnCost > 1) {
+				actor.StartMultiTurnAction(action, target);
+				RaiseTurnEvent(TurnEventType.MultiTurnStarted, actor, target, action);
+			}
+			else {
+				BattleCommand cmd;
+				try {
+					cmd = new BattleCommand(actor, action, target);
+				}
+				catch (System.Exception ex) {
+					RaiseBattleEvent(BattleEventType.CommandError, $"Exception constructing BattleCommand for {actor.m_CombatantName}: {ex}", actor);
+					yield break;
+				}
+
+				RaiseTurnEvent(TurnEventType.ActionSelected, actor, target, action);
+
+				List<BattleResult> results = null;
+				try {
+					results = MoveResolver.Resolve(cmd, m_Combatants);
+				}
+				catch (System.Exception ex) {
+					RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {actor.m_CombatantName}: {ex}", actor);
+					yield break;
+				}
+
+				if (results != null) {
+					foreach (var result in results) {
+						try {
+							MoveResolved?.Invoke(result);
+						}
+						catch (System.Exception ex) {
+							RaiseBattleEvent(BattleEventType.EventHandlerError, $"MoveResolved handler threw for {actor.m_CombatantName}: {ex}", actor);
+						}
+					}
+				}
+			}
 		}
 
 		private List<Combatant> GetValidTargets(Combatant attacker) {
@@ -320,6 +347,20 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			return upcoming;
 		}
+	}
+
+	public struct PlayerInputData {
+		public Combatant Actor;
+		public List<BattleAction> AvailableMoves;
+		public List<Combatant> ValidTargets;
+		public float Timestamp;
+	}
+
+	public struct PlayerInputResponse {
+		public BattleAction SelectedAction;
+		public Combatant SelectedTarget;
+		public bool IsValid;
+		public string ValidationMessage;
 	}
 
 	public enum BattleEventType {

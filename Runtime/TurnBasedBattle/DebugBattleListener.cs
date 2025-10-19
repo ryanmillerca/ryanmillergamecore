@@ -1,6 +1,7 @@
-namespace RyanMillerGameCore.TurnBasedCombat {
-	using UnityEngine;
+using UnityEngine;
+using System.Linq;
 
+namespace RyanMillerGameCore.TurnBasedCombat {
 	public class DebugBattleListener : MonoBehaviour {
 		[Header("References")]
 		public BattleManager battleManager;
@@ -10,6 +11,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public bool logTurnEvents = true;
 		public bool logCombatantEvents = true;
 		public bool logMoveResolution = true;
+		public bool logPlayerInputEvents = true;
 
 		private void OnEnable() {
 			if (battleManager == null) {
@@ -21,6 +23,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				battleManager.TurnEvent += OnTurnEvent;
 				battleManager.MoveResolved += OnMoveResolved;
 				battleManager.BattleEnded += OnBattleEnded;
+				battleManager.PlayerInputRequired += OnPlayerInputRequired;
+				battleManager.PlayerInputReceived += OnPlayerInputReceived;
 			}
 		}
 
@@ -30,6 +34,30 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				battleManager.TurnEvent -= OnTurnEvent;
 				battleManager.MoveResolved -= OnMoveResolved;
 				battleManager.BattleEnded -= OnBattleEnded;
+				battleManager.PlayerInputRequired -= OnPlayerInputRequired;
+				battleManager.PlayerInputReceived -= OnPlayerInputReceived;
+			}
+		}
+
+		private void OnPlayerInputRequired(PlayerInputData inputData) {
+			if (!logPlayerInputEvents) return;
+
+			string colorTag = $"<color={inputData.Actor.ColorAsHex}>";
+			Debug.Log($"{colorTag}🎮 PLAYER INPUT REQUIRED for {inputData.Actor.m_CombatantName}</color>");
+			Debug.Log($"{colorTag}   Moves: {string.Join(", ", inputData.AvailableMoves.Select(m => m.m_ActionName))}</color>");
+			Debug.Log($"{colorTag}   Targets: {string.Join(", ", inputData.ValidTargets.Select(t => t.m_CombatantName))}</color>");
+		}
+
+		private void OnPlayerInputReceived(PlayerInputResponse response) {
+			if (!logPlayerInputEvents) return;
+
+			if (response.IsValid) {
+				string colorTag = $"<color=#00FF00>";
+				Debug.Log($"{colorTag}🎮 PLAYER SELECTED: {response.SelectedAction.m_ActionName} -> {response.SelectedTarget.m_CombatantName}</color>");
+			}
+			else {
+				string colorTag = $"<color=#FF0000>";
+				Debug.Log($"{colorTag}🎮 INVALID PLAYER INPUT: {response.ValidationMessage}</color>");
 			}
 		}
 
@@ -79,10 +107,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			switch (eventData.EventType) {
 				case TurnEventType.TurnStarted:
-					Debug.Log($"{colorTag}🎪 It's {eventData.Combatant.m_CombatantName}'s turn!</color>");
+					string brainInfo = eventData.Combatant.m_AIBrain != null ?
+					$" ({eventData.Combatant.m_AIBrain.GetType().Name})" : "";
+					Debug.Log($"{colorTag}🎪 It's {eventData.Combatant.m_CombatantName}'s turn!{brainInfo}</color>");
 					break;
 				case TurnEventType.ActionSelected:
-					Debug.Log($"{colorTag}🎯 {eventData.Combatant.m_CombatantName} selects {eventData.Action.m_ActionName} targeting {eventData.Target.m_CombatantName}</color>");
+					string aiNote = eventData.Combatant.m_Team == Team.Enemy ? " [AI]" : "";
+					Debug.Log($"{colorTag}🎯 {eventData.Combatant.m_CombatantName} selects {eventData.Action.m_ActionName} targeting {eventData.Target.m_CombatantName}{aiNote}</color>");
 					break;
 				case TurnEventType.MultiTurnStarted:
 					Debug.Log($"{colorTag}⚡ {eventData.Combatant.m_CombatantName} starts charging {eventData.Action.m_ActionName} for {eventData.Action.m_TurnCost} turns!</color>");

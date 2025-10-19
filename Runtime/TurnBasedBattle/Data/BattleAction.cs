@@ -1,6 +1,6 @@
-namespace RyanMillerGameCore.TurnBasedCombat {
-	using UnityEngine;
+using UnityEngine;
 
+namespace RyanMillerGameCore.TurnBasedCombat {
 	[CreateAssetMenu(menuName = "Battle/Action")]
 	public class BattleAction : ScriptableObject {
 		[Header("Basic Info")]

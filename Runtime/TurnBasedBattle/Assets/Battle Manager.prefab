@@ -1,0 +1,323 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3858788297736344714
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4775835994440095526}
+  - component: {fileID: 5669372029704281225}
+  m_Layer: 0
+  m_Name: Enemy Brawler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4775835994440095526
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3858788297736344714}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6916853974954668531}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5669372029704281225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3858788297736344714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d06435958403470bbefd2bf8f5820f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.Combatant
+  m_CombatantName: Enemy Brawler
+  m_MaxHp: 50
+  m_Attack: 10
+  m_Defense: 10
+  m_Speed: 6
+  m_CurrentHp: 50
+  m_Moves:
+  - {fileID: 11400000, guid: 0ae6078373b764d9087a847458408d08, type: 2}
+  - {fileID: 11400000, guid: 4bea2fb22a49d42f4956ce9fc6a5b2f3, type: 2}
+  m_Team: 1
+  m_TurnGauge: 0
+  m_Color: {r: 1, g: 0.67158884, b: 0.3176471, a: 1}
+  m_AIBrain: {fileID: 11400000, guid: f7e9751c5127b4449881a4efa4ffc381, type: 2}
+  currentMultiTurnAction:
+    action: {fileID: 0}
+    target: {fileID: 0}
+    turnsRemaining: 0
+    currentTurn: 0
+    isComplete: 0
+    originalDefense: 0
+    originalSpeed: 0
+    defenseBuffApplied: 0
+    speedDebuffApplied: 0
+  isCharging: 0
+  isDefending: 0
+  defendTurnsRemaining: 0
+  defendDamageReduction: 1
+  counterAttackChance: 0
+  counterAttackMultiplier: 1
+  lastAttacker: {fileID: 0}
+  hasAttackBuff: 0
+  attackBuffTurnsRemaining: 0
+  attackBuffMultiplier: 1
+  originalAttack: 0
+--- !u!1 &4174507899781720083
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 988498788245552493}
+  - component: {fileID: 5890895403630120371}
+  m_Layer: 0
+  m_Name: Enemy Healer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &988498788245552493
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174507899781720083}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6916853974954668531}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5890895403630120371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174507899781720083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d06435958403470bbefd2bf8f5820f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.Combatant
+  m_CombatantName: Enemy Healer
+  m_MaxHp: 50
+  m_Attack: 10
+  m_Defense: 10
+  m_Speed: 10
+  m_CurrentHp: 50
+  m_Moves:
+  - {fileID: 11400000, guid: 0ae6078373b764d9087a847458408d08, type: 2}
+  - {fileID: 11400000, guid: 88044ba448935418cb729f031afa00a4, type: 2}
+  m_Team: 1
+  m_TurnGauge: 0
+  m_Color: {r: 1, g: 0.3160377, b: 0.3160377, a: 1}
+  m_AIBrain: {fileID: 11400000, guid: cb5fac158ff914ca28d17a794cac25ec, type: 2}
+  currentMultiTurnAction:
+    action: {fileID: 0}
+    target: {fileID: 0}
+    turnsRemaining: 0
+    currentTurn: 0
+    isComplete: 0
+    originalDefense: 0
+    originalSpeed: 0
+    defenseBuffApplied: 0
+    speedDebuffApplied: 0
+  isCharging: 0
+  isDefending: 0
+  defendTurnsRemaining: 0
+  defendDamageReduction: 1
+  counterAttackChance: 0
+  counterAttackMultiplier: 1
+  lastAttacker: {fileID: 0}
+  hasAttackBuff: 0
+  attackBuffTurnsRemaining: 0
+  attackBuffMultiplier: 1
+  originalAttack: 0
+--- !u!1 &4707586355035247784
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 366747149867394619}
+  - component: {fileID: 1345791621070557168}
+  - component: {fileID: 7578225939541802295}
+  m_Layer: 0
+  m_Name: Player
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &366747149867394619
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4707586355035247784}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6916853974954668531}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1345791621070557168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4707586355035247784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d06435958403470bbefd2bf8f5820f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.Combatant
+  m_CombatantName: Player 1
+  m_MaxHp: 100
+  m_Attack: 20
+  m_Defense: 10
+  m_Speed: 10
+  m_CurrentHp: 100
+  m_Moves:
+  - {fileID: 11400000, guid: 0ae6078373b764d9087a847458408d08, type: 2}
+  - {fileID: 11400000, guid: 88044ba448935418cb729f031afa00a4, type: 2}
+  m_Team: 0
+  m_TurnGauge: 0
+  m_Color: {r: 0.3160377, g: 0.42215344, b: 1, a: 1}
+  m_AIBrain: {fileID: 0}
+  currentMultiTurnAction:
+    action: {fileID: 0}
+    target: {fileID: 0}
+    turnsRemaining: 0
+    currentTurn: 0
+    isComplete: 0
+    originalDefense: 0
+    originalSpeed: 0
+    defenseBuffApplied: 0
+    speedDebuffApplied: 0
+  isCharging: 0
+  isDefending: 0
+  defendTurnsRemaining: 0
+  defendDamageReduction: 1
+  counterAttackChance: 0
+  counterAttackMultiplier: 1
+  lastAttacker: {fileID: 0}
+  hasAttackBuff: 0
+  attackBuffTurnsRemaining: 0
+  attackBuffMultiplier: 1
+  originalAttack: 0
+--- !u!114 &7578225939541802295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4707586355035247784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21557621ec8642f6b3f25ee241e368a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedCombat.PlayerInputHandler
+  battleManager: {fileID: 9081274791497287221}
+--- !u!1 &6770578703550087857
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6916853974954668531}
+  - component: {fileID: 9081274791497287221}
+  - component: {fileID: 6159012377075298837}
+  m_Layer: 0
+  m_Name: Battle Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6916853974954668531
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6770578703550087857}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 19.29316, y: 4.56991, z: 53.26278}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 366747149867394619}
+  - {fileID: 988498788245552493}
+  - {fileID: 4775835994440095526}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9081274791497287221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6770578703550087857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4166b581b6b242cc8e30f9849e469c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.BattleManager
+  m_Combatants:
+  - {fileID: 1345791621070557168}
+  - {fileID: 5890895403630120371}
+  - {fileID: 5669372029704281225}
+  m_GaugeThreshold: 1
+  m_TickRate: 1
+  m_LookaheadTurns: 5
+--- !u!114 &6159012377075298837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6770578703550087857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 957d7ea044d941009e47314316fa4bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedCombat.DebugBattleListener
+  battleManager: {fileID: 9081274791497287221}
+  logBattleEvents: 1
+  logTurnEvents: 1
+  logCombatantEvents: 1
+  logMoveResolution: 1
+  logPlayerInputEvents: 1
