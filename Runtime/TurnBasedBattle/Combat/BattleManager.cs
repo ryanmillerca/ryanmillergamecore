@@ -49,7 +49,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				// Tick gauges
 				foreach (var c in m_Combatants.Where(c => c.isAlive)) {
 					c.m_TurnGauge += c.m_Speed * m_TickRate;
-					c.m_TurnGauge = Mathf.Min(c.m_TurnGauge, m_GaugeThreshold);
+					//c.m_TurnGauge = Mathf.Min(c.m_TurnGauge, m_GaugeThreshold);
 				}
 
 				// Process ready combatants
@@ -60,40 +60,32 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 				// Process ready combatants (dynamic, recalculated each iteration)
 				while (true) {
-					// If no enemies or not enough combatants, stop before selecting anyone
-					if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
-						Debug.Log("Battle condition met before selecting next actor — stopping action processing.");
-						break;
-					}
+					// stop early if battle ended
+					if (!EnemiesAreAlive() || !CombatantsAreAlive()) break;
 
-					// pick the next ready-to-act combatant (highest gauge, alive, >= threshold)
+					// choose the next combatant with gauge >= threshold
 					var next = m_Combatants
 					.Where(c => c.isAlive && c.m_TurnGauge >= m_GaugeThreshold)
 					.OrderByDescending(c => c.m_TurnGauge)
 					.FirstOrDefault();
 
-					if (next == null) {
-						// Nothing ready right now
-						break;
-					}
+					if (next == null) break;
 
-					Debug.Log($"[BattleLoop] Next actor: {next.m_CombatantName} (gauge={next.m_TurnGauge}, alive={next.isAlive}). EnemiesAlive={EnemiesAreAlive()}. CombatantsAliveCount={m_Combatants.Count(c => c.isAlive)}");
+					// Let the selected combatant act as many times as they have whole thresholds
+					while (next != null && next.isAlive && next.m_TurnGauge >= m_GaugeThreshold) {
+						Debug.Log($"Starting turn coroutine for {next.m_CombatantName} (gauge={next.m_TurnGauge})");
+						yield return StartCoroutine(TakeTurn(next));
 
-					// Start their turn
-					yield return StartCoroutine(TakeTurn(next));
-
-					// After the action resolved, check if the battle ended
-					if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
-						Debug.Log("Battle condition met after action — stopping further turns this tick.");
-						break;
-					}
-
-					// Subtract gauge only if they still exist (defensive)
-					if (next != null) {
+						// subtract one threshold per action
 						next.m_TurnGauge -= m_GaugeThreshold;
+
+						// if battle ended by this action stop everything
+						if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
+							Debug.Log("Battle condition met after action — stopping further turns this tick.");
+							break;
+						}
 					}
 				}
-
 				DisplayTurnOrder();
 				yield return new WaitForSeconds(m_TickRate);
 			}
@@ -106,22 +98,22 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			if (c == null) yield break;
 
 			if (!c.isAlive) {
-				Debug.LogWarning($"TakeTurn: {c?.m_CombatantName ?? "NULL"} was dead at turn start — skipping.");
+				Debug.LogWarning($"<color={c.ColorAsHex}>TakeTurn: {c?.m_CombatantName ?? "NULL"} was dead at turn start — skipping.<color>");
 				yield break;
 			}
 
-			Debug.Log($"TakeTurn started for {c.m_CombatantName} (alive={c.isAlive}).");
+			Debug.Log($"<color={c.ColorAsHex}>TakeTurn started for {c.m_CombatantName} (alive={c.isAlive}).</color>");
 
 			// Pick first alive target that is not self (snapshot target for this action)
 			var target = m_Combatants.FirstOrDefault(t => t.isAlive && t != c);
 			if (target == null) {
-				Debug.LogWarning($"TakeTurn: no valid target found for {c.m_CombatantName}. Ending turn.");
+				Debug.LogWarning($"<color={c.ColorAsHex}>TakeTurn: no valid target found for {c.m_CombatantName}. Ending turn.</color>");
 				yield break;
 			}
 
 			// Safety: make sure there is at least one move
 			if (c.m_Moves == null || c.m_Moves.Count == 0) {
-				Debug.LogWarning($"TakeTurn: {c.m_CombatantName} has no moves. Ending turn.");
+				Debug.LogWarning($"<color={c.ColorAsHex}>TakeTurn: {c.m_CombatantName} has no moves. Ending turn.</color>");
 				yield break;
 			}
 
@@ -135,7 +127,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 
 			// LOG: show the player's intention before Resolve so logs read intuitively
-			Debug.Log($"It's {c.m_CombatantName}'s turn. They {cmd.BattleAction?.m_ActionName ?? "NULL ACTION"} with target {cmd.Target?.m_CombatantName ?? "NULL"}.");
+			Debug.Log($"<color={c.ColorAsHex}>It's {c.m_CombatantName}'s turn. They {cmd.BattleAction?.m_ActionName ?? "NULL ACTION"} with target {cmd.Target?.m_CombatantName ?? "NULL"}.</color>");
 
 			// Resolve the move (this is where damage/heal/buffs are applied)
 			List<BattleResult> results = null;

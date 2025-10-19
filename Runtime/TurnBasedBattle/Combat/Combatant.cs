@@ -12,9 +12,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public List<BattleAction> m_Moves;
 		public bool m_IsPlayer = false;
 		[HideInInspector] public float m_TurnGauge = 0f; // 0-100 gauge
-
+		public Color m_Color;
+		
 		private void Awake() {
 			m_CurrentHp = Mathf.Clamp(m_CurrentHp, 0, m_MaxHp);
+		}
+
+		public string ColorAsHex {
+			get {
+				return "#" + ColorUtility.ToHtmlStringRGB(m_Color);
+			}
 		}
 
 		public bool isAlive {
@@ -29,7 +36,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				m_CurrentHp = 0;
 				Die();
 			}
-			Debug.Log($"{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})");
+			Debug.Log($"<color={ColorAsHex}>{m_CombatantName} takes {dmg} damage. (HP: {m_CurrentHp}/{m_MaxHp})</color>");
 			if (isAlive == false) {
 				Debug.Log($"{m_CombatantName} died!");
 			}
@@ -42,12 +49,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public void Heal(int amount) {
 			m_CurrentHp += amount;
 			if (m_CurrentHp > m_MaxHp) {
-				Debug.Log($"{m_CombatantName} heals {amount}. (HP: {m_CurrentHp}/{m_MaxHp})");
+				Debug.Log($"<color={ColorAsHex}>{m_CombatantName} heals {amount}. (HP: {m_CurrentHp}/{m_MaxHp})</color>");
 				m_CurrentHp = m_MaxHp;
 			}
-			Debug.Log($"{m_CombatantName} heals {amount}. (HP: {m_CurrentHp}/{m_MaxHp})");
+			Debug.Log($"<color={ColorAsHex}>{m_CombatantName} heals {amount}. (HP: {m_CurrentHp}/{m_MaxHp})<color>");
 			if (m_CurrentHp == m_MaxHp) {
-				Debug.Log($"{m_CombatantName} is at full health!");
+				Debug.Log($"<color={ColorAsHex}>{m_CombatantName} is at full health!<color>");
 			}
 		}
 	}
