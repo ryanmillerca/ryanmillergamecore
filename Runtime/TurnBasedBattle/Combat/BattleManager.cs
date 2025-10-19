@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
 namespace RyanMillerGameCore.TurnBasedCombat {
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Linq;
+	using UnityEngine;
+
 	public class BattleManager : MonoBehaviour {
 		[Header("Combatants")]
 		public List<Combatant> m_Combatants = new List<Combatant>();
@@ -154,10 +154,11 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			RaiseTurnEvent(TurnEventType.TurnStarted, c);
 
-			// Advance defend turns for all combatants at the start of each turn
+			// Advance defend and attack buff turns for all combatants at the start of each turn
 			foreach (var combatant in m_Combatants) {
 				if (combatant.isAlive) {
 					combatant.AdvanceDefendTurn();
+					combatant.AdvanceAttackBuffTurn();
 				}
 			}
 

@@ -1,368 +1,366 @@
-using System.Collections.Generic;
-using UnityEngine;
+namespace RyanMillerGameCore.TurnBasedCombat {
+	using System.Collections.Generic;
+	using UnityEngine;
 
-namespace RyanMillerGameCore.TurnBasedCombat
-{
-    public enum Team
-    {
-        Player,
-        Enemy,
-        Neutral
-    }
+	public enum Team {
+		Player,
+		Enemy,
+		Neutral
+	}
 
-    public class Combatant : MonoBehaviour
-    {
-        public string m_CombatantName;
-        public int m_MaxHp = 100;
-        public int m_Attack = 20;
-        public int m_Defense = 10;
-        public int m_Speed = 10;
-        public int m_CurrentHp = 100;
-        public List<BattleAction> m_Moves;
-        public Team m_Team = Team.Enemy;
-        [HideInInspector] public float m_TurnGauge = 0f;
-        public Color m_Color;
+	public class Combatant : MonoBehaviour {
+		public string m_CombatantName;
+		public int m_MaxHp = 100;
+		public int m_Attack = 20;
+		public int m_Defense = 10;
+		public int m_Speed = 10;
+		public int m_CurrentHp = 100;
+		public List<BattleAction> m_Moves;
+		public Team m_Team = Team.Enemy;
+		[HideInInspector] public float m_TurnGauge = 0f;
+		public Color m_Color;
 
-        [HideInInspector] public MultiTurnActionState currentMultiTurnAction;
-        [HideInInspector] public bool isCharging = false;
+		[HideInInspector] public MultiTurnActionState currentMultiTurnAction;
+		[HideInInspector] public bool isCharging = false;
 
-        [HideInInspector] public bool isDefending = false;
-        [HideInInspector] public int defendTurnsRemaining = 0;
-        [HideInInspector] public float defendDamageReduction = 1f;
-        [HideInInspector] public float counterAttackChance = 0f;
-        [HideInInspector] public float counterAttackMultiplier = 1f;
-        [HideInInspector] public Combatant lastAttacker = null;
+		[HideInInspector] public bool isDefending = false;
+		[HideInInspector] public int defendTurnsRemaining = 0;
+		[HideInInspector] public float defendDamageReduction = 1f;
+		[HideInInspector] public float counterAttackChance = 0f;
+		[HideInInspector] public float counterAttackMultiplier = 1f;
+		[HideInInspector] public Combatant lastAttacker = null;
 
-        public delegate void OnCombatantEvent(CombatantEventData eventData);
-        public event OnCombatantEvent CombatantEvent;
+		[HideInInspector] public bool hasAttackBuff = false;
+		[HideInInspector] public int attackBuffTurnsRemaining = 0;
+		[HideInInspector] public float attackBuffMultiplier = 1f;
+		[HideInInspector] public int originalAttack;
 
-        public bool m_IsPlayer
-        {
-            get { return m_Team == Team.Player; }
-            set { m_Team = value ? Team.Player : Team.Enemy; }
-        }
+		public delegate void OnCombatantEvent(CombatantEventData eventData);
+		public event OnCombatantEvent CombatantEvent;
 
-        private void Awake()
-        {
-            m_CurrentHp = Mathf.Clamp(m_CurrentHp, 0, m_MaxHp);
-        }
+		public bool m_IsPlayer {
+			get { return m_Team == Team.Player; }
+			set { m_Team = value ? Team.Player : Team.Enemy; }
+		}
 
-        private void RaiseCombatantEvent(CombatantEventType eventType, string message, int amount = 0)
-        {
-            CombatantEvent?.Invoke(new CombatantEventData
-            {
-                EventType = eventType,
-                Combatant = this,
-                Message = message,
-                Amount = amount,
-                Timestamp = Time.time
-            });
-        }
+		private void Awake() {
+			m_CurrentHp = Mathf.Clamp(m_CurrentHp, 0, m_MaxHp);
+			originalAttack = m_Attack;
+		}
 
-        public void StartDefend(BattleAction defendAction)
-        {
-            isDefending = true;
-            defendTurnsRemaining = defendAction.m_DefendDuration;
-            defendDamageReduction = defendAction.m_DamageReduction;
-            counterAttackChance = defendAction.m_CounterChance;
-            counterAttackMultiplier = defendAction.m_CounterMultiplier;
+		private void RaiseCombatantEvent(CombatantEventType eventType, string message, int amount = 0) {
+			CombatantEvent?.Invoke(new CombatantEventData {
+				EventType = eventType,
+				Combatant = this,
+				Message = message,
+				Amount = amount,
+				Timestamp = Time.time
+			});
+		}
 
-            RaiseCombatantEvent(CombatantEventType.DefendStarted,
-                $"{m_CombatantName} takes a defensive stance! Damage reduced by {((1f - defendDamageReduction) * 100f):0}% for {defendTurnsRemaining} turn(s).");
-        }
+		public void StartDefend(BattleAction defendAction) {
+			isDefending = true;
+			defendTurnsRemaining = defendAction.m_DefendDuration;
+			defendDamageReduction = defendAction.m_DamageReduction;
+			counterAttackChance = defendAction.m_CounterChance;
+			counterAttackMultiplier = defendAction.m_CounterMultiplier;
 
-        public void EndDefend()
-        {
-            if (isDefending)
-            {
-                isDefending = false;
-                defendTurnsRemaining = 0;
-                defendDamageReduction = 1f;
-                counterAttackChance = 0f;
-                counterAttackMultiplier = 1f;
-                lastAttacker = null;
+			// Apply attack buff if specified
+			if (defendAction.m_DefendAttackBuff > 1f) {
+				ApplyAttackBuff(defendAction.m_DefendAttackBuff, defendAction.m_AttackBuffDuration);
+			}
 
-                RaiseCombatantEvent(CombatantEventType.DefendEnded,
-                    $"{m_CombatantName} drops defensive stance.");
-            }
-        }
+			string buffText = defendAction.m_DefendAttackBuff > 1f ?
+			$", attack increased by {((defendAction.m_DefendAttackBuff - 1f) * 100f):0}% for {defendAction.m_AttackBuffDuration} turn(s)" : "";
 
-        public void AdvanceDefendTurn()
-        {
-            if (isDefending)
-            {
-                defendTurnsRemaining--;
-                if (defendTurnsRemaining <= 0)
-                {
-                    EndDefend();
-                }
-            }
-        }
+			RaiseCombatantEvent(CombatantEventType.DefendStarted,
+				$"{m_CombatantName} takes a defensive stance! Damage reduced by {((1f - defendDamageReduction) * 100f):0}% for {defendTurnsRemaining} turn(s){buffText}.");
+		}
 
-        public bool TryCounterAttack(Combatant attacker)
-        {
-            if (!isDefending || !isAlive || !attacker.isAlive)
-                return false;
+		public void ApplyAttackBuff(float multiplier, int duration) {
+			hasAttackBuff = true;
+			attackBuffTurnsRemaining = duration;
+			attackBuffMultiplier = multiplier;
 
-            if (Random.value <= counterAttackChance)
-            {
-                lastAttacker = attacker;
-                return true;
-            }
-            return false;
-        }
+			// Store original attack and apply buff
+			originalAttack = m_Attack;
+			m_Attack = Mathf.RoundToInt(m_Attack * multiplier);
 
-        public void TakeDamage(int dmg, Combatant attacker = null)
-        {
-            int originalDamage = dmg;
-            
-            if (isDefending)
-            {
-                dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * defendDamageReduction));
-            }
+			RaiseCombatantEvent(CombatantEventType.AttackBuffed,
+				$"{m_CombatantName}'s attack increases to {m_Attack} for {duration} turn(s)!");
+		}
 
-            int previousHp = m_CurrentHp;
-            m_CurrentHp -= dmg;
-            if (m_CurrentHp < 0)
-            {
-                m_CurrentHp = 0;
-            }
+		public void RemoveAttackBuff() {
+			if (hasAttackBuff) {
+				m_Attack = originalAttack;
+				hasAttackBuff = false;
+				attackBuffTurnsRemaining = 0;
+				attackBuffMultiplier = 1f;
 
-            string defendText = isDefending ? $" (reduced from {originalDamage} due to defense)" : "";
-            RaiseCombatantEvent(CombatantEventType.DamageTaken,
-                $"{m_CombatantName} takes {dmg} damage{defendText}. (HP: {m_CurrentHp}/{m_MaxHp})", dmg);
+				RaiseCombatantEvent(CombatantEventType.AttackBuffEnded,
+					$"{m_CombatantName}'s attack returns to normal.");
+			}
+		}
 
-            if (isDefending && attacker != null && dmg > 0)
-            {
-                if (TryCounterAttack(attacker))
-                {
-                    RaiseCombatantEvent(CombatantEventType.CounterAttack,
-                        $"{m_CombatantName} prepares a counter attack against {attacker.m_CombatantName}!");
-                }
-            }
+		public void AdvanceAttackBuffTurn() {
+			if (hasAttackBuff) {
+				attackBuffTurnsRemaining--;
+				if (attackBuffTurnsRemaining <= 0) {
+					RemoveAttackBuff();
+				}
+			}
+		}
 
-            if (m_CurrentHp == 0 && previousHp > 0)
-            {
-                if (isCharging && currentMultiTurnAction != null)
-                {
-                    CancelMultiTurnAction();
-                }
-                EndDefend();
-                Die();
-            }
-        }
+		public void EndDefend() {
+			if (isDefending) {
+				isDefending = false;
+				defendTurnsRemaining = 0;
+				defendDamageReduction = 1f;
+				counterAttackChance = 0f;
+				counterAttackMultiplier = 1f;
+				lastAttacker = null;
 
-        public void TakeDamage(int dmg)
-        {
-            TakeDamage(dmg, null);
-        }
+				RaiseCombatantEvent(CombatantEventType.DefendEnded,
+					$"{m_CombatantName} drops defensive stance.");
+			}
+		}
 
-        public void StartMultiTurnAction(BattleAction action, Combatant target)
-        {
-            currentMultiTurnAction = new MultiTurnActionState(action, this, target);
-            isCharging = true;
-            ApplyChargeTurnEffects();
+		public void AdvanceDefendTurn() {
+			if (isDefending) {
+				defendTurnsRemaining--;
+				if (defendTurnsRemaining <= 0) {
+					EndDefend();
+				}
+			}
+		}
 
-            RaiseCombatantEvent(CombatantEventType.ChargeStarted,
-                $"{m_CombatantName} begins charging {action.m_ActionName}! ({action.m_TurnCost} turns)");
-        }
+		public bool TryCounterAttack(Combatant attacker) {
+			if (!isDefending || !isAlive || !attacker.isAlive)
+				return false;
 
-        public bool AdvanceMultiTurnAction()
-        {
-            if (currentMultiTurnAction == null) return false;
+			if (Random.value <= counterAttackChance) {
+				lastAttacker = attacker;
+				return true;
+			}
+			return false;
+		}
 
-            bool isReady = currentMultiTurnAction.AdvanceTurn();
+		public void TakeDamage(int dmg, Combatant attacker = null) {
+			int originalDamage = dmg;
 
-            if (isReady)
-            {
-                RaiseCombatantEvent(CombatantEventType.ChargeComplete,
-                    $"{m_CombatantName} completes charging {currentMultiTurnAction.action.m_ActionName}!");
-                return true;
-            }
-            else
-            {
-                ApplyChargeTurnEffects();
-                RaiseCombatantEvent(CombatantEventType.Charging,
-                    currentMultiTurnAction.GetChargeMessage(this));
-                return false;
-            }
-        }
+			if (isDefending) {
+				dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * defendDamageReduction));
+			}
 
-        public void CompleteMultiTurnAction()
-        {
-            if (currentMultiTurnAction != null)
-            {
-                RemoveChargeTurnEffects();
-                currentMultiTurnAction = null;
-                isCharging = false;
-            }
-        }
+			int previousHp = m_CurrentHp;
+			m_CurrentHp -= dmg;
+			if (m_CurrentHp < 0) {
+				m_CurrentHp = 0;
+			}
 
-        public void CancelMultiTurnAction()
-        {
-            if (currentMultiTurnAction != null)
-            {
-                RemoveChargeTurnEffects();
-                RaiseCombatantEvent(CombatantEventType.ChargeCancelled,
-                    $"{m_CombatantName}'s {currentMultiTurnAction.action.m_ActionName} was cancelled!");
-                currentMultiTurnAction = null;
-                isCharging = false;
-            }
-        }
+			string defendText = isDefending ? $" (reduced from {originalDamage} due to defense)" : "";
+			RaiseCombatantEvent(CombatantEventType.DamageTaken,
+				$"{m_CombatantName} takes {dmg} damage{defendText}. (HP: {m_CurrentHp}/{m_MaxHp})", dmg);
 
-        private void ApplyChargeTurnEffects()
-        {
-            if (currentMultiTurnAction == null) return;
+			if (isDefending && attacker != null && dmg > 0) {
+				if (TryCounterAttack(attacker)) {
+					RaiseCombatantEvent(CombatantEventType.CounterAttack,
+						$"{m_CombatantName} prepares a counter attack against {attacker.m_CombatantName}!");
+				}
+			}
 
-            switch (currentMultiTurnAction.action.m_ChargeTurnBehavior)
-            {
-                case ChargeTurnBehavior.ApplyDefenseBuff:
-                    if (!currentMultiTurnAction.defenseBuffApplied)
-                    {
-                        int defenseBonus = Mathf.RoundToInt(m_Defense * 0.3f);
-                        m_Defense += defenseBonus;
-                        currentMultiTurnAction.defenseBuffApplied = true;
-                    }
-                    break;
+			if (m_CurrentHp == 0 && previousHp > 0) {
+				if (isCharging && currentMultiTurnAction != null) {
+					CancelMultiTurnAction();
+				}
+				EndDefend();
+				RemoveAttackBuff();
+				Die();
+			}
+		}
 
-                case ChargeTurnBehavior.ApplySpeedDebuff:
-                    if (!currentMultiTurnAction.speedDebuffApplied)
-                    {
-                        int speedReduction = Mathf.RoundToInt(m_Speed * 0.2f);
-                        m_Speed = Mathf.Max(1, m_Speed - speedReduction);
-                        currentMultiTurnAction.speedDebuffApplied = true;
-                    }
-                    break;
+		public void TakeDamage(int dmg) {
+			TakeDamage(dmg, null);
+		}
 
-                case ChargeTurnBehavior.TakeDamage:
-                    int chargeDamage = Mathf.Max(1, m_MaxHp / 20);
-                    TakeDamage(chargeDamage);
-                    RaiseCombatantEvent(CombatantEventType.ChargeDamage,
-                        $"{m_CombatantName} takes {chargeDamage} damage from charging!");
-                    break;
-            }
-        }
+		public void StartMultiTurnAction(BattleAction action, Combatant target) {
+			currentMultiTurnAction = new MultiTurnActionState(action, this, target);
+			isCharging = true;
+			ApplyChargeTurnEffects();
 
-        private void RemoveChargeTurnEffects()
-        {
-            if (currentMultiTurnAction == null) return;
+			RaiseCombatantEvent(CombatantEventType.ChargeStarted,
+				$"{m_CombatantName} begins charging {action.m_ActionName}! ({action.m_TurnCost} turns)");
+		}
 
-            if (currentMultiTurnAction.defenseBuffApplied)
-            {
-                m_Defense = currentMultiTurnAction.originalDefense;
-            }
-            if (currentMultiTurnAction.speedDebuffApplied)
-            {
-                m_Speed = currentMultiTurnAction.originalSpeed;
-            }
-        }
+		public bool AdvanceMultiTurnAction() {
+			if (currentMultiTurnAction == null) return false;
 
-        public string ColorAsHex
-        {
-            get
-            {
-                return "#" + ColorUtility.ToHtmlStringRGB(m_Color);
-            }
-        }
+			bool isReady = currentMultiTurnAction.AdvanceTurn();
 
-        public bool isAlive
-        {
-            get
-            {
-                return m_CurrentHp > 0;
-            }
-        }
+			if (isReady) {
+				RaiseCombatantEvent(CombatantEventType.ChargeComplete,
+					$"{m_CombatantName} completes charging {currentMultiTurnAction.action.m_ActionName}!");
+				return true;
+			}
+			else {
+				ApplyChargeTurnEffects();
+				RaiseCombatantEvent(CombatantEventType.Charging,
+					currentMultiTurnAction.GetChargeMessage(this));
+				return false;
+			}
+		}
 
-        public void Die()
-        {
-            RaiseCombatantEvent(CombatantEventType.Died, $"{m_CombatantName} died!");
-        }
+		public void CompleteMultiTurnAction() {
+			if (currentMultiTurnAction != null) {
+				RemoveChargeTurnEffects();
+				currentMultiTurnAction = null;
+				isCharging = false;
+			}
+		}
 
-        public void Heal(int amount)
-        {
-            int previousHp = m_CurrentHp;
-            m_CurrentHp += amount;
-            if (m_CurrentHp > m_MaxHp)
-            {
-                m_CurrentHp = m_MaxHp;
-            }
+		public void CancelMultiTurnAction() {
+			if (currentMultiTurnAction != null) {
+				RemoveChargeTurnEffects();
+				RaiseCombatantEvent(CombatantEventType.ChargeCancelled,
+					$"{m_CombatantName}'s {currentMultiTurnAction.action.m_ActionName} was cancelled!");
+				currentMultiTurnAction = null;
+				isCharging = false;
+			}
+		}
 
-            int actualHeal = m_CurrentHp - previousHp;
-            RaiseCombatantEvent(CombatantEventType.HealingReceived,
-                $"{m_CombatantName} heals {actualHeal}. (HP: {m_CurrentHp}/{m_MaxHp})", actualHeal);
+		private void ApplyChargeTurnEffects() {
+			if (currentMultiTurnAction == null) return;
 
-            if (m_CurrentHp == m_MaxHp)
-            {
-                RaiseCombatantEvent(CombatantEventType.FullHealth, $"{m_CombatantName} is at full health!");
-            }
-        }
-    }
+			switch (currentMultiTurnAction.action.m_ChargeTurnBehavior) {
+				case ChargeTurnBehavior.ApplyDefenseBuff:
+					if (!currentMultiTurnAction.defenseBuffApplied) {
+						int defenseBonus = Mathf.RoundToInt(m_Defense * 0.3f);
+						m_Defense += defenseBonus;
+						currentMultiTurnAction.defenseBuffApplied = true;
+					}
+					break;
 
-    [System.Serializable]
-    public class MultiTurnActionState
-    {
-        public BattleAction action;
-        public Combatant target;
-        public int turnsRemaining;
-        public int currentTurn;
-        public bool isComplete = false;
+				case ChargeTurnBehavior.ApplySpeedDebuff:
+					if (!currentMultiTurnAction.speedDebuffApplied) {
+						int speedReduction = Mathf.RoundToInt(m_Speed * 0.2f);
+						m_Speed = Mathf.Max(1, m_Speed - speedReduction);
+						currentMultiTurnAction.speedDebuffApplied = true;
+					}
+					break;
 
-        public int originalDefense;
-        public int originalSpeed;
-        public bool defenseBuffApplied = false;
-        public bool speedDebuffApplied = false;
+				case ChargeTurnBehavior.TakeDamage:
+					int chargeDamage = Mathf.Max(1, m_MaxHp / 20);
+					TakeDamage(chargeDamage);
+					RaiseCombatantEvent(CombatantEventType.ChargeDamage,
+						$"{m_CombatantName} takes {chargeDamage} damage from charging!");
+					break;
+			}
+		}
 
-        public MultiTurnActionState(BattleAction action, Combatant actor, Combatant target)
-        {
-            this.action = action;
-            this.target = target;
-            this.turnsRemaining = action.m_TurnCost;
-            this.currentTurn = 0;
-            this.originalDefense = actor.m_Defense;
-            this.originalSpeed = actor.m_Speed;
-        }
+		private void RemoveChargeTurnEffects() {
+			if (currentMultiTurnAction == null) return;
 
-        public bool AdvanceTurn()
-        {
-            currentTurn++;
-            turnsRemaining--;
+			if (currentMultiTurnAction.defenseBuffApplied) {
+				m_Defense = currentMultiTurnAction.originalDefense;
+			}
+			if (currentMultiTurnAction.speedDebuffApplied) {
+				m_Speed = currentMultiTurnAction.originalSpeed;
+			}
+		}
 
-            if (turnsRemaining <= 0)
-            {
-                isComplete = true;
-                return true;
-            }
-            return false;
-        }
+		public string ColorAsHex {
+			get {
+				return "#" + ColorUtility.ToHtmlStringRGB(m_Color);
+			}
+		}
 
-        public string GetChargeMessage(Combatant actor)
-        {
-            return $"{actor.m_CombatantName}{action.m_ChargeMessage} ({turnsRemaining} turn(s) remaining)";
-        }
-    }
+		public bool isAlive {
+			get {
+				return m_CurrentHp > 0;
+			}
+		}
 
-    public enum CombatantEventType
-    {
-        DamageTaken,
-        HealingReceived,
-        Died,
-        FullHealth,
-        ChargeStarted,
-        Charging,
-        ChargeComplete,
-        ChargeCancelled,
-        ChargeDamage,
-        DefendStarted,
-        DefendEnded,
-        CounterAttack
-    }
+		public void Die() {
+			RaiseCombatantEvent(CombatantEventType.Died, $"{m_CombatantName} died!");
+		}
 
-    public struct CombatantEventData
-    {
-        public CombatantEventType EventType;
-        public Combatant Combatant;
-        public string Message;
-        public int Amount;
-        public float Timestamp;
-    }
+		public void Heal(int amount) {
+			int previousHp = m_CurrentHp;
+			m_CurrentHp += amount;
+			if (m_CurrentHp > m_MaxHp) {
+				m_CurrentHp = m_MaxHp;
+			}
+
+			int actualHeal = m_CurrentHp - previousHp;
+			RaiseCombatantEvent(CombatantEventType.HealingReceived,
+				$"{m_CombatantName} heals {actualHeal}. (HP: {m_CurrentHp}/{m_MaxHp})", actualHeal);
+
+			if (m_CurrentHp == m_MaxHp) {
+				RaiseCombatantEvent(CombatantEventType.FullHealth, $"{m_CombatantName} is at full health!");
+			}
+		}
+	}
+
+	[System.Serializable]
+	public class MultiTurnActionState {
+		public BattleAction action;
+		public Combatant target;
+		public int turnsRemaining;
+		public int currentTurn;
+		public bool isComplete = false;
+
+		public int originalDefense;
+		public int originalSpeed;
+		public bool defenseBuffApplied = false;
+		public bool speedDebuffApplied = false;
+
+		public MultiTurnActionState(BattleAction action, Combatant actor, Combatant target) {
+			this.action = action;
+			this.target = target;
+			this.turnsRemaining = action.m_TurnCost;
+			this.currentTurn = 0;
+			this.originalDefense = actor.m_Defense;
+			this.originalSpeed = actor.m_Speed;
+		}
+
+		public bool AdvanceTurn() {
+			currentTurn++;
+			turnsRemaining--;
+
+			if (turnsRemaining <= 0) {
+				isComplete = true;
+				return true;
+			}
+			return false;
+		}
+
+		public string GetChargeMessage(Combatant actor) {
+			return $"{actor.m_CombatantName}{action.m_ChargeMessage} ({turnsRemaining} turn(s) remaining)";
+		}
+	}
+
+	public enum CombatantEventType {
+		DamageTaken,
+		HealingReceived,
+		Died,
+		FullHealth,
+		ChargeStarted,
+		Charging,
+		ChargeComplete,
+		ChargeCancelled,
+		ChargeDamage,
+		DefendStarted,
+		DefendEnded,
+		CounterAttack,
+		AttackBuffed,
+		AttackBuffEnded
+	}
+
+	public struct CombatantEventData {
+		public CombatantEventType EventType;
+		public Combatant Combatant;
+		public string Message;
+		public int Amount;
+		public float Timestamp;
+	}
 }

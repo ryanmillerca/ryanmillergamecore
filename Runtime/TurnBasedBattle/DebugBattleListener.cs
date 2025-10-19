@@ -195,6 +195,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				case CombatantEventType.CounterAttack:
 					Debug.Log($"{colorTag}⚔️ {eventData.Message}</color>");
 					break;
+				case CombatantEventType.AttackBuffed:
+					Debug.Log($"{colorTag}📈 {eventData.Message}</color>");
+					break;
+				case CombatantEventType.AttackBuffEnded:
+					Debug.Log($"{colorTag}📉 {eventData.Message}</color>");
+					break;
 			}
 		}
 	}

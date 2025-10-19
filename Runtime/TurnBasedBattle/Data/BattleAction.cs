@@ -1,6 +1,6 @@
-using UnityEngine;
-
 namespace RyanMillerGameCore.TurnBasedCombat {
+	using UnityEngine;
+
 	[CreateAssetMenu(menuName = "Battle/Action")]
 	public class BattleAction : ScriptableObject {
 		[Header("Basic Info")]
@@ -29,6 +29,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public float m_CounterChance = 0f;
 		[Tooltip("Counter attack power multiplier")]
 		public float m_CounterMultiplier = 1f;
+		[Tooltip("Attack buff multiplier applied after defending (1.2 = +20% attack)")]
+		public float m_DefendAttackBuff = 1f;
+		[Tooltip("Turns the attack buff lasts")]
+		public int m_AttackBuffDuration = 1;
 
 		[Header("Multi-Turn Actions")]
 		public bool m_IsMultiTurn = false;
