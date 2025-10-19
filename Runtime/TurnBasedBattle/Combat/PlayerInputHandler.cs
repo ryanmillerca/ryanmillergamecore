@@ -30,9 +30,9 @@ namespace RyanMillerGameCore.TurnBasedCombat
 
         private void OnPlayerInputRequired(PlayerInputData inputData)
         {
-            Debug.Log($"🎮 Player input required for {inputData.Actor.m_CombatantName}");
-            Debug.Log($"   Available moves: {string.Join(", ", inputData.AvailableMoves.Select(m => m.m_ActionName))}");
-            Debug.Log($"   Valid targets: {string.Join(", ", inputData.ValidTargets.Select(t => t.m_CombatantName))}");
+            Debug.Log($"Waiting on Player input for {inputData.Actor.m_CombatantName}");
+            Debug.Log($"Available moves: {string.Join(", ", inputData.AvailableMoves.Select(m => m.m_ActionName))}");
+            Debug.Log($"Valid targets: {string.Join(", ", inputData.ValidTargets.Select(t => t.m_CombatantName))}");
 
             // Here you would:
             // 1. Show your battle UI menu

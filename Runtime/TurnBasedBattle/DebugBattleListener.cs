@@ -43,9 +43,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			if (!logPlayerInputEvents) return;
 
 			string colorTag = $"<color={inputData.Actor.ColorAsHex}>";
-			Debug.Log($"{colorTag}🎮 PLAYER INPUT REQUIRED for {inputData.Actor.m_CombatantName}</color>");
-			Debug.Log($"{colorTag}   Moves: {string.Join(", ", inputData.AvailableMoves.Select(m => m.m_ActionName))}</color>");
-			Debug.Log($"{colorTag}   Targets: {string.Join(", ", inputData.ValidTargets.Select(t => t.m_CombatantName))}</color>");
+			Debug.Log($"{colorTag}PLAYER INPUT REQUIRED for {inputData.Actor.m_CombatantName}</color>");
+			Debug.Log($"{colorTag}Moves: {string.Join(", ", inputData.AvailableMoves.Select(m => m.m_ActionName))}</color>");
+			Debug.Log($"{colorTag}Targets: {string.Join(", ", inputData.ValidTargets.Select(t => t.m_CombatantName))}</color>");
 		}
 
 		private void OnPlayerInputReceived(PlayerInputResponse response) {
@@ -53,11 +53,11 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			if (response.IsValid) {
 				string colorTag = $"<color=#00FF00>";
-				Debug.Log($"{colorTag}🎮 PLAYER SELECTED: {response.SelectedAction.m_ActionName} -> {response.SelectedTarget.m_CombatantName}</color>");
+				Debug.Log($"{colorTag}PLAYER SELECTED: {response.SelectedAction.m_ActionName} -> {response.SelectedTarget.m_CombatantName}</color>");
 			}
 			else {
 				string colorTag = $"<color=#FF0000>";
-				Debug.Log($"{colorTag}🎮 INVALID PLAYER INPUT: {response.ValidationMessage}</color>");
+				Debug.Log($"{colorTag}INVALID PLAYER INPUT: {response.ValidationMessage}</color>");
 			}
 		}
 
@@ -69,33 +69,33 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			switch (eventData.EventType) {
 				case BattleEventType.BattleStarted:
-					Debug.Log($"🚀 BATTLE STARTED: {eventData.Message}");
+					Debug.Log($"BATTLE STARTED: {eventData.Message}");
 					break;
 				case BattleEventType.BattleEnded:
-					Debug.Log($"🏁 BATTLE ENDED: {eventData.Message}");
+					Debug.Log($"BATTLE ENDED: {eventData.Message}");
 					break;
 				case BattleEventType.TurnSkipped:
-					Debug.LogWarning($"{colorTag}⏭️ {eventData.Message}{colorClose}");
+					Debug.LogWarning($"{colorTag}{eventData.Message}{colorClose}");
 					break;
 				case BattleEventType.NoValidTargets:
-					Debug.LogWarning($"{colorTag}🎯 {eventData.Message}{colorClose}");
+					Debug.LogWarning($"{colorTag}{eventData.Message}{colorClose}");
 					break;
 				case BattleEventType.NoMovesAvailable:
-					Debug.LogWarning($"{colorTag}❌ {eventData.Message}{colorClose}");
+					Debug.LogWarning($"{colorTag}{eventData.Message}{colorClose}");
 					break;
 				case BattleEventType.CommandError:
 				case BattleEventType.ResolutionError:
 				case BattleEventType.EventHandlerError:
-					Debug.LogError($"{colorTag}💥 {eventData.Message}{colorClose}");
+					Debug.LogError($"{colorTag}{eventData.Message}{colorClose}");
 					break;
 				case BattleEventType.BattleEndConditionMet:
-					Debug.Log($"{colorTag}⚡ {eventData.Message}{colorClose}");
+					Debug.Log($"{colorTag}{eventData.Message}{colorClose}");
 					break;
 				case BattleEventType.TurnOrderUpdated:
-					Debug.Log($"📋 {eventData.Message}");
+					Debug.Log($"{eventData.Message}");
 					break;
 				case BattleEventType.TargetChanged:
-					Debug.Log($"{colorTag}🎯 {eventData.Message}{colorClose}");
+					Debug.Log($"{colorTag}{eventData.Message}{colorClose}");
 					break;
 			}
 		}
@@ -109,17 +109,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				case TurnEventType.TurnStarted:
 					string brainInfo = eventData.Combatant.m_AIBrain != null ?
 					$" ({eventData.Combatant.m_AIBrain.GetType().Name})" : "";
-					Debug.Log($"{colorTag}🎪 It's {eventData.Combatant.m_CombatantName}'s turn!{brainInfo}</color>");
+					Debug.Log($"{colorTag}It's {eventData.Combatant.m_CombatantName}'s turn!{brainInfo}</color>");
 					break;
 				case TurnEventType.ActionSelected:
 					string aiNote = eventData.Combatant.m_Team == Team.Enemy ? " [AI]" : "";
-					Debug.Log($"{colorTag}🎯 {eventData.Combatant.m_CombatantName} selects {eventData.Action.m_ActionName} targeting {eventData.Target.m_CombatantName}{aiNote}</color>");
+					Debug.Log($"{colorTag}{eventData.Combatant.m_CombatantName} selects {eventData.Action.m_ActionName} targeting {eventData.Target.m_CombatantName}{aiNote}</color>");
 					break;
 				case TurnEventType.MultiTurnStarted:
-					Debug.Log($"{colorTag}⚡ {eventData.Combatant.m_CombatantName} starts charging {eventData.Action.m_ActionName} for {eventData.Action.m_TurnCost} turns!</color>");
+					Debug.Log($"{colorTag}{eventData.Combatant.m_CombatantName} starts charging {eventData.Action.m_ActionName} for {eventData.Action.m_TurnCost} turns!</color>");
 					break;
 				case TurnEventType.TurnEnded:
-					Debug.Log($"{colorTag}✅ {eventData.Combatant.m_CombatantName}'s turn ended</color>");
+					Debug.Log($"{colorTag}{eventData.Combatant.m_CombatantName}'s turn ended</color>");
 					break;
 			}
 		}
@@ -138,36 +138,36 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				Debug.Log($"{colorTag}❌ {result.Message}</color>");
 			}
 			else if (result.DamageDealt > 0) {
-				string critTag = result.CriticalHit ? "💥 " : "";
+				string critTag = result.CriticalHit ? "CRIT " : "";
 				string critInfo = result.CriticalHit ? $"[Crit Chance: {result.CriticalChance:P1}]" : "";
 
 				string targetName = result.Target != null ? result.Target.m_CombatantName : "DEAD TARGET";
 				string safeMessage = result.Message ?? $"{result.Actor.m_CombatantName} used attack on {targetName} for {result.DamageDealt} damage.";
 
-				Debug.Log($"{colorTag}⚔️ {critTag}{safeMessage} {critInfo}</color>");
+				Debug.Log($"{colorTag}{critTag}{safeMessage} {critInfo}</color>");
 			}
 			else if (result.HealingDone > 0) {
 				string targetName = result.Target != null ? result.Target.m_CombatantName : "SELF";
 				string safeMessage = result.Message ?? $"{result.Actor.m_CombatantName} used heal on {targetName} for {result.HealingDone} healing.";
 
-				Debug.Log($"{colorTag}💚 {safeMessage}</color>");
+				Debug.Log($"{colorTag}{safeMessage}</color>");
 			}
 			else {
 				string safeMessage = result.Message ?? $"{result.Actor.m_CombatantName} used {result.BattleAction?.m_ActionName ?? "UNKNOWN ACTION"}.";
-				Debug.Log($"{colorTag}✨ {safeMessage}</color>");
+				Debug.Log($"{colorTag}{safeMessage}</color>");
 			}
 		}
 
 		private void OnBattleEnded(BattleOutcome outcome) {
 			switch (outcome) {
 				case BattleOutcome.Victory:
-					Debug.Log("🎉 VICTORY! Players win!");
+					Debug.Log("VICTORY! You (Player) win!");
 					break;
 				case BattleOutcome.Defeat:
-					Debug.Log("💀 DEFEAT! Enemies win!");
+					Debug.Log("DEFEAT! Enemies win!");
 					break;
 				case BattleOutcome.Undefined:
-					Debug.Log("❓ Battle ended with undefined outcome");
+					Debug.Log("Battle ended with undefined outcome");
 					break;
 			}
 		}
@@ -191,46 +191,46 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			switch (eventData.EventType) {
 				case CombatantEventType.DamageTaken:
-					Debug.Log($"{colorTag}💔 {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.HealingReceived:
-					Debug.Log($"{colorTag}💚 {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.Died:
-					Debug.Log($"{colorTag}☠️ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.FullHealth:
-					Debug.Log($"{colorTag}⭐ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.ChargeStarted:
-					Debug.Log($"{colorTag}⚡ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.Charging:
-					Debug.Log($"{colorTag}⏳ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.ChargeComplete:
-					Debug.Log($"{colorTag}✅ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.ChargeCancelled:
-					Debug.Log($"{colorTag}❌ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.ChargeDamage:
-					Debug.Log($"{colorTag}⚡ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.DefendStarted:
-					Debug.Log($"{colorTag}🛡️ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.DefendEnded:
-					Debug.Log($"{colorTag}🛡️ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.CounterAttack:
-					Debug.Log($"{colorTag}⚔️ {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.AttackBuffed:
-					Debug.Log($"{colorTag}📈 {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 				case CombatantEventType.AttackBuffEnded:
-					Debug.Log($"{colorTag}📉 {eventData.Message}</color>");
+					Debug.Log($"{colorTag}{eventData.Message}</color>");
 					break;
 			}
 		}
