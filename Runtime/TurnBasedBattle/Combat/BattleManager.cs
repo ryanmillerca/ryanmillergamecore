@@ -23,23 +23,23 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			StartCoroutine(BattleLoop());
 		}
 
-		bool EnemiesAreAlive() {
+		// New team-based victory conditions
+		bool PlayersAreAlive() {
 			foreach (Combatant c in m_Combatants) {
-				if (c.isAlive && c.m_IsPlayer == false) {
+				if (c.isAlive && c.m_Team == Team.Player) {
 					return true;
 				}
 			}
 			return false;
 		}
 
-		bool CombatantsAreAlive() {
-			int aliveCombatants = 0;
+		bool EnemiesAreAlive() {
 			foreach (Combatant c in m_Combatants) {
-				if (c.isAlive) {
-					aliveCombatants++;
+				if (c.isAlive && c.m_Team == Team.Enemy) {
+					return true;
 				}
 			}
-			return aliveCombatants > 1;
+			return false;
 		}
 
 		private IEnumerator BattleLoop() {
@@ -47,16 +47,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			var turnQueue = new Queue<Combatant>();
 
-			while (EnemiesAreAlive() && CombatantsAreAlive()) {
+			// Battle continues while both teams have living members
+			while (PlayersAreAlive() && EnemiesAreAlive()) {
 				// Recalculate and fill turn queue every cycle
 				FillTurnQueueEvenly(turnQueue);
 
 				// Process turns from the queue
-				while (turnQueue.Count > 0 && EnemiesAreAlive() && CombatantsAreAlive()) {
+				while (turnQueue.Count > 0 && PlayersAreAlive() && EnemiesAreAlive()) {
 					var next = turnQueue.Dequeue();
 
 					if (next.isAlive) {
-//						Debug.Log($"<color={next.ColorAsHex}>Starting turn coroutine for {next.m_CombatantName}</color>");
 						yield return StartCoroutine(TakeTurn(next));
 					}
 				}
@@ -66,7 +66,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 
 			m_BattleActive = false;
-			Debug.Log("Battle ended!");
+			
+			// Determine battle outcome
+			if (PlayersAreAlive() && !EnemiesAreAlive()) {
+				Debug.Log("Victory! All enemies defeated!");
+			}
+			else if (!PlayersAreAlive() && EnemiesAreAlive()) {
+				Debug.Log("Defeat! All players are down!");
+			}
+			else {
+				Debug.Log("Battle ended unexpectedly!");
+			}
 		}
 
 		private void FillTurnQueueEvenly(Queue<Combatant> turnQueue) {
@@ -119,12 +129,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield break;
 			}
 
-//			Debug.Log($"<color={c.ColorAsHex}>TakeTurn started for {c.m_CombatantName} (alive={c.isAlive}).</color>");
-
-			// Pick first alive target that is not self (snapshot target for this action)
-			var target = m_Combatants.FirstOrDefault(t => t.isAlive && t != c);
-			if (target == null) {
-				Debug.LogWarning($"<color={c.ColorAsHex}>TakeTurn: no valid target found for {c.m_CombatantName}. Ending turn.</color>");
+			// Get valid targets based on team affiliation
+			var validTargets = GetValidTargets(c);
+			if (validTargets.Count == 0) {
+				Debug.LogWarning($"<color={c.ColorAsHex}>TakeTurn: no valid targets found for {c.m_CombatantName}. Ending turn.</color>");
 				yield break;
 			}
 
@@ -134,6 +142,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield break;
 			}
 
+			// Pick a random valid target
+			var target = validTargets[Random.Range(0, validTargets.Count)];
+			
 			BattleCommand cmd;
 			try {
 				cmd = new BattleCommand(c, c.m_Moves[0], target);
@@ -156,12 +167,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield break;
 			}
 
-			// Diagnostics: how many results, how many dealt damage/healing
-			int damageCount = results?.Count(r => r.DamageDealt > 0) ?? 0;
-			int healCount = results?.Count(r => r.HealingDone > 0) ?? 0;
-
 			// If resolve somehow killed the last enemy, bail out early (prevents further processing)
-			if (!EnemiesAreAlive() || !CombatantsAreAlive()) {
+			if (!PlayersAreAlive() || !EnemiesAreAlive()) {
 				Debug.Log($"After {c.m_CombatantName}'s action, battle end condition met. Ending turn early.");
 				yield break;
 			}
@@ -180,6 +187,24 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 
 			yield return new WaitForSeconds(0.5f); // placeholder for animations
+		}
+
+		// New method to get valid targets based on team
+		private List<Combatant> GetValidTargets(Combatant attacker) {
+			var validTargets = new List<Combatant>();
+			
+			foreach (var combatant in m_Combatants) {
+				if (!combatant.isAlive || combatant == attacker) 
+					continue;
+					
+				// Players attack enemies, enemies attack players
+				// Same team members don't attack each other
+				if (attacker.m_Team != combatant.m_Team) {
+					validTargets.Add(combatant);
+				}
+			}
+			
+			return validTargets;
 		}
 
 		private void DisplayTurnOrder() {

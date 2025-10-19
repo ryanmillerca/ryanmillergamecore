@@ -2,6 +2,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 	using System.Collections.Generic;
 	using UnityEngine;
 
+	// Team enum to define affiliations
+	public enum Team {
+		Player,
+		Enemy,
+		Neutral // Optional: for future expansion
+	}
+
 	public class Combatant : MonoBehaviour {
 		public string m_CombatantName;
 		public int m_MaxHp = 100;
@@ -10,9 +17,15 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public int m_Speed = 10;
 		public int m_CurrentHp = 100;
 		public List<BattleAction> m_Moves;
-		public bool m_IsPlayer = false;
+		public Team m_Team = Team.Enemy; // Replace m_IsPlayer with Team
 		[HideInInspector] public float m_TurnGauge = 0f; // 0-100 gauge
 		public Color m_Color;
+		
+		// Backwards compatibility property
+		public bool m_IsPlayer {
+			get { return m_Team == Team.Player; }
+			set { m_Team = value ? Team.Player : Team.Enemy; }
+		}
 		
 		private void Awake() {
 			m_CurrentHp = Mathf.Clamp(m_CurrentHp, 0, m_MaxHp);

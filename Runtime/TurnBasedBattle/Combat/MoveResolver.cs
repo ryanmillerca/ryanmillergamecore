@@ -117,12 +117,27 @@ namespace RyanMillerGameCore.TurnBasedCombat
 
             switch (cmd.BattleAction.m_TargetType)
             {
-                case ActionTargetType.Self: return new List<Combatant> { cmd.Actor };
-                case ActionTargetType.SingleEnemy: return new List<Combatant> { cmd.Target };
-                case ActionTargetType.AllEnemies: return allCombatants.FindAll(c => c.isAlive && c != cmd.Actor); // simple enemy/allies logic
-                case ActionTargetType.SingleAlly: return new List<Combatant> { cmd.Target };
-                case ActionTargetType.AllAllies: return allCombatants.FindAll(c => c.isAlive && c != cmd.Target); // tweak based on your team/allies
-                default: return new List<Combatant> { cmd.Target };
+                case ActionTargetType.Self: 
+                    return new List<Combatant> { cmd.Actor };
+                    
+                case ActionTargetType.SingleEnemy: 
+                    // Only target enemies of the actor's team
+                    return new List<Combatant> { cmd.Target }.FindAll(t => t.m_Team != cmd.Actor.m_Team && t.isAlive);
+                    
+                case ActionTargetType.AllEnemies: 
+                    // Target all enemies of the actor's team
+                    return allCombatants.FindAll(c => c.isAlive && c.m_Team != cmd.Actor.m_Team);
+                    
+                case ActionTargetType.SingleAlly: 
+                    // Only target allies (including self if appropriate)
+                    return new List<Combatant> { cmd.Target }.FindAll(t => t.m_Team == cmd.Actor.m_Team && t.isAlive);
+                    
+                case ActionTargetType.AllAllies: 
+                    // Target all allies (could include/exclude self based on design)
+                    return allCombatants.FindAll(c => c.isAlive && c.m_Team == cmd.Actor.m_Team && c != cmd.Actor);
+                    
+                default: 
+                    return new List<Combatant> { cmd.Target };
             }
         }
 
