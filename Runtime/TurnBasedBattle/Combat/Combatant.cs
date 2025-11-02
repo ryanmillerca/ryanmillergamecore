@@ -9,6 +9,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 	}
 
 	public class Combatant : MonoBehaviour {
+		
+		
+		// returns the combatant's actions in a List<BattleAction> form for UI compatibility
+		public List<BattleAction> m_MovesAsActions()
+		{
+			// Return a copy to avoid accidental modification of the original list by UI code.
+			// If you prefer not to copy, return m_Moves directly.
+			if (m_Moves == null) return new List<BattleAction>();
+			return new List<BattleAction>(m_Moves);
+		}
+		
 		public string m_CombatantName;
 		public int m_MaxHp = 100;
 		public int m_Attack = 20;

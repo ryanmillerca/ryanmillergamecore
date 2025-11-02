@@ -9,5 +9,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			BattleAction = action;
 			Target = target;
 		}
+		public BattleCommand() {
+			throw new System.NotImplementedException();
+		}
 	}
 }

@@ -4,11 +4,14 @@ using RyanMillerGameCore.TurnBasedCombat.UI;
 
 namespace RyanMillerGameCore.TurnBasedCombat
 {
-    public class PlayerInputHandler : MonoBehaviour
+    /// <summary>
+    /// Connects BattleManager to Input UI for Player
+    /// </summary>
+    public class CombatInputPlayer : MonoBehaviour
     {
         [Header("References")]
         public BattleManager battleManager;
-        public UIBattleMenu uiBattleMenu; // You'll create this
+        public UIBattleMenu uiBattleMenu; 
 
         private void OnEnable()
         {
@@ -40,11 +43,10 @@ namespace RyanMillerGameCore.TurnBasedCombat
             // 3. Wait for player selection
             // 4. Call SubmitPlayerInput when ready
 
-            // Example of how you might handle this:
-            // uiBattleMenu.Show(inputData, OnPlayerSelection);
+            uiBattleMenu.Show(inputData);
             
             // For now, we'll simulate a player selection after a delay
-            StartCoroutine(SimulatePlayerInput(inputData));
+            //StartCoroutine(SimulatePlayerInput(inputData));
         }
 
         private System.Collections.IEnumerator SimulatePlayerInput(PlayerInputData inputData)

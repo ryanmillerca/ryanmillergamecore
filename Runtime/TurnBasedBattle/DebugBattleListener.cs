@@ -3,41 +3,9 @@ using System.Linq;
 
 namespace RyanMillerGameCore.TurnBasedCombat {
 	public class DebugBattleListener : MonoBehaviour {
-		[Header("References")]
-		public BattleManager battleManager;
 
-		[Header("Log Settings")]
-		public bool logBattleEvents = true;
-		public bool logTurnEvents = true;
-		public bool logCombatantEvents = true;
-		public bool logMoveResolution = true;
-		public bool logPlayerInputEvents = true;
 
-		private void OnEnable() {
-			if (battleManager == null) {
-				battleManager = FindObjectOfType<BattleManager>();
-			}
-
-			if (battleManager != null) {
-				battleManager.BattleEvent += OnBattleEvent;
-				battleManager.TurnEvent += OnTurnEvent;
-				battleManager.MoveResolved += OnMoveResolved;
-				battleManager.BattleEnded += OnBattleEnded;
-				battleManager.PlayerInputRequired += OnPlayerInputRequired;
-				battleManager.PlayerInputReceived += OnPlayerInputReceived;
-			}
-		}
-
-		private void OnDisable() {
-			if (battleManager != null) {
-				battleManager.BattleEvent -= OnBattleEvent;
-				battleManager.TurnEvent -= OnTurnEvent;
-				battleManager.MoveResolved -= OnMoveResolved;
-				battleManager.BattleEnded -= OnBattleEnded;
-				battleManager.PlayerInputRequired -= OnPlayerInputRequired;
-				battleManager.PlayerInputReceived -= OnPlayerInputReceived;
-			}
-		}
+		#region Event Receivers
 
 		private void OnPlayerInputRequired(PlayerInputData inputData) {
 			if (!logPlayerInputEvents) return;
@@ -108,7 +76,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			switch (eventData.EventType) {
 				case TurnEventType.TurnStarted:
 					string brainInfo = eventData.Combatant.m_AIBrain != null ?
-					$" ({eventData.Combatant.m_AIBrain.GetType().Name})" : "";
+						$" ({eventData.Combatant.m_AIBrain.GetType().Name})" : "";
 					Debug.Log($"{colorTag}It's {eventData.Combatant.m_CombatantName}'s turn!{brainInfo}</color>");
 					break;
 				case TurnEventType.ActionSelected:
@@ -171,19 +139,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					break;
 			}
 		}
-
-		public void SubscribeToCombatant(Combatant combatant) {
-			if (combatant != null) {
-				combatant.CombatantEvent += OnCombatantEvent;
-			}
-		}
-
-		public void UnsubscribeFromCombatant(Combatant combatant) {
-			if (combatant != null) {
-				combatant.CombatantEvent -= OnCombatantEvent;
-			}
-		}
-
 		private void OnCombatantEvent(CombatantEventData eventData) {
 			if (!logCombatantEvents) return;
 
@@ -234,5 +189,72 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					break;
 			}
 		}
+
+		#endregion
+
+
+		#region Serialized Fields
+
+		[Header("References")]
+		[SerializeField] private BattleManager battleManager;
+
+		[Header("Log Settings")]
+		[SerializeField] private bool logBattleEvents = true;
+		[SerializeField] private bool logTurnEvents = true;
+		[SerializeField] private bool logCombatantEvents = true;
+		[SerializeField] private bool logMoveResolution = true;
+		[SerializeField] private bool logPlayerInputEvents = true;
+
+		#endregion
+
+
+		#region Monobehaviour
+
+		private void OnEnable() {
+			if (battleManager == null) {
+				battleManager = FindFirstObjectByType<BattleManager>();
+			}
+
+			if (battleManager != null) {
+				battleManager.BattleEvent += OnBattleEvent;
+				battleManager.TurnEvent += OnTurnEvent;
+				battleManager.MoveResolved += OnMoveResolved;
+				battleManager.BattleEnded += OnBattleEnded;
+				battleManager.PlayerInputRequired += OnPlayerInputRequired;
+				battleManager.PlayerInputReceived += OnPlayerInputReceived;
+			}
+		}
+
+		private void OnDisable() {
+			if (battleManager != null) {
+				battleManager.BattleEvent -= OnBattleEvent;
+				battleManager.TurnEvent -= OnTurnEvent;
+				battleManager.MoveResolved -= OnMoveResolved;
+				battleManager.BattleEnded -= OnBattleEnded;
+				battleManager.PlayerInputRequired -= OnPlayerInputRequired;
+				battleManager.PlayerInputReceived -= OnPlayerInputReceived;
+			}
+		}
+
+		#endregion
+
+
+		#region Private Methods
+
+		public void SubscribeToCombatant(Combatant combatant) {
+			if (combatant != null) {
+				combatant.CombatantEvent += OnCombatantEvent;
+			}
+		}
+
+		public void UnsubscribeFromCombatant(Combatant combatant) {
+			if (combatant != null) {
+				combatant.CombatantEvent -= OnCombatantEvent;
+			}
+		}
+
+		#endregion
+
+
 	}
 }
