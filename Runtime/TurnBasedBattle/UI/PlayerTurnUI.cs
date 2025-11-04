@@ -4,7 +4,8 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 	using TMPro;
 	using UnityEngine;
 	using UnityEngine.UI;
-	using RyanMillerGameCore.TurnBasedCombat;
+	using TurnBasedCombat;
+	using System;
 
 	/// <summary>
 	/// UI controller for player turn input using prepopulated button arrays + TextMeshPro labels.
@@ -108,26 +109,36 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 		/// <param name="numberOfButtons"></param>
 		private void PrepareActionButtons(int numberOfButtons) {
 			int difference = numberOfButtons - actionButtons.Count;
-			if (difference <= 0) {
-				return;
-			}
-			for (int i = difference; i >= 0; i--) {
-				GameObject newActionButton = Instantiate(actionButtonPrefab, transform, false);
-				actionButtons.Add(newActionButton.GetComponent<CombatActionButton>());
+			if (difference <= 0) return;
+
+			Transform parentTransform = (actionPanel != null) ? actionPanel.transform : this.transform;
+			for (int i = 0; i < difference; i++) {
+				GameObject newActionButton = Instantiate(actionButtonPrefab, parentTransform, false);
+				newActionButton.transform.localScale = Vector3.one;
+				var cab = newActionButton.GetComponent<CombatActionButton>();
+				if (cab != null) actionButtons.Add(cab);
+				else {
+					Debug.LogWarning("Prepared action button prefab is missing CombatActionButton component.");
+					actionButtons.Add(null); // keep index consistency
+				}
 			}
 		}
 
 		public void OnActionButtonClicked(BattleAction battleAction) {
+			if (battleAction == null || m_CurrentActor == null) return;
 
-			// Decide whether target selection is needed
+			// Record selected action for later (target selection)
+			m_SelectedAction = battleAction;
+
 			bool requiresSingleTarget = battleAction.m_TargetType == ActionTargetType.SingleEnemy || battleAction.m_TargetType == ActionTargetType.SingleAlly;
 
+			// Immediate submit for self/group actions
 			if (battleAction.m_TargetSelf ||
 			    battleAction.m_TargetType == ActionTargetType.Self ||
 			    battleAction.m_TargetType == ActionTargetType.AllEnemies ||
 			    battleAction.m_TargetType == ActionTargetType.AllAllies) {
-				// Immediate submit. For group/self actions we pass actor as "target" (resolver will handle TargetType).
-				var cmd = new BattleCommand(m_CurrentActor, battleAction, battleAction.m_TargetSelf ? m_CurrentActor : m_CurrentActor);
+
+				var cmd = new BattleCommand(m_CurrentActor, battleAction, m_CurrentActor);
 				m_BattleManager.SubmitPlayerCommand(cmd);
 				HideAllPanels();
 				return;
@@ -150,10 +161,27 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			if (actionPanel != null) actionPanel.SetActive(false);
 			if (targetPanel != null) targetPanel.SetActive(true);
 
-			// Build candidate list: all alive combatants except the actor. You may want to filter by team.
-			m_CurrentTargets = m_BattleManager.m_Combatants.Where(c => c.isAlive && c != m_CurrentActor).ToList();
+			// Preferred: use BattleManager.GetValidTargets if public. If not, fallback to filtering.
+			try {
+				var mi = m_BattleManager.GetType().GetMethod("GetValidTargets", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+				if (mi != null) {
+					var res = mi.Invoke(m_BattleManager, new object[] { m_CurrentActor }) as System.Collections.IEnumerable;
+					m_CurrentTargets.Clear();
+					if (res != null) {
+						foreach (var o in res)
+							if (o is Combatant c)
+								m_CurrentTargets.Add(c);
+					}
+				}
+				else {
+					m_CurrentTargets = m_BattleManager.m_Combatants.Where(c => c.isAlive && c != m_CurrentActor).ToList();
+				}
+			}
+			catch (Exception ex) {
+				Debug.LogWarning("BuildAndShowTargets reflection failed: " + ex.Message);
+				m_CurrentTargets = m_BattleManager.m_Combatants.Where(c => c.isAlive && c != m_CurrentActor).ToList();
+			}
 
-			int count = Mathf.Min(targetButtons.Length, m_CurrentTargets.Count);
 			for (int i = 0; i < targetButtons.Length; i++) {
 				bool used = i < m_CurrentTargets.Count;
 				targetButtons[i].gameObject.SetActive(used);
@@ -171,7 +199,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 
 			// If there are zero targets, submit action with actor as target
 			if (m_CurrentTargets.Count == 0) {
-				var cmd = new BattleCommand(m_CurrentActor, m_SelectedAction, m_CurrentActor);
+				var cmd = new BattleCommand(m_CurrentActor, m_SelectedAction ?? m_CurrentActions.FirstOrDefault(), m_CurrentActor);
 				m_BattleManager.SubmitPlayerCommand(cmd);
 				HideAllPanels();
 			}

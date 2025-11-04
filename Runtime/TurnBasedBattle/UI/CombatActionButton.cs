@@ -13,6 +13,9 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 
 		private void Awake() {
 			button = GetComponent<Button>();
+			if (label == null) {
+				label = GetComponentInChildren<TextMeshProUGUI>();
+			}
 		}
 
 		public void Configure(PlayerTurnUI playerTurnUI, BattleAction battleAction) {
