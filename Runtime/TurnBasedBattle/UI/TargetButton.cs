@@ -3,11 +3,11 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 	using TMPro;
 	using UnityEngine.UI;
 
-	public class CombatActionButton : MonoBehaviour {
+	public class TargetButton : MonoBehaviour {
 
 		[SerializeField] private TextMeshProUGUI label;
 		private PlayerTurnUI playerTurnUI;
-		private BattleAction battleAction;
+		private Combatant combatant;
 		private Button button;
 
 		private void Awake() {
@@ -17,11 +17,11 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			}
 		}
 
-		public void Configure(PlayerTurnUI playerTurnUI, BattleAction battleAction) {
+		public void Configure(PlayerTurnUI playerTurnUI, Combatant combatant) {
 			this.playerTurnUI = playerTurnUI;
-			this.battleAction = battleAction;
-			if (battleAction) {
-				label.SetText(battleAction.m_ActionName);
+			this.combatant = combatant;
+			if (combatant) {
+				label.SetText(combatant.m_CombatantName);
 				button.interactable = true;
 			}
 			else {
@@ -31,13 +31,13 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 		}
 
 		public void Reset() {
-			this.battleAction = null;
+			this.combatant = null;
 			label.SetText("");
 		}
 
 		public void OnClick() {
-			if (battleAction) {
-				playerTurnUI.OnActionButtonClicked(battleAction);
+			if (combatant) {
+				playerTurnUI.OnTargetButtonClicked(combatant);
 			}
 		}
 	}

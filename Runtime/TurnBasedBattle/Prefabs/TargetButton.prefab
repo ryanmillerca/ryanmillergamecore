@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &943483727893457491
+--- !u!1 &5052114447814428198
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2024686980209879079}
-  - component: {fileID: 9082274704346342617}
-  - component: {fileID: 1461672538666233939}
+  - component: {fileID: 8259589071139749193}
+  - component: {fileID: 2089155395379312204}
+  - component: {fileID: 7718478142887584549}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -18,40 +18,40 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &2024686980209879079
+--- !u!224 &8259589071139749193
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943483727893457491}
+  m_GameObject: {fileID: 5052114447814428198}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5078434812353600262}
+  m_Father: {fileID: 1094429134933896162}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &9082274704346342617
+--- !u!222 &2089155395379312204
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943483727893457491}
+  m_GameObject: {fileID: 5052114447814428198}
   m_CullTransparentMesh: 1
---- !u!114 &1461672538666233939
+--- !u!114 &7718478142887584549
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943483727893457491}
+  m_GameObject: {fileID: 5052114447814428198}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
@@ -136,7 +136,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1 &4146696545629679231
+--- !u!1 &6490572000892941297
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,31 +144,31 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5078434812353600262}
-  - component: {fileID: 4913900446258432964}
-  - component: {fileID: 6305017592380134810}
-  - component: {fileID: 100108378471334857}
-  - component: {fileID: 1865676374252467364}
+  - component: {fileID: 1094429134933896162}
+  - component: {fileID: 2910565247645636394}
+  - component: {fileID: 1096245719368847891}
+  - component: {fileID: 8851687114957533311}
+  - component: {fileID: 6869083070001686043}
   m_Layer: 5
-  m_Name: CombatActionButton
+  m_Name: TargetButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &5078434812353600262
+--- !u!224 &1094429134933896162
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4146696545629679231}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_GameObject: {fileID: 6490572000892941297}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2024686980209879079}
+  - {fileID: 8259589071139749193}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -176,21 +176,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 163.46, y: 66.4}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &4913900446258432964
+--- !u!222 &2910565247645636394
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4146696545629679231}
+  m_GameObject: {fileID: 6490572000892941297}
   m_CullTransparentMesh: 1
---- !u!114 &6305017592380134810
+--- !u!114 &1096245719368847891
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4146696545629679231}
+  m_GameObject: {fileID: 6490572000892941297}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
@@ -214,13 +214,13 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &100108378471334857
+--- !u!114 &8851687114957533311
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4146696545629679231}
+  m_GameObject: {fileID: 6490572000892941297}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -254,12 +254,12 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 6305017592380134810}
+  m_TargetGraphic: {fileID: 1096245719368847891}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1865676374252467364}
-        m_TargetAssemblyTypeName: RyanMillerGameCore.TurnBasedCombat.UI.CombatActionButton,
+      - m_Target: {fileID: 6869083070001686043}
+        m_TargetAssemblyTypeName: RyanMillerGameCore.TurnBasedCombat.UI.TargetButton,
           TurnBasedBattle
         m_MethodName: OnClick
         m_Mode: 1
@@ -271,16 +271,16 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1865676374252467364
+--- !u!114 &6869083070001686043
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4146696545629679231}
+  m_GameObject: {fileID: 6490572000892941297}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ab84d361c58a4c7d87c0ed145006f2f, type: 3}
+  m_Script: {fileID: 11500000, guid: d271cd2787a6241e19e5e1ead3a7637d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TurnBasedBattle::CombatActionButton
-  label: {fileID: 0}
+  m_EditorClassIdentifier: TurnBasedBattle::TargetButton
+  label: {fileID: 7718478142887584549}

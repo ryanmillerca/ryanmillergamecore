@@ -19,14 +19,13 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 
 		[Tooltip("Precreated action buttons (enable/disable). The corresponding labels should be in actionLabels at same indices.")]
 		public GameObject actionButtonPrefab;
-		public List<CombatActionButton> actionButtons = new List<CombatActionButton>();
-		public TMP_Text[] actionLabels;
+		private List<CombatActionButton> actionButtons = new List<CombatActionButton>();
+
+		public GameObject targetButtonPrefab;
+		private List<TargetButton> targetButtons = new List<TargetButton>();
 
 		[Header("Target UI (prepopulated)")]
 		[Tooltip("Precreated target buttons (enable/disable). The corresponding labels should be in targetLabels at same indices.")]
-		public Button[] targetButtons;
-		public TMP_Text[] targetLabels;
-
 		[Header("Panels")]
 		public GameObject actionPanel; // parent panel for action buttons
 		public GameObject targetPanel; // parent panel for target buttons
@@ -182,6 +181,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 				m_CurrentTargets = m_BattleManager.m_Combatants.Where(c => c.isAlive && c != m_CurrentActor).ToList();
 			}
 
+			/*
 			for (int i = 0; i < targetButtons.Length; i++) {
 				bool used = i < m_CurrentTargets.Count;
 				targetButtons[i].gameObject.SetActive(used);
@@ -197,6 +197,23 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 				}
 			}
 
+*/
+			PrepareTargetButtons(m_CurrentTargets.Count);
+
+			// Enable and populate prepopulated action buttons up to array length
+			int count = Mathf.Min(targetButtons.Count, m_CurrentTargets.Count);
+			for (int i = 0; i < targetButtons.Count; i++) {
+				bool used = i < count;
+				if (used) {
+					targetButtons[i].gameObject.SetActive(true);
+					targetButtons[i].Configure(this, m_CurrentTargets[i]);
+				}
+				else {
+					actionButtons[i].Reset();
+					actionButtons[i].gameObject.SetActive(false);
+				}
+			}
+
 			// If there are zero targets, submit action with actor as target
 			if (m_CurrentTargets.Count == 0) {
 				var cmd = new BattleCommand(m_CurrentActor, m_SelectedAction ?? m_CurrentActions.FirstOrDefault(), m_CurrentActor);
@@ -205,7 +222,24 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			}
 		}
 
-		private void OnTargetButtonClicked(Combatant chosenTarget) {
+		void PrepareTargetButtons(int numberOfButtons) {
+			int difference = numberOfButtons - targetButtons.Count;
+			if (difference <= 0) return;
+
+			Transform parentTransform = (targetPanel != null) ? targetPanel.transform : this.transform;
+			for (int i = 0; i < difference; i++) {
+				GameObject newTargetButton = Instantiate(targetButtonPrefab, parentTransform, false);
+				newTargetButton.transform.localScale = Vector3.one;
+				var tb = newTargetButton.GetComponent<TargetButton>();
+				if (tb != null) targetButtons.Add(tb);
+				else {
+					Debug.LogWarning("Prepared target button prefab is missing TargetButton component.");
+					targetButtons.Add(null); // keep index consistency
+				}
+			}
+		}
+
+		public void OnTargetButtonClicked(Combatant chosenTarget) {
 			if (m_CurrentActor == null || m_SelectedAction == null || chosenTarget == null) return;
 
 			var cmd = new BattleCommand(m_CurrentActor, m_SelectedAction, chosenTarget);
@@ -231,28 +265,9 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 				b.Reset();
 				b.gameObject.SetActive(false);
 			}
-
-			if (actionLabels != null) {
-				foreach (var l in actionLabels)
-					if (l != null)
-						l.text = "";
-			}
 		}
 
-		private void ClearTargetSelectionState() {
-			if (targetButtons == null) return;
-			foreach (var b in targetButtons) {
-				if (b == null) continue;
-				b.onClick.RemoveAllListeners();
-				b.gameObject.SetActive(false);
-			}
-
-			if (targetLabels != null) {
-				foreach (var l in targetLabels)
-					if (l != null)
-						l.text = "";
-			}
-		}
+		private void ClearTargetSelectionState() { }
 
 		// Optional: respond to moveResolved (show simple logs or spawn floating text)
 		private void HandleMoveResolved(BattleResult result) {
