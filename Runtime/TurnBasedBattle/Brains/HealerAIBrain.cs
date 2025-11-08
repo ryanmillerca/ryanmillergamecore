@@ -17,7 +17,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 
 			if (injuredAllies.Count > 0) {
 				// Try to find a heal move
-				var healMoves = availableMoves.FindAll(m => m.m_ActionType == ActionType.Heal);
+				var healMoves = availableMoves.FindAll(m => m.ActionType == ActionType.Heal);
 				if (healMoves.Count > 0) {
 					var mostInjuredAlly = GetMostInjuredAlly(injuredAllies);
 					return (healMoves[0], mostInjuredAlly);
@@ -34,7 +34,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 		private List<Combatant> GetAllyTargets(Combatant self, List<Combatant> allTargets) {
 			var allies = new List<Combatant>();
 			foreach (var target in allTargets) {
-				if (target.m_Team == self.m_Team && target != self)
+				if (target.Team == self.Team && target != self)
 					allies.Add(target);
 			}
 			return allies;
@@ -43,7 +43,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 		private List<Combatant> GetInjuredAllies(List<Combatant> allies, float threshold) {
 			var injured = new List<Combatant>();
 			foreach (var ally in allies) {
-				float healthPercent = (float)ally.m_CurrentHp / ally.m_MaxHp;
+				float healthPercent = (float)ally.CurrentHp / ally.MaxHp;
 				if (healthPercent < threshold)
 					injured.Add(ally);
 			}
@@ -53,7 +53,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 		private Combatant GetMostInjuredAlly(List<Combatant> injuredAllies) {
 			Combatant mostInjured = injuredAllies[0];
 			foreach (var ally in injuredAllies) {
-				if (ally.m_CurrentHp < mostInjured.m_CurrentHp)
+				if (ally.CurrentHp < mostInjured.CurrentHp)
 					mostInjured = ally;
 			}
 			return mostInjured;

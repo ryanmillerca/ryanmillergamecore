@@ -12,26 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01970ece3270a462d96a2d9a82ffdf69, type: 3}
   m_Name: Defend
   m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.BattleAction
-  m_ActionName: Fight
-  m_ActionType: 5
-  m_TargetType: 0
-  m_Accuracy: 1
-  m_CritChance: 0
-  m_Power: 10
-  m_StatMultiplier: 1
-  m_Duration: 0
-  m_AttackModifier: 0
-  m_DefenseModifier: 0
-  m_SpeedModifier: 0
-  m_DamageReduction: 0.3
-  m_DefendDuration: 1
-  m_CounterChance: 0
-  m_CounterMultiplier: 1
-  m_DefendAttackBuff: 1
-  m_AttackBuffDuration: 1
-  m_IsMultiTurn: 0
-  m_TurnCost: 1
-  m_ChargeTurnBehavior: 0
-  m_ChargeMessage: ' is charging...'
-  m_ChargeMultiplier: 1.5
-  m_TargetSelf: 0
+  ActionName: Defend
+  ActionType: 5
+  TargetType: 0
+  Accuracy: 1
+  CritChance: 0
+  Power: 10
+  StatMultiplier: 1
+  Duration: 0
+  AttackModifier: 0
+  DefenseModifier: 0
+  SpeedModifier: 0
+  DamageReduction: 0.5
+  DefendDuration: 1
+  CounterChance: 0
+  CounterMultiplier: 1
+  DefendAttackBuff: 1
+  AttackBuffDuration: 1
+  IsMultiTurn: 0
+  TurnCost: 1
+  ChargeTurnBehavior: 0
+  ChargeMessage: ' is charging...'
+  ChargeMultiplier: 1.5
+  TargetSelf: 0

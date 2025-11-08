@@ -2,52 +2,103 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace RyanMillerGameCore.TurnBasedCombat {
-	public enum Team {
-		Player,
-		Enemy,
-		Neutral
-	}
 
 	public class Combatant : MonoBehaviour {
-		
-		
+
 		// returns the combatant's actions in a List<BattleAction> form for UI compatibility
-		public List<BattleAction> m_MovesAsActions()
-		{
+		public List<BattleAction> MovesAsActions() {
 			// Return a copy to avoid accidental modification of the original list by UI code.
 			// If you prefer not to copy, return m_Moves directly.
-			if (m_Moves == null) return new List<BattleAction>();
+			if (m_Moves == null) {
+				return new List<BattleAction>();
+			}
 			return new List<BattleAction>(m_Moves);
 		}
-		
-		public string m_CombatantName;
-		public int m_MaxHp = 100;
-		public int m_Attack = 20;
-		public int m_Defense = 10;
-		public int m_Speed = 10;
-		public int m_CurrentHp = 100;
-		public List<BattleAction> m_Moves;
-		public Team m_Team = Team.Enemy;
-		[HideInInspector] public float m_TurnGauge = 0f;
-		public Color m_Color;
 
-		[Header("AI Behavior")]
-		public EnemyAIBrain m_AIBrain;
+		public string CombatantName {
+			get { return m_CombatantName; }
+		}
 
-		[HideInInspector] public MultiTurnActionState currentMultiTurnAction;
-		[HideInInspector] public bool isCharging = false;
+		public int MaxHp {
+			get { return m_MaxHp; }
+		}
 
-		[HideInInspector] public bool isDefending = false;
-		[HideInInspector] public int defendTurnsRemaining = 0;
-		[HideInInspector] public float defendDamageReduction = 1f;
-		[HideInInspector] public float counterAttackChance = 0f;
-		[HideInInspector] public float counterAttackMultiplier = 1f;
-		[HideInInspector] public Combatant lastAttacker = null;
+		public int Attack {
+			get { return m_Attack; }
+			set { m_Attack = value; }
+		}
 
-		[HideInInspector] public bool hasAttackBuff = false;
-		[HideInInspector] public int attackBuffTurnsRemaining = 0;
-		[HideInInspector] public float attackBuffMultiplier = 1f;
-		[HideInInspector] public int originalAttack;
+		public int Defense {
+			get { return m_Defense; }
+			set { m_Defense = value; }
+		}
+
+		public int Speed {
+			get { return m_Speed; }
+			set { m_Speed = value; }
+		}
+
+		public int CurrentHp {
+			get { return m_CurrentHp; }
+		}
+
+		public List<BattleAction> Moves {
+			get { return m_Moves; }
+		}
+
+		public Team Team {
+			get { return m_Team; }
+		}
+
+		public Color Color {
+			get { return m_Color; }
+		}
+
+		public EnemyAIBrain AIBrain {
+			get { return m_AIBrain; }
+		}
+
+		public Combatant LastAttacker {
+			get { return lastAttacker; }
+			set { lastAttacker = value; }
+		}
+
+		public bool IsDefending {
+			get { return isDefending; }
+		}
+
+		public float CounterAttackMultiplier {
+			get { return counterAttackMultiplier; }
+		}
+
+		public float TurnGauge {
+			get { return m_TurnGauge; }
+		}
+
+		[SerializeField] private string m_CombatantName;
+		[SerializeField] private int m_MaxHp = 100;
+		[SerializeField] private int m_Attack = 20;
+		[SerializeField] private int m_Defense = 10;
+		[SerializeField] private int m_Speed = 10;
+		[SerializeField] private int m_CurrentHp = 100;
+		[SerializeField] private List<BattleAction> m_Moves;
+		[SerializeField] private Team m_Team = Team.Enemy;
+		[SerializeField] private Color m_Color;
+		[SerializeField] private EnemyAIBrain m_AIBrain;
+
+		private float m_TurnGauge = 0f;
+		private MultiTurnActionState currentMultiTurnAction;
+		private bool isCharging = false;
+		private bool isDefending = false;
+		private int defendTurnsRemaining = 0;
+		private float defendDamageReduction = 1f;
+		private float counterAttackChance = 0f;
+		private float counterAttackMultiplier = 1f;
+		private Combatant lastAttacker = null;
+		private bool hasAttackBuff = false;
+		private int attackBuffTurnsRemaining = 0;
+		private float attackBuffMultiplier = 1f;
+		private int originalAttack;
 
 		public delegate void OnCombatantEvent(CombatantEventData eventData);
 		public event OnCombatantEvent CombatantEvent;
@@ -88,17 +139,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 		public void StartDefend(BattleAction defendAction) {
 			isDefending = true;
-			defendTurnsRemaining = defendAction.m_DefendDuration;
-			defendDamageReduction = defendAction.m_DamageReduction;
-			counterAttackChance = defendAction.m_CounterChance;
-			counterAttackMultiplier = defendAction.m_CounterMultiplier;
+			defendTurnsRemaining = defendAction.DefendDuration;
+			defendDamageReduction = defendAction.DamageReduction;
+			counterAttackChance = defendAction.CounterChance;
+			counterAttackMultiplier = defendAction.CounterMultiplier;
 
-			if (defendAction.m_DefendAttackBuff > 1f) {
-				ApplyAttackBuff(defendAction.m_DefendAttackBuff, defendAction.m_AttackBuffDuration);
+			if (defendAction.DefendAttackBuff > 1f) {
+				ApplyAttackBuff(defendAction.DefendAttackBuff, defendAction.AttackBuffDuration);
 			}
 
-			string buffText = defendAction.m_DefendAttackBuff > 1f ?
-			$", attack increased by {((defendAction.m_DefendAttackBuff - 1f) * 100f):0}% for {defendAction.m_AttackBuffDuration} turn(s)" : "";
+			string buffText = defendAction.DefendAttackBuff > 1f ?
+				$", attack increased by {((defendAction.DefendAttackBuff - 1f) * 100f):0}% for {defendAction.AttackBuffDuration} turn(s)" : "";
 
 			RaiseCombatantEvent(CombatantEventType.DefendStarted,
 				$"{m_CombatantName} takes a defensive stance! Damage reduced by {((1f - defendDamageReduction) * 100f):0}% for {defendTurnsRemaining} turn(s){buffText}.");
@@ -215,7 +266,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			ApplyChargeTurnEffects();
 
 			RaiseCombatantEvent(CombatantEventType.ChargeStarted,
-				$"{m_CombatantName} begins charging {action.m_ActionName}! ({action.m_TurnCost} turns)");
+				$"{m_CombatantName} begins charging {action.ActionName}! ({action.TurnCost} turns)");
 		}
 
 		public bool AdvanceMultiTurnAction() {
@@ -225,7 +276,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			if (isReady) {
 				RaiseCombatantEvent(CombatantEventType.ChargeComplete,
-					$"{m_CombatantName} completes charging {currentMultiTurnAction.action.m_ActionName}!");
+					$"{m_CombatantName} completes charging {currentMultiTurnAction.action.ActionName}!");
 				return true;
 			}
 			else {
@@ -248,7 +299,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			if (currentMultiTurnAction != null) {
 				RemoveChargeTurnEffects();
 				RaiseCombatantEvent(CombatantEventType.ChargeCancelled,
-					$"{m_CombatantName}'s {currentMultiTurnAction.action.m_ActionName} was cancelled!");
+					$"{m_CombatantName}'s {currentMultiTurnAction.action.ActionName} was cancelled!");
 				currentMultiTurnAction = null;
 				isCharging = false;
 			}
@@ -257,7 +308,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		private void ApplyChargeTurnEffects() {
 			if (currentMultiTurnAction == null) return;
 
-			switch (currentMultiTurnAction.action.m_ChargeTurnBehavior) {
+			switch (currentMultiTurnAction.action.ChargeTurnBehavior) {
 				case ChargeTurnBehavior.ApplyDefenseBuff:
 					if (!currentMultiTurnAction.defenseBuffApplied) {
 						int defenseBonus = Mathf.RoundToInt(m_Defense * 0.3f);
@@ -343,10 +394,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public MultiTurnActionState(BattleAction action, Combatant actor, Combatant target) {
 			this.action = action;
 			this.target = target;
-			this.turnsRemaining = action.m_TurnCost;
+			this.turnsRemaining = action.TurnCost;
 			this.currentTurn = 0;
-			this.originalDefense = actor.m_Defense;
-			this.originalSpeed = actor.m_Speed;
+			this.originalDefense = actor.Defense;
+			this.originalSpeed = actor.Speed;
 		}
 
 		public bool AdvanceTurn() {
@@ -361,7 +412,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		public string GetChargeMessage(Combatant actor) {
-			return $"{actor.m_CombatantName}{action.m_ChargeMessage} ({turnsRemaining} turn(s) remaining)";
+			return $"{actor.CombatantName}{action.ChargeMessage} ({turnsRemaining} turn(s) remaining)";
 		}
 	}
 
@@ -388,5 +439,11 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public string Message;
 		public int Amount;
 		public float Timestamp;
+	}
+
+	public enum Team {
+		Player,
+		Enemy,
+		Neutral
 	}
 }

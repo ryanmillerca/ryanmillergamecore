@@ -1,94 +1,47 @@
-using System.Linq;
-using UnityEngine;
-using RyanMillerGameCore.TurnBasedCombat.UI;
+namespace RyanMillerGameCore.TurnBasedCombat {
+	using System.Linq;
+	using UnityEngine;
+	using UI;
 
-namespace RyanMillerGameCore.TurnBasedCombat
-{
-    /// <summary>
-    /// Connects BattleManager to Input UI for Player
-    /// </summary>
-    public class CombatInputPlayer : MonoBehaviour
-    {
-        [Header("References")]
-        public BattleManager battleManager;
-        public UIBattleMenu uiBattleMenu; 
+	/// <summary>
+	/// Connects BattleManager to Input UI for Player
+	/// </summary>
+	public class CombatInputPlayer : MonoBehaviour {
+		[SerializeField] private BattleManager m_BattleManager;
+		[SerializeField] private UIBattleMenu m_UIBattleMenu;
 
-        private void OnEnable()
-        {
-            if (battleManager != null)
-            {
-                battleManager.PlayerInputRequired += OnPlayerInputRequired;
-                battleManager.PlayerInputReceived += OnPlayerInputReceived;
-            }
-        }
+		private void OnEnable() {
+			if (m_BattleManager == null) {
+				return;
+			}
+			m_BattleManager.PlayerInputRequired += OnPlayerInputRequired;
+			m_BattleManager.PlayerInputReceived += OnPlayerInputReceived;
+		}
 
-        private void OnDisable()
-        {
-            if (battleManager != null)
-            {
-                battleManager.PlayerInputRequired -= OnPlayerInputRequired;
-                battleManager.PlayerInputReceived -= OnPlayerInputReceived;
-            }
-        }
+		private void OnDisable() {
+			if (m_BattleManager == null) {
+				return;
+			}
+			m_BattleManager.PlayerInputRequired -= OnPlayerInputRequired;
+			m_BattleManager.PlayerInputReceived -= OnPlayerInputReceived;
+		}
 
-        private void OnPlayerInputRequired(PlayerInputData inputData)
-        {
-            Debug.Log($"Waiting on Player input for {inputData.Actor.m_CombatantName}");
-            Debug.Log($"Available moves: {string.Join(", ", inputData.AvailableMoves.Select(m => m.m_ActionName))}");
-            Debug.Log($"Valid targets: {string.Join(", ", inputData.ValidTargets.Select(t => t.m_CombatantName))}");
+		private void OnPlayerInputRequired(PlayerInputData inputData) {
+			Debug.Log($"Waiting on Player input for {inputData.Actor.CombatantName}");
+			Debug.Log($"Available moves: {string.Join(", ", inputData.AvailableMoves.Select(m => m.ActionName))}");
+			Debug.Log($"Valid targets: {string.Join(", ", inputData.ValidTargets.Select(t => t.CombatantName))}");
 
-            // Here you would:
-            // 1. Show your battle UI menu
-            // 2. Populate it with available moves and targets
-            // 3. Wait for player selection
-            // 4. Call SubmitPlayerInput when ready
+			// Here you would:
+			// 1. Show your battle UI menu
+			// 2. Populate it with available moves and targets
+			// 3. Wait for player selection
+			// 4. Call SubmitPlayerInput when ready
 
-            uiBattleMenu.Show(inputData);
-            
-            // For now, we'll simulate a player selection after a delay
-            //StartCoroutine(SimulatePlayerInput(inputData));
-        }
+			m_UIBattleMenu.Show(inputData);
+		}
 
-        private System.Collections.IEnumerator SimulatePlayerInput(PlayerInputData inputData)
-        {
-            // Simulate player thinking time
-            yield return new WaitForSeconds(1.5f);
-
-            // Create a simulated player response
-            var response = new PlayerInputResponse
-            {
-                SelectedAction = inputData.AvailableMoves[0], // First move
-                SelectedTarget = inputData.ValidTargets[0],   // First target
-                IsValid = true,
-                ValidationMessage = "Valid selection"
-            };
-
-            // Submit the response to the battle manager
-            battleManager.SubmitPlayerInput(response);
-        }
-
-        private void OnPlayerInputReceived(PlayerInputResponse response)
-        {
-            Debug.Log($"🎮 Player input received: {response.SelectedAction.m_ActionName} on {response.SelectedTarget.m_CombatantName}");
-        }
-
-        // Public methods for your UI to call
-        public void SubmitActionSelection(BattleAction action, Combatant target)
-        {
-            var response = new PlayerInputResponse
-            {
-                SelectedAction = action,
-                SelectedTarget = target,
-                IsValid = true,
-                ValidationMessage = "Valid selection"
-            };
-
-            battleManager.SubmitPlayerInput(response);
-        }
-
-        public void CancelActionSelection()
-        {
-            battleManager.CancelPlayerInput();
-        }
-    }
+		private void OnPlayerInputReceived(PlayerInputResponse response) {
+			Debug.Log($"🎮 Player input received: {response.SelectedAction.ActionName} on {response.SelectedTarget.CombatantName}");
+		}
+	}
 }

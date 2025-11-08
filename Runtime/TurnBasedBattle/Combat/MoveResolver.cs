@@ -21,13 +21,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			if (!cmd.Actor.isAlive) {
 				results.Add(new BattleResult {
-					Message = $"{cmd.Actor.m_CombatantName} is down and cannot act.",
+					Message = $"{cmd.Actor.CombatantName} is down and cannot act.",
 					Success = false
 				});
 				return results;
 			}
 
-			if (cmd.BattleAction.m_ActionType == ActionType.Defend) {
+			if (cmd.BattleAction.ActionType == ActionType.Defend) {
 				var result = new BattleResult {
 					Actor = cmd.Actor,
 					Target = cmd.Actor,
@@ -36,7 +36,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				};
 
 				cmd.Actor.StartDefend(cmd.BattleAction);
-				result.Message = $"{cmd.Actor.m_CombatantName} defends!";
+				result.Message = $"{cmd.Actor.CombatantName} defends!";
 				results.Add(result);
 				return results;
 			}
@@ -45,7 +45,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				results.Add(new BattleResult {
 					Actor = cmd.Actor,
 					BattleAction = cmd.BattleAction,
-					Message = $"{cmd.Actor.m_CombatantName}'s {cmd.BattleAction.m_ActionName} has no valid target!",
+					Message = $"{cmd.Actor.CombatantName}'s {cmd.BattleAction.ActionName} has no valid target!",
 					Success = false
 				});
 				return results;
@@ -53,30 +53,30 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			if (!cmd.Target.isAlive) {
 				results.Add(new BattleResult {
-					Message = $"{cmd.Target.m_CombatantName} is already down. Action wasted.",
+					Message = $"{cmd.Target.CombatantName} is already down. Action wasted.",
 					Success = false
 				});
 				return results;
 			}
 
-			if (Random.value > cmd.BattleAction.m_Accuracy) {
+			if (Random.value > cmd.BattleAction.Accuracy) {
 				results.Add(new BattleResult {
 					Actor = cmd.Actor,
 					Target = cmd.Target,
 					BattleAction = cmd.BattleAction,
 					Missed = true,
 					Success = false,
-					Message = $"{cmd.Actor.m_CombatantName} used {cmd.BattleAction.m_ActionName} but missed!"
+					Message = $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} but missed!"
 				});
 				return results;
 			}
 
-			if (cmd.Target != null && cmd.Target.lastAttacker == cmd.Actor && cmd.Target.isDefending) {
+			if (cmd.Target != null && cmd.Target.LastAttacker == cmd.Actor && cmd.Target.IsDefending) {
 				var counterResult = ResolveCounterAttack(cmd.Target, cmd.Actor);
 				if (counterResult != null) {
 					results.Add(counterResult);
 				}
-				cmd.Target.lastAttacker = null;
+				cmd.Target.LastAttacker = null;
 			}
 
 			var targets = GetTargets(cmd, allCombatants);
@@ -91,10 +91,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					ChargeMultiplier = chargeMultiplier
 				};
 
-				switch (cmd.BattleAction.m_ActionType) {
+				switch (cmd.BattleAction.ActionType) {
 					case ActionType.Heal:
-						int healAmount = Mathf.CeilToInt(cmd.Actor.m_MaxHp * 0.15f) +
-						                 Mathf.RoundToInt(cmd.Actor.m_Attack * 0.2f);
+						int healAmount = Mathf.CeilToInt(cmd.Actor.MaxHp * 0.15f) +
+						                 Mathf.RoundToInt(cmd.Actor.Attack * 0.2f);
 
 						if (isChargedAction) {
 							healAmount = Mathf.RoundToInt(healAmount * chargeMultiplier);
@@ -104,9 +104,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 						result.HealingDone = healAmount;
 
 						string healChargeText = isChargedAction ? " (FULLY CHARGED!)" : "";
-						result.Message = cmd.BattleAction.m_TargetSelf
-						? $"{cmd.Actor.m_CombatantName} used {cmd.BattleAction.m_ActionName} to heal self.{healChargeText}"
-						: $"{cmd.Actor.m_CombatantName} used {cmd.BattleAction.m_ActionName} to heal {target.m_CombatantName}.{healChargeText}";
+						result.Message = cmd.BattleAction.TargetSelf
+						? $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} to heal self.{healChargeText}"
+						: $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} to heal {target.CombatantName}.{healChargeText}";
 						break;
 
 					case ActionType.Damage:
@@ -115,16 +115,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 					case ActionType.Buff:
 						ApplyBuff(target, cmd.BattleAction);
-						result.Message = $"{cmd.Actor.m_CombatantName} buffed {target.m_CombatantName} with {cmd.BattleAction.m_ActionName}.";
+						result.Message = $"{cmd.Actor.CombatantName} buffed {target.CombatantName} with {cmd.BattleAction.ActionName}.";
 						break;
 
 					case ActionType.Debuff:
 						ApplyDebuff(target, cmd.BattleAction);
-						result.Message = $"{cmd.Actor.m_CombatantName} debuffed {target.m_CombatantName} with {cmd.BattleAction.m_ActionName}.";
+						result.Message = $"{cmd.Actor.CombatantName} debuffed {target.CombatantName} with {cmd.BattleAction.ActionName}.";
 						break;
 
 					case ActionType.Item:
-						result.Message = $"{cmd.Actor.m_CombatantName} used item {cmd.BattleAction.m_ActionName}.";
+						result.Message = $"{cmd.Actor.CombatantName} used item {cmd.BattleAction.ActionName}.";
 						break;
 				}
 
@@ -139,10 +139,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				return null;
 
 			var counterAction = ScriptableObject.CreateInstance<BattleAction>();
-			counterAction.m_ActionName = "Counter Attack";
-			counterAction.m_ActionType = ActionType.Damage;
-			counterAction.m_Power = Mathf.RoundToInt(defender.m_Attack * defender.counterAttackMultiplier);
-			counterAction.m_Accuracy = 1f;
+			counterAction.ActionName = "Counter Attack";
+			counterAction.ActionType = ActionType.Damage;
+			counterAction.Power = Mathf.RoundToInt(defender.Attack * defender.CounterAttackMultiplier);
+			counterAction.Accuracy = 1f;
 
 			var counterCmd = new BattleCommand(defender, counterAction, attacker);
 			var counterResult = CalculateDamage(counterCmd, attacker, new BattleResult {
@@ -152,15 +152,15 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				Success = true
 			}, false, 1f);
 
-			counterResult.Message = $"{defender.m_CombatantName} counter attacks {attacker.m_CombatantName} for {counterResult.DamageDealt} damage!";
+			counterResult.Message = $"{defender.CombatantName} counter attacks {attacker.CombatantName} for {counterResult.DamageDealt} damage!";
 
 			return counterResult;
 		}
 
 		private static BattleResult CalculateDamage(BattleCommand cmd, Combatant target, BattleResult result, bool isChargedAction, float chargeMultiplier) {
-			float attack = cmd.Actor.m_Attack * cmd.BattleAction.m_StatMultiplier;
-			float defense = Mathf.Max(1, target.m_Defense);
-			float baseDamage = cmd.BattleAction.m_Power * (attack / defense);
+			float attack = cmd.Actor.Attack * cmd.BattleAction.StatMultiplier;
+			float defense = Mathf.Max(1, target.Defense);
+			float baseDamage = cmd.BattleAction.Power * (attack / defense);
 			float randomFactor = Random.Range(0.85f, 1.0f);
 			int damage = Mathf.Max(1, Mathf.FloorToInt(baseDamage * randomFactor));
 
@@ -182,16 +182,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			string critText = isCritical ? " (CRITICAL HIT!)" : "";
 			string chargeText = isChargedAction ? " (FULLY CHARGED!)" : "";
-			result.Message = $"{cmd.Actor.m_CombatantName} used {cmd.BattleAction.m_ActionName} on {target.m_CombatantName}{critText}{chargeText} for {damage} damage.";
+			result.Message = $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} on {target.CombatantName}{critText}{chargeText} for {damage} damage.";
 
 			return result;
 		}
 
 		private static float CalculateCriticalHitChance(Combatant attacker, BattleAction action) {
 			float critChance = BASE_CRIT_CHANCE;
-			critChance += action.m_CritChance;
+			critChance += action.CritChance;
 
-			if (attacker.m_Team == Team.Player) {
+			if (attacker.Team == Team.Player) {
 				critChance *= PLAYER_CRIT_MODIFIER;
 			}
 			else {
@@ -202,25 +202,25 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private static List<Combatant> GetTargets(BattleCommand cmd, List<Combatant> allCombatants) {
-			if (cmd.BattleAction.m_TargetSelf) return new List<Combatant> { cmd.Actor };
+			if (cmd.BattleAction.TargetSelf) return new List<Combatant> { cmd.Actor };
 
 			if (allCombatants == null) return new List<Combatant> { cmd.Target };
 
-			switch (cmd.BattleAction.m_TargetType) {
+			switch (cmd.BattleAction.TargetType) {
 				case ActionTargetType.Self:
 					return new List<Combatant> { cmd.Actor };
 
 				case ActionTargetType.SingleEnemy:
-					return new List<Combatant> { cmd.Target }.FindAll(t => t.m_Team != cmd.Actor.m_Team && t.isAlive);
+					return new List<Combatant> { cmd.Target }.FindAll(t => t.Team != cmd.Actor.Team && t.isAlive);
 
 				case ActionTargetType.AllEnemies:
-					return allCombatants.FindAll(c => c.isAlive && c.m_Team != cmd.Actor.m_Team);
+					return allCombatants.FindAll(c => c.isAlive && c.Team != cmd.Actor.Team);
 
 				case ActionTargetType.SingleAlly:
-					return new List<Combatant> { cmd.Target }.FindAll(t => t.m_Team == cmd.Actor.m_Team && t.isAlive);
+					return new List<Combatant> { cmd.Target }.FindAll(t => t.Team == cmd.Actor.Team && t.isAlive);
 
 				case ActionTargetType.AllAllies:
-					return allCombatants.FindAll(c => c.isAlive && c.m_Team == cmd.Actor.m_Team && c != cmd.Actor);
+					return allCombatants.FindAll(c => c.isAlive && c.Team == cmd.Actor.Team && c != cmd.Actor);
 
 				default:
 					return new List<Combatant> { cmd.Target };
@@ -228,15 +228,15 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private static void ApplyBuff(Combatant target, BattleAction action) {
-			if (action.m_AttackModifier != 0) target.m_Attack += Mathf.RoundToInt(target.m_Attack * action.m_AttackModifier);
-			if (action.m_DefenseModifier != 0) target.m_Defense += Mathf.RoundToInt(target.m_Defense * action.m_DefenseModifier);
-			if (action.m_SpeedModifier != 0) target.m_Speed += Mathf.RoundToInt(target.m_Speed * action.m_SpeedModifier);
+			if (action.AttackModifier != 0) target.Attack += Mathf.RoundToInt(target.Attack * action.AttackModifier);
+			if (action.DefenseModifier != 0) target.Defense += Mathf.RoundToInt(target.Defense * action.DefenseModifier);
+			if (action.SpeedModifier != 0) target.Speed += Mathf.RoundToInt(target.Speed * action.SpeedModifier);
 		}
 
 		private static void ApplyDebuff(Combatant target, BattleAction action) {
-			if (action.m_AttackModifier != 0) target.m_Attack -= Mathf.RoundToInt(target.m_Attack * action.m_AttackModifier);
-			if (action.m_DefenseModifier != 0) target.m_Defense -= Mathf.RoundToInt(target.m_Defense * action.m_DefenseModifier);
-			if (action.m_SpeedModifier != 0) target.m_Speed -= Mathf.RoundToInt(target.m_Speed * action.m_SpeedModifier);
+			if (action.AttackModifier != 0) target.Attack -= Mathf.RoundToInt(target.Attack * action.AttackModifier);
+			if (action.DefenseModifier != 0) target.Defense -= Mathf.RoundToInt(target.Defense * action.DefenseModifier);
+			if (action.SpeedModifier != 0) target.Speed -= Mathf.RoundToInt(target.Speed * action.SpeedModifier);
 		}
 	}
 }

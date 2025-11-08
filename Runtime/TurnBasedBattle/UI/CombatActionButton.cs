@@ -21,7 +21,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			this.playerTurnUI = playerTurnUI;
 			this.battleAction = battleAction;
 			if (battleAction) {
-				label.SetText(battleAction.m_ActionName);
+				label.SetText(battleAction.ActionName);
 				button.interactable = true;
 			}
 			else {

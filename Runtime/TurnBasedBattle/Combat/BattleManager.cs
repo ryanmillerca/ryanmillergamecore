@@ -1,28 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using System;
-using Random = UnityEngine.Random;
-
 namespace RyanMillerGameCore.TurnBasedCombat {
-	public class BattleManager : MonoBehaviour {
-		[Header("Combatants")]
-		public List<Combatant> m_Combatants = new List<Combatant>();
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Linq;
+	using UnityEngine;
+	using System;
+	using Random = UnityEngine.Random;
 
-		[Header("Turn Settings")]
-		public float m_GaugeThreshold = 100f;
-		public float m_TickRate = 1f;
-		public int m_LookaheadTurns = 5;
+	public class BattleManager : MonoBehaviour, ITargetProvider {
 
-#pragma warning disable CS0414
-		private bool m_BattleActive = false;
+		public List<Combatant> Combatants {
+			get {
+				return m_Combatants;
+			}
+		}
+
+		[SerializeField] private List<Combatant> m_Combatants = new List<Combatant>();
+		[SerializeField] private float m_GaugeThreshold = 100f;
+		[SerializeField] private float m_TickRate = 1f;
+		[SerializeField] private int m_LookaheadTurns = 5;
+		[SerializeField] private float m_TurnDelay = 0.5f;
 
 		private bool m_WaitingForPlayerInput = false;
 		private Combatant m_CurrentPlayerActor = null;
 		private List<Combatant> m_CurrentValidTargets = null;
-
-		// Pending player command storage
 		private BattleCommand m_PendingPlayerCommand = null;
 
 		public delegate void OnMoveResolved(BattleResult result);
@@ -44,21 +44,26 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public event OnPlayerInputReceived PlayerInputReceived;
 		public event Action<Combatant, List<BattleAction>> OnPlayerActionRequested;
 		public event Action<List<Combatant>> OnTurnOrderUpdated;
-		// New API for the UI to submit a full BattleCommand (preferred)
+
 		public void SubmitPlayerCommand(BattleCommand cmd) {
-			if (!m_WaitingForPlayerInput) return;
-			if (cmd == null) return;
-			if (m_CurrentPlayerActor == null) return;
-			if (cmd.Actor != m_CurrentPlayerActor) return; // ensure actor matches the one requesting input
-			if (!m_CurrentPlayerActor.isAlive) return;
+			if (!m_WaitingForPlayerInput) {
+				return;
+			}
+			if (cmd == null) {
+				return;
+			}
+			if (m_CurrentPlayerActor == null) {
+				return;
+			}
+			if (cmd.Actor != m_CurrentPlayerActor) {
+				return;
+			}
+			if (!m_CurrentPlayerActor.isAlive) {
+				return;
+			}
 
-			// Accept the command
 			m_PendingPlayerCommand = cmd;
-
-			// Mark input as received so the waiting coroutine continues
 			m_WaitingForPlayerInput = false;
-
-			// Fire legacy PlayerInputReceived event for compatibility (optional)
 			PlayerInputReceived?.Invoke(new PlayerInputResponse {
 				SelectedAction = cmd.BattleAction,
 				SelectedTarget = cmd.Target,
@@ -67,20 +72,38 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			});
 		}
 
-		public void SubmitPlayerInput(PlayerInputResponse response) {
-			if (m_WaitingForPlayerInput && m_CurrentPlayerActor != null) {
-				m_WaitingForPlayerInput = false;
-				PlayerInputReceived?.Invoke(response);
+		public IEnumerable<Combatant> GetValidTargets(Combatant actor) {
+			var validTargets = new List<Combatant>();
+			if (!actor) {
+				return validTargets;
 			}
+			foreach (Combatant combatant in m_Combatants) {
+				if (!combatant.isAlive || combatant == actor) {
+					continue;
+				}
+				if (actor.Team != combatant.Team) {
+					validTargets.Add(combatant);
+				}
+			}
+			return validTargets;
+		}
+
+		public void SubmitPlayerInput(PlayerInputResponse response) {
+			if (!m_WaitingForPlayerInput || m_CurrentPlayerActor == null) {
+				return;
+			}
+			m_WaitingForPlayerInput = false;
+			PlayerInputReceived?.Invoke(response);
 		}
 
 		public void CancelPlayerInput() {
-			if (m_WaitingForPlayerInput) {
-				m_WaitingForPlayerInput = false;
-				m_CurrentPlayerActor = null;
-				m_CurrentValidTargets = null;
-				m_PendingPlayerCommand = null;
+			if (!m_WaitingForPlayerInput) {
+				return;
 			}
+			m_WaitingForPlayerInput = false;
+			m_CurrentPlayerActor = null;
+			m_CurrentValidTargets = null;
+			m_PendingPlayerCommand = null;
 		}
 
 		private void RaiseBattleEvent(BattleEventType eventType, string message, Combatant combatant = null, Combatant target = null) {
@@ -103,22 +126,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			});
 		}
 
-		bool PlayersAreAlive() {
-			foreach (Combatant c in m_Combatants) {
-				if (c.isAlive && c.m_Team == Team.Player) {
-					return true;
-				}
-			}
-			return false;
+		private bool PlayersAreAlive() {
+			return m_Combatants.Any(c => c.isAlive && c.Team == Team.Player);
 		}
 
-		bool EnemiesAreAlive() {
-			foreach (Combatant c in m_Combatants) {
-				if (c.isAlive && c.m_Team == Team.Enemy) {
-					return true;
-				}
-			}
-			return false;
+		private bool EnemiesAreAlive() {
+			return m_Combatants.Any(c => c.isAlive && c.Team == Team.Enemy);
 		}
 
 		private void Start() {
@@ -126,14 +139,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private IEnumerator BattleLoop() {
-			m_BattleActive = true;
 			RaiseBattleEvent(BattleEventType.BattleStarted, "Battle started!");
-
 			var turnQueue = new Queue<Combatant>();
-
 			while (PlayersAreAlive() && EnemiesAreAlive()) {
 				FillTurnQueueEvenly(turnQueue);
-
 				while (turnQueue.Count > 0 && PlayersAreAlive() && EnemiesAreAlive()) {
 					var next = turnQueue.Dequeue();
 
@@ -141,13 +150,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 						yield return StartCoroutine(TakeTurn(next));
 					}
 				}
-
 				DisplayTurnOrder();
 				yield return new WaitForSeconds(m_TickRate);
 			}
-
-			m_BattleActive = false;
-
 			BattleOutcome outcome;
 			if (PlayersAreAlive() && !EnemiesAreAlive()) {
 				outcome = BattleOutcome.Victory;
@@ -167,56 +172,45 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 		private void FillTurnQueueEvenly(Queue<Combatant> turnQueue) {
 			var aliveCombatants = m_Combatants.Where(c => c.isAlive).ToList();
-			if (aliveCombatants.Count == 0) return;
-
-			int totalSpeed = aliveCombatants.Sum(c => c.m_Speed);
-
+			if (aliveCombatants.Count == 0) { return; }
+			int totalSpeed = aliveCombatants.Sum(c => c.Speed);
 			var combatantList = new List<CombatantData>();
-			foreach (var combatant in aliveCombatants) {
+			foreach (Combatant combatant in aliveCombatants) {
 				combatantList.Add(new CombatantData {
 					Combatant = combatant,
-					Speed = combatant.m_Speed,
-					Step = (double)totalSpeed / combatant.m_Speed,
+					Speed = combatant.Speed,
+					Step = (double)totalSpeed / combatant.Speed,
 					Position = 0.0
 				});
 			}
-
-			foreach (var data in combatantList) {
+			foreach (CombatantData data in combatantList) {
 				data.Position = data.Step / 2;
 			}
-
 			for (int i = 0; i < totalSpeed; i++) {
-				var nextData = combatantList.OrderBy(d => d.Position).First();
+				CombatantData nextData = combatantList.OrderBy(d => d.Position).First();
 				turnQueue.Enqueue(nextData.Combatant);
 				nextData.Position += nextData.Step;
 			}
 		}
 
-		private class CombatantData {
-			public Combatant Combatant { get; set; }
-			public int Speed { get; set; }
-			public double Step { get; set; }
-			public double Position { get; set; }
-		}
-
 		private IEnumerator TakeTurn(Combatant c) {
-			if (c == null) yield break;
+			if (c == null) { yield break; }
 
 			if (!c.isAlive) {
-				RaiseBattleEvent(BattleEventType.TurnSkipped, $"{c.m_CombatantName} was dead at turn start — skipping.", c);
+				RaiseBattleEvent(BattleEventType.TurnSkipped, $"{c.CombatantName} was dead at turn start — skipping.", c);
 				yield break;
 			}
 
 			RaiseTurnEvent(TurnEventType.TurnStarted, c);
 
-			foreach (var combatant in m_Combatants) {
+			foreach (Combatant combatant in m_Combatants) {
 				if (combatant.isAlive) {
 					combatant.AdvanceDefendTurn();
 					combatant.AdvanceAttackBuffTurn();
 				}
 			}
 
-			if (c.m_Team == Team.Player) {
+			if (c.Team == Team.Player) {
 				yield return StartCoroutine(HandlePlayerTurn(c));
 			}
 			else {
@@ -224,25 +218,27 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 
 			if (!PlayersAreAlive() || !EnemiesAreAlive()) {
-				RaiseBattleEvent(BattleEventType.BattleEndConditionMet, $"After {c.m_CombatantName}'s action, battle end condition met.", c);
+				RaiseBattleEvent(BattleEventType.BattleEndConditionMet, $"After {c.CombatantName}'s action, battle end condition met.", c);
 				yield break;
 			}
 
 			RaiseTurnEvent(TurnEventType.TurnEnded, c);
-			yield return new WaitForSeconds(0.5f);
+			yield return new WaitForSeconds(m_TurnDelay);
 		}
 
+
 		private IEnumerator HandlePlayerTurn(Combatant player) {
-			var availableMoves = player.m_Moves?.Where(m => m != null).ToList() ?? new List<BattleAction>();
-			var validTargets = GetValidTargets(player);
+			var availableMoves = player.Moves?.Where(m => m != null).ToList() ?? new List<BattleAction>();
+			// NOTE: call .ToList() to keep the rest of the code (which uses .Count) intact
+			var validTargets = GetValidTargets(player).ToList();
 
 			if (availableMoves.Count == 0) {
-				RaiseBattleEvent(BattleEventType.NoMovesAvailable, $"{player.m_CombatantName} has no moves. Ending turn.", player);
+				RaiseBattleEvent(BattleEventType.NoMovesAvailable, $"{player.CombatantName} has no moves. Ending turn.", player);
 				yield break;
 			}
 
 			if (validTargets.Count == 0) {
-				RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {player.m_CombatantName}. Ending turn.", player);
+				RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {player.CombatantName}. Ending turn.", player);
 				yield break;
 			}
 
@@ -285,7 +281,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			// Validate the command a little
 			if (cmd.Actor == null || cmd.BattleAction == null || cmd.Target == null) {
-				RaiseBattleEvent(BattleEventType.CommandError, $"Submitted command invalid for {cmd.Actor?.m_CombatantName ?? "null actor"}", cmd.Actor, cmd.Target);
+				RaiseBattleEvent(BattleEventType.CommandError, $"Submitted command invalid for {cmd.Actor?.CombatantName ?? "null actor"}", cmd.Actor, cmd.Target);
 				yield break;
 			}
 
@@ -297,7 +293,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				results = MoveResolver.Resolve(cmd, m_Combatants);
 			}
 			catch (System.Exception ex) {
-				RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {cmd.Actor.m_CombatantName}: {ex}", cmd.Actor);
+				RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {cmd.Actor.CombatantName}: {ex}", cmd.Actor);
 				yield break;
 			}
 
@@ -307,7 +303,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 						MoveResolved?.Invoke(result);
 					}
 					catch (System.Exception ex) {
-						RaiseBattleEvent(BattleEventType.EventHandlerError, $"MoveResolved handler threw for {cmd.Actor.m_CombatantName}: {ex}", cmd.Actor);
+						RaiseBattleEvent(BattleEventType.EventHandlerError, $"MoveResolved handler threw for {cmd.Actor.CombatantName}: {ex}", cmd.Actor);
 					}
 				}
 			}
@@ -324,21 +320,22 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private IEnumerator HandleAITurn(Combatant ai) {
-			var validTargets = GetValidTargets(ai);
+			// call GetValidTargets and convert to List so rest of code works unchanged
+			var validTargets = GetValidTargets(ai).ToList();
 			if (validTargets.Count == 0) {
-				RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {ai.m_CombatantName}. Ending turn.", ai);
+				RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {ai.CombatantName}. Ending turn.", ai);
 				yield break;
 			}
 
-			if (ai.m_Moves == null || ai.m_Moves.Count == 0) {
-				RaiseBattleEvent(BattleEventType.NoMovesAvailable, $"{ai.m_CombatantName} has no moves. Ending turn.", ai);
+			if (ai.Moves == null || ai.Moves.Count == 0) {
+				RaiseBattleEvent(BattleEventType.NoMovesAvailable, $"{ai.CombatantName} has no moves. Ending turn.", ai);
 				yield break;
 			}
 
 			var (action, target) = ai.DecideAIAction(validTargets);
 
 			if (action == null || target == null) {
-				RaiseBattleEvent(BattleEventType.NoValidTargets, $"AI could not decide action for {ai.m_CombatantName}. Ending turn.", ai);
+				RaiseBattleEvent(BattleEventType.NoValidTargets, $"AI could not decide action for {ai.CombatantName}. Ending turn.", ai);
 				yield break;
 			}
 
@@ -346,7 +343,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private IEnumerator ExecuteAction(Combatant actor, BattleAction action, Combatant target) {
-			if (action.m_IsMultiTurn && action.m_TurnCost > 1) {
+			if (action.IsMultiTurn && action.TurnCost > 1) {
 				actor.StartMultiTurnAction(action, target);
 				RaiseTurnEvent(TurnEventType.MultiTurnStarted, actor, target, action);
 			}
@@ -356,7 +353,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					cmd = new BattleCommand(actor, action, target);
 				}
 				catch (System.Exception ex) {
-					RaiseBattleEvent(BattleEventType.CommandError, $"Exception constructing BattleCommand for {actor.m_CombatantName}: {ex}", actor);
+					RaiseBattleEvent(BattleEventType.CommandError, $"Exception constructing BattleCommand for {actor.CombatantName}: {ex}", actor);
 					yield break;
 				}
 
@@ -367,7 +364,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					results = MoveResolver.Resolve(cmd, m_Combatants);
 				}
 				catch (System.Exception ex) {
-					RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {actor.m_CombatantName}: {ex}", actor);
+					RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {actor.CombatantName}: {ex}", actor);
 					yield break;
 				}
 
@@ -377,53 +374,38 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 							MoveResolved?.Invoke(result);
 						}
 						catch (System.Exception ex) {
-							RaiseBattleEvent(BattleEventType.EventHandlerError, $"MoveResolved handler threw for {actor.m_CombatantName}: {ex}", actor);
+							RaiseBattleEvent(BattleEventType.EventHandlerError, $"MoveResolved handler threw for {actor.CombatantName}: {ex}", actor);
 						}
 					}
 				}
 			}
 		}
 
-		private List<Combatant> GetValidTargets(Combatant attacker) {
-			var validTargets = new List<Combatant>();
-
-			foreach (var combatant in m_Combatants) {
-				if (!combatant.isAlive || combatant == attacker)
-					continue;
-
-				if (attacker.m_Team != combatant.m_Team) {
-					validTargets.Add(combatant);
-				}
-			}
-
-			return validTargets;
-		}
-
 		private void DisplayTurnOrder() {
 			var upcoming = GetUpcomingTurns();
-			string queue = string.Join(" -> ", upcoming.Select(c => $"{c.m_CombatantName} ({c.m_TurnGauge:0})"));
+			string queue = string.Join(" -> ", upcoming.Select(c => $"{c.CombatantName} ({c.TurnGauge:0})"));
 			RaiseBattleEvent(BattleEventType.TurnOrderUpdated, $"Upcoming Turns: {queue}");
 			OnTurnOrderUpdated?.Invoke(upcoming);
 		}
 
-		public List<Combatant> GetUpcomingTurns() {
+		private List<Combatant> GetUpcomingTurns() {
 			var tempList = m_Combatants
-			.Where(c => c.isAlive)
-			.Select(c => new { combatant = c, gauge = c.m_TurnGauge })
-			.ToList();
+				.Where(c => c.isAlive)
+				.Select(c => new { combatant = c, gauge = c.TurnGauge })
+				.ToList();
 
 			List<Combatant> upcoming = new List<Combatant>();
 
 			for (int i = 0; i < m_LookaheadTurns; i++) {
 				if (tempList.Count == 0) break;
 
-				var next = tempList.OrderBy(c => (m_GaugeThreshold - c.gauge) / c.combatant.m_Speed).First();
+				var next = tempList.OrderBy(c => (m_GaugeThreshold - c.gauge) / c.combatant.Speed).First();
 				upcoming.Add(next.combatant);
 
-				float timeToAct = (m_GaugeThreshold - next.gauge) / next.combatant.m_Speed;
+				float timeToAct = (m_GaugeThreshold - next.gauge) / next.combatant.Speed;
 
 				for (int j = 0; j < tempList.Count; j++)
-					tempList[j] = new { combatant = tempList[j].combatant, gauge = tempList[j].gauge + tempList[j].combatant.m_Speed * timeToAct };
+					tempList[j] = new { combatant = tempList[j].combatant, gauge = tempList[j].gauge + tempList[j].combatant.Speed * timeToAct };
 
 				int idx = tempList.FindIndex(t => t.combatant == next.combatant);
 				tempList[idx] = new { combatant = next.combatant, gauge = tempList[idx].gauge - m_GaugeThreshold };
@@ -431,6 +413,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			return upcoming;
 		}
+	}
+
+	public class CombatantData {
+		public Combatant Combatant { get; set; }
+		public int Speed { get; set; }
+		public double Step { get; set; }
+		public double Position { get; set; }
 	}
 
 	public struct PlayerInputData {
@@ -488,5 +477,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public Combatant Target;
 		public BattleAction Action;
 		public float Timestamp;
+	}
+
+	public interface ITargetProvider {
+		IEnumerable<Combatant> GetValidTargets(Combatant actor);
 	}
 }

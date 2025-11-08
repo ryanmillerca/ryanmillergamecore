@@ -5,22 +5,22 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 	[CreateAssetMenu(menuName = "Battle/AI/Strategic Brain")]
 	public class StrategicAIBrain : EnemyAIBrain {
 		[Header("Strategic Behavior")]
-		public float lowHealthThreshold = 0.3f;
-		public float defendHealthThreshold = 0.4f;
+		[SerializeField] private float m_LowHealthThreshold = 0.3f;
+		[SerializeField] private float m_DefendHealthThreshold = 0.4f;
 
 		public override (BattleAction action, Combatant target) ChooseAction(Combatant self, List<Combatant> validTargets, List<BattleAction> availableMoves) {
 			if (availableMoves.Count == 0 || validTargets.Count == 0)
 				return (null, null);
 
 			// Check self health for defensive actions
-			float selfHealthPercent = (float)self.m_CurrentHp / self.m_MaxHp;
+			float selfHealthPercent = (float)self.CurrentHp / self.MaxHp;
 
-			if (selfHealthPercent < defendHealthThreshold) {
+			if (selfHealthPercent < m_DefendHealthThreshold) {
 				// Try to defend or heal
-				var defendMoves = availableMoves.FindAll(m => m.m_ActionType == ActionType.Defend);
-				var healMoves = availableMoves.FindAll(m => m.m_ActionType == ActionType.Heal && m.m_TargetSelf);
+				var defendMoves = availableMoves.FindAll(m => m.ActionType == ActionType.Defend);
+				var healMoves = availableMoves.FindAll(m => m.ActionType == ActionType.Heal && m.TargetSelf);
 
-				if (defendMoves.Count > 0 && selfHealthPercent < lowHealthThreshold) {
+				if (defendMoves.Count > 0 && selfHealthPercent < m_LowHealthThreshold) {
 					return (defendMoves[0], self);
 				}
 				else if (healMoves.Count > 0) {
@@ -33,7 +33,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 			var weakestEnemy = GetWeakestEnemy(enemyTargets);
 
 			// Prefer high-damage moves against weak enemies
-			var damageMoves = availableMoves.FindAll(m => m.m_ActionType == ActionType.Damage);
+			var damageMoves = availableMoves.FindAll(m => m.ActionType == ActionType.Damage);
 			if (damageMoves.Count > 0 && weakestEnemy != null) {
 				var strongestDamageMove = GetStrongestDamageMove(damageMoves);
 				return (strongestDamageMove, weakestEnemy);
@@ -49,7 +49,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 		private List<Combatant> GetEnemyTargets(Combatant self, List<Combatant> allTargets) {
 			var enemies = new List<Combatant>();
 			foreach (var target in allTargets) {
-				if (target.m_Team != self.m_Team)
+				if (target.Team != self.Team)
 					enemies.Add(target);
 			}
 			return enemies;
@@ -60,7 +60,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 
 			Combatant weakest = enemies[0];
 			foreach (var enemy in enemies) {
-				if (enemy.m_CurrentHp < weakest.m_CurrentHp)
+				if (enemy.CurrentHp < weakest.CurrentHp)
 					weakest = enemy;
 			}
 			return weakest;
@@ -69,7 +69,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 		private BattleAction GetStrongestDamageMove(List<BattleAction> damageMoves) {
 			BattleAction strongest = damageMoves[0];
 			foreach (var move in damageMoves) {
-				if (move.m_Power > strongest.m_Power)
+				if (move.Power > strongest.Power)
 					strongest = move;
 			}
 			return strongest;

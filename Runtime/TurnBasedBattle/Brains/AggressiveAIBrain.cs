@@ -31,7 +31,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 		}
 
 		private float GetMoveWeight(BattleAction move) {
-			return move.m_ActionType switch {
+			return move.ActionType switch {
 				ActionType.Damage => damageMoveWeight,
 				ActionType.Heal => healMoveWeight,
 				ActionType.Buff => buffMoveWeight,
@@ -62,7 +62,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 		private Combatant GetLowestHPTarget(List<Combatant> targets) {
 			Combatant lowestHPTarget = targets[0];
 			foreach (var target in targets) {
-				if (target.m_CurrentHp < lowestHPTarget.m_CurrentHp)
+				if (target.CurrentHp < lowestHPTarget.CurrentHp)
 					lowestHPTarget = target;
 			}
 			return lowestHPTarget;
