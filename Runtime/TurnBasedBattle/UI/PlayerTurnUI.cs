@@ -1,41 +1,26 @@
 namespace RyanMillerGameCore.TurnBasedCombat.UI {
 	using System.Collections.Generic;
 	using System.Linq;
-	using TMPro;
 	using UnityEngine;
-	using UnityEngine.UI;
 	using TurnBasedCombat;
 	using System;
 
 	/// <summary>
-	/// UI controller for player turn input using prepopulated button arrays + TextMeshPro labels.
-	/// - Hook this up in the inspector: buttons arrays, TMP labels, panels, BattleManager.
-	/// - Expects BattleManager to expose: OnPlayerActionRequested(Combatant, List<BattleAction>),
-	///   MoveResolved(BattleResult), SubmitPlayerCommand(BattleCommand).
+	/// UI controller for player turn input
 	/// </summary>
 	public class PlayerTurnUI : MonoBehaviour {
-		[Header("References")]
-		public BattleManager m_BattleManager; // drag your BattleManager here
 
-		[Tooltip("Precreated action buttons (enable/disable). The corresponding labels should be in actionLabels at same indices.")]
+		public BattleManager m_BattleManager;
 		public GameObject actionButtonPrefab;
-		private List<CombatActionButton> actionButtons = new List<CombatActionButton>();
-
 		public GameObject targetButtonPrefab;
-		private List<TargetButton> targetButtons = new List<TargetButton>();
+		public GameObject actionPanel;
+		public GameObject targetPanel;
 
-		[Header("Target UI (prepopulated)")]
-		[Tooltip("Precreated target buttons (enable/disable). The corresponding labels should be in targetLabels at same indices.")]
-		[Header("Panels")]
-		public GameObject actionPanel; // parent panel for action buttons
-		public GameObject targetPanel; // parent panel for target buttons
-
-		// Current turn state
 		private Combatant m_CurrentActor;
 		private List<BattleAction> m_CurrentActions;
 		private BattleAction m_SelectedAction;
-
-		// Available candidate targets (populated when target selection is needed)
+		private List<TargetButton> targetButtons = new List<TargetButton>();
+		private List<CombatActionButton> actionButtons = new List<CombatActionButton>();
 		private List<Combatant> m_CurrentTargets = new List<Combatant>();
 
 		private void OnEnable() {
@@ -43,8 +28,6 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 				Debug.LogWarning("PlayerTurnUI: BattleManager not assigned in inspector.");
 				return;
 			}
-
-			// Subscribe to BattleManager events
 			m_BattleManager.OnPlayerActionRequested += HandlePlayerActionRequested;
 			m_BattleManager.MoveResolved += HandleMoveResolved;
 			m_BattleManager.OnTurnOrderUpdated += HandleTurnOrderUpdated; // optional
@@ -56,7 +39,6 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 				m_BattleManager.MoveResolved -= HandleMoveResolved;
 				m_BattleManager.OnTurnOrderUpdated -= HandleTurnOrderUpdated;
 			}
-
 			ClearActionSelectionState();
 			ClearTargetSelectionState();
 		}
@@ -71,7 +53,6 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 		}
 
 		private void ShowActionPanel() {
-
 			// Clear previous state
 			ClearTargetSelectionState();
 			ClearActionSelectionState();
@@ -105,7 +86,6 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 		/// <summary>
 		/// Adds more action buttons if we don't have enough
 		/// </summary>
-		/// <param name="numberOfButtons"></param>
 		private void PrepareActionButtons(int numberOfButtons) {
 			int difference = numberOfButtons - actionButtons.Count;
 			if (difference <= 0) return;
@@ -160,7 +140,6 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			if (actionPanel != null) actionPanel.SetActive(false);
 			if (targetPanel != null) targetPanel.SetActive(true);
 
-			// Preferred: use BattleManager.GetValidTargets if public. If not, fallback to filtering.
 			try {
 				var mi = m_BattleManager.GetType().GetMethod("GetValidTargets", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
 				if (mi != null) {
@@ -181,26 +160,8 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 				m_CurrentTargets = m_BattleManager.m_Combatants.Where(c => c.isAlive && c != m_CurrentActor).ToList();
 			}
 
-			/*
-			for (int i = 0; i < targetButtons.Length; i++) {
-				bool used = i < m_CurrentTargets.Count;
-				targetButtons[i].gameObject.SetActive(used);
-				targetButtons[i].onClick.RemoveAllListeners();
-
-				if (used) {
-					var target = m_CurrentTargets[i];
-					if (i < targetLabels.Length && targetLabels[i] != null)
-						targetLabels[i].text = $"{target.m_CombatantName} ({target.m_CurrentHp}/{target.m_MaxHp})";
-
-					int idx = i; // capture
-					targetButtons[i].onClick.AddListener(() => OnTargetButtonClicked(m_CurrentTargets[idx]));
-				}
-			}
-
-*/
 			PrepareTargetButtons(m_CurrentTargets.Count);
 
-			// Enable and populate prepopulated action buttons up to array length
 			int count = Mathf.Min(targetButtons.Count, m_CurrentTargets.Count);
 			for (int i = 0; i < targetButtons.Count; i++) {
 				bool used = i < count;
@@ -222,6 +183,9 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			}
 		}
 
+		/// <summary>
+		/// Adds more target buttons if we don't have enough
+		/// </summary>
 		void PrepareTargetButtons(int numberOfButtons) {
 			int difference = numberOfButtons - targetButtons.Count;
 			if (difference <= 0) return;
@@ -234,7 +198,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 				if (tb != null) targetButtons.Add(tb);
 				else {
 					Debug.LogWarning("Prepared target button prefab is missing TargetButton component.");
-					targetButtons.Add(null); // keep index consistency
+					targetButtons.Add(null);
 				}
 			}
 		}
@@ -260,8 +224,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 
 		private void ClearActionSelectionState() {
 			if (actionButtons == null) return;
-			foreach (var b in actionButtons) {
-				if (b == null) continue;
+			foreach (CombatActionButton b in actionButtons.Where(b => b)) {
 				b.Reset();
 				b.gameObject.SetActive(false);
 			}
@@ -269,13 +232,11 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 
 		private void ClearTargetSelectionState() { }
 
-		// Optional: respond to moveResolved (show simple logs or spawn floating text)
 		private void HandleMoveResolved(BattleResult result) {
 			// Example: show debug text — replace with floating text or other VFX instantiation
 			Debug.Log($"[UI] {result.Message}");
 		}
 
-		// Optional: react to turn order updates (refresh queue display if you have one)
 		private void HandleTurnOrderUpdated(List<Combatant> upcoming) {
 			// UI hook if you want notifications when queue changes.
 			// Example: Debug.Log("Turn queue updated");
