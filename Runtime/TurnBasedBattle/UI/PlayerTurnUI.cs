@@ -30,7 +30,13 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			}
 			m_BattleManager.OnPlayerActionRequested += HandlePlayerActionRequested;
 			m_BattleManager.MoveResolved += HandleMoveResolved;
-			m_BattleManager.OnTurnOrderUpdated += HandleTurnOrderUpdated; // optional
+			m_BattleManager.OnTurnOrderUpdated += HandleTurnOrderUpdated;
+			foreach (Transform child in m_ActionPanel.transform) {
+				child.gameObject.SetActive(false);
+			}
+			foreach (Transform child in m_TargetPanel.transform) {
+				child.gameObject.SetActive(false);
+			}
 		}
 
 		private void OnDisable() {

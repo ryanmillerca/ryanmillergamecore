@@ -1,8 +1,7 @@
-using UnityEngine;
-using System.Linq;
-using UnityEngine.Serialization;
-
 namespace RyanMillerGameCore.TurnBasedCombat {
+	using UnityEngine;
+    using System.Linq;
+	
 	public class DebugBattleListener : MonoBehaviour {
 
 
