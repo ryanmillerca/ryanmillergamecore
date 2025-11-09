@@ -135,7 +135,62 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private void Start() {
+			InitializeCombatants();
 			StartCoroutine(BattleLoop());
+		}
+
+		private void InitializeCombatants() {
+			foreach (var c in m_Combatants) {
+				c.CombatantEvent += OnCombatantEventHandler;
+			}
+		}
+
+		private void OnCombatantEventHandler(CombatantEventData eventData) {
+			if (eventData.EventType == CombatantEventType.CounterAttack) {
+				StartCoroutine(HandleCounterAttack(eventData.Combatant));
+			}
+		}
+
+		private IEnumerator HandleCounterAttack(Combatant counterActor) {
+			Combatant target = counterActor.LastAttacker;
+
+			if (target == null || !target.isAlive) {
+				counterActor.LastAttacker = null;
+				yield break;
+			}
+
+			float originalTargetCounterChance = target.CounterChance;
+			target.CounterChance = 0f;
+			BattleAction counterAction = GetOrCreateCounterAction(counterActor);
+
+			if (counterAction == null) {
+				RaiseBattleEvent(BattleEventType.CommandError, $"{counterActor.CombatantName} failed to find a counter action.", counterActor);
+				target.CounterChance = originalTargetCounterChance;
+				yield break;
+			}
+
+			var counterCmd = new BattleCommand(counterActor, counterAction, target);
+
+			RaiseTurnEvent(TurnEventType.ActionSelected, counterActor, target, counterAction);
+
+			List<BattleResult> results = MoveResolver.Resolve(counterCmd, m_Combatants);
+
+			if (results != null) {
+				foreach (var result in results) {
+					MoveResolved?.Invoke(result);
+				}
+			}
+			target.CounterChance = originalTargetCounterChance;
+			counterActor.LastAttacker = null;
+			yield return new WaitForSeconds(0.2f);
+		}
+
+		private BattleAction GetOrCreateCounterAction(Combatant actor) {
+			var counterMove = actor.Moves.FirstOrDefault(m => m.ActionName.ToLower() == "counter");
+			if (counterMove == null) {
+				counterMove = actor.Moves.FirstOrDefault(m => m.ActionType == ActionType.Damage);
+			}
+			return counterMove;
 		}
 
 		private IEnumerator BattleLoop() {

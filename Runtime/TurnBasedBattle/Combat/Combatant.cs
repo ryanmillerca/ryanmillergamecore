@@ -66,7 +66,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public bool IsDefending {
 			get { return isDefending; }
 		}
-
+		
+		public float CounterChance {
+			get { return counterAttackChance; }
+			set { counterAttackChance = value; }
+		}
+		
 		public float CounterAttackMultiplier {
 			get { return counterAttackMultiplier; }
 		}
@@ -99,7 +104,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		private int attackBuffTurnsRemaining = 0;
 		private float attackBuffMultiplier = 1f;
 		private int originalAttack;
-
+		
 		public delegate void OnCombatantEvent(CombatantEventData eventData);
 		public event OnCombatantEvent CombatantEvent;
 
