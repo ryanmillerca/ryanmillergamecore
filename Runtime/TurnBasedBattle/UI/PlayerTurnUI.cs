@@ -143,54 +143,63 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			HideAllPanels();
 		}
 
-		private void BuildAndShowTargets() {
+		private void BuildAndShowTargets()
+		{
 			ClearTargetSelectionState();
 
 			if (m_ActionPanel != null) m_ActionPanel.SetActive(false);
 			if (m_TargetPanel != null) m_TargetPanel.SetActive(true);
 
-			try {
-				// No reflection: use ITargetProvider if available
-				var provider = m_BattleManager as ITargetProvider;
-				IEnumerable<Combatant> res = null;
-				if (provider != null) {
-					res = provider.GetValidTargets(m_currentActor);
-				}
-				else {
-					// fallback to default: alive combatants excluding the actor
-					res = m_BattleManager.Combatants.Where(c => c.isAlive && c != m_currentActor);
-				}
+			m_currentTargets.Clear();
 
-				m_currentTargets.Clear();
-				if (res != null) {
-					foreach (var c in res) {
-						if (c != null) m_currentTargets.Add(c);
-					}
-				}
-			}
-			catch (Exception ex) {
-				Debug.LogWarning("BuildAndShowTargets failed: " + ex.Message);
-				m_currentTargets = m_BattleManager.Combatants.Where(c => c.isAlive && c != m_currentActor).ToList();
+			// Determine targets based on selected action's target type
+			switch (m_selectedAction.TargetType)
+			{
+				case ActionTargetType.Self:
+					m_currentTargets.Add(m_currentActor);
+					break;
+
+				case ActionTargetType.SingleAlly:
+				case ActionTargetType.AllAllies:
+					m_currentTargets = m_BattleManager.Combatants
+						.Where(c => c.isAlive && c.Team == m_currentActor.Team)
+						.ToList();
+					break;
+
+				case ActionTargetType.SingleEnemy:
+				case ActionTargetType.AllEnemies:
+					m_currentTargets = m_BattleManager.Combatants
+						.Where(c => c.isAlive && c.Team != m_currentActor.Team)
+						.ToList();
+					break;
 			}
 
 			PrepareTargetButtons(m_currentTargets.Count);
 
 			int count = Mathf.Min(m_targetButtons.Count, m_currentTargets.Count);
-			for (int i = 0; i < m_targetButtons.Count; i++) {
+			for (int i = 0; i < m_targetButtons.Count; i++)
+			{
 				bool used = i < count;
-				if (used) {
+				if (used)
+				{
 					m_targetButtons[i].gameObject.SetActive(true);
 					m_targetButtons[i].Configure(this, m_currentTargets[i]);
 				}
-				else {
+				else
+				{
 					if (m_targetButtons[i] != null) m_targetButtons[i].Reset();
 					m_targetButtons[i].gameObject.SetActive(false);
 				}
 			}
 
-			// If there are zero targets, submit action with actor as target
-			if (m_currentTargets.Count == 0) {
-				var cmd = new BattleCommand(m_currentActor, m_selectedAction ?? m_currentActions.FirstOrDefault(), m_currentActor);
+			// If there are zero targets (shouldn't happen normally), submit action with actor as fallback
+			if (m_currentTargets.Count == 0)
+			{
+				var cmd = new BattleCommand(
+					m_currentActor,
+					m_selectedAction ?? m_currentActions.FirstOrDefault(),
+					m_currentActor
+				);
 				m_BattleManager.SubmitPlayerCommand(cmd);
 				HideAllPanels();
 			}

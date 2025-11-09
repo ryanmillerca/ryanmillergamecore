@@ -8,33 +8,52 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 		public float healThreshold = 0.5f; // Heal when allies are below 50% HP
 
 		public override (BattleAction action, Combatant target) ChooseAction(Combatant self, List<Combatant> validTargets, List<BattleAction> availableMoves) {
-			if (availableMoves.Count == 0 || validTargets.Count == 0)
+
+			if (availableMoves.Count == 0)
 				return (null, null);
 
-			// Check if any allies need healing
-			var allies = GetAllyTargets(self, validTargets);
-			var injuredAllies = GetInjuredAllies(allies, healThreshold);
+			// Get all allies including self from the BattleManager
+			List<Combatant> allAllies = new List<Combatant>();
+			foreach (var c in this.BattleManager.Combatants) {
+				if (c.Team == self.Team && c.isAlive)
+					allAllies.Add(c);
+			}
 
-			if (injuredAllies.Count > 0) {
-				// Try to find a heal move
-				var healMoves = availableMoves.FindAll(m => m.ActionType == ActionType.Heal);
-				if (healMoves.Count > 0) {
-					var mostInjuredAlly = GetMostInjuredAlly(injuredAllies);
-					return (healMoves[0], mostInjuredAlly);
+			// Find injured allies
+			var healMoves = availableMoves.FindAll(m => m.ActionType == ActionType.Heal);
+			if (healMoves.Count > 0) {
+				List<Combatant> injuredAllies = allAllies.FindAll(a => ((float)a.CurrentHp / a.MaxHp) < healThreshold);
+				if (injuredAllies.Count > 0) {
+					// Pick the most injured ally
+					Combatant mostInjured = injuredAllies[0];
+					foreach (var a in injuredAllies) {
+						if (a.CurrentHp < mostInjured.CurrentHp)
+							mostInjured = a;
+					}
+					return (healMoves[0], mostInjured);
 				}
 			}
 
-			// No healing needed or no heal moves available, use random target selection
-			var randomAction = availableMoves[Random.Range(0, availableMoves.Count)];
-			var randomTarget = validTargets[Random.Range(0, validTargets.Count)];
+			// No healing needed — pick random damage move against enemy
+			var damageMoves = availableMoves.FindAll(m => m.ActionType == ActionType.Damage);
+			if (damageMoves.Count > 0) {
+				var randomMove = damageMoves[Random.Range(0, damageMoves.Count)];
+				List<Combatant> enemies = this.BattleManager.Combatants.FindAll(c => c.Team != self.Team && c.isAlive);
+				if (enemies.Count > 0) {
+					var target = enemies[Random.Range(0, enemies.Count)];
+					return (randomMove, target);
+				}
+			}
 
-			return (randomAction, randomTarget);
+			// Fallback
+			return (availableMoves[0], self);
 		}
-
+		
 		private List<Combatant> GetAllyTargets(Combatant self, List<Combatant> allTargets) {
 			var allies = new List<Combatant>();
 			foreach (var target in allTargets) {
-				if (target.Team == self.Team && target != self)
+				// Include self + any living allies on the same team
+				if (target.Team == self.Team && target.isAlive)
 					allies.Add(target);
 			}
 			return allies;
@@ -49,7 +68,6 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 			}
 			return injured;
 		}
-
 		private Combatant GetMostInjuredAlly(List<Combatant> injuredAllies) {
 			Combatant mostInjured = injuredAllies[0];
 			foreach (var ally in injuredAllies) {

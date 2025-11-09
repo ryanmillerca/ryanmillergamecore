@@ -57,7 +57,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -120,7 +120,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -566,7 +566,7 @@ MonoBehaviour:
   m_MaxHp: 50
   m_Attack: 10
   m_Defense: 10
-  m_Speed: 6
+  m_Speed: 10
   m_CurrentHp: 50
   m_Moves:
   - {fileID: 11400000, guid: 0ae6078373b764d9087a847458408d08, type: 2}
@@ -604,7 +604,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "<color=#FFAB51><b>Enemy Brawler</b></color>\nHP: 50/50 (100%)\nATK 10
-    \u2022 DEF 10 \u2022 SPD 6"
+    \u2022 DEF 10 \u2022 SPD 10"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -631,8 +631,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -747,7 +747,7 @@ MonoBehaviour:
   m_MaxHp: 50
   m_Attack: 10
   m_Defense: 10
-  m_Speed: 6
+  m_Speed: 10
   m_CurrentHp: 50
   m_Moves:
   - {fileID: 11400000, guid: 0ae6078373b764d9087a847458408d08, type: 2}
@@ -785,7 +785,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "<color=#FF5151><b>Enemy Healer</b></color>\nHP: 50/50 (100%)\nATK 10 \u2022
-    DEF 10 \u2022 SPD 6"
+    DEF 10 \u2022 SPD 10"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -812,8 +812,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -929,7 +929,7 @@ MonoBehaviour:
   m_MaxHp: 100
   m_Attack: 20
   m_Defense: 10
-  m_Speed: 13
+  m_Speed: 10
   m_CurrentHp: 100
   m_Moves:
   - {fileID: 11400000, guid: 0ae6078373b764d9087a847458408d08, type: 2}
@@ -980,7 +980,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "<color=#516CFF><b>Player 1</b></color>\nHP: 100/100 (100%)\nATK 20 \u2022
-    DEF 10 \u2022 SPD 13"
+    DEF 10 \u2022 SPD 10"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1007,8 +1007,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1161,8 +1161,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1316,7 +1316,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6770578703550087857}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 19.29316, y: 4.56991, z: 53.26278}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
