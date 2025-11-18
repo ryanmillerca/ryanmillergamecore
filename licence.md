@@ -1,4 +1,4 @@
-# ryanmillergamecore License
+# Ryan Miller Game Core License
 **Version 1.0 — 2025**  
 **Copyright © Ryan Miller — me@ryanmiller.ca**
 
@@ -34,7 +34,7 @@ You may **not**:
 ## 4. Attribution Requirement
 If you ship or publicly release a Game that uses the Game-Kit, you must provide credit in a publicly visible area such as an in-game credits section, documentation, or release notes:
 
-> **“Uses ryanmillergamecore”**
+> **“Uses Ryan Miller Game Core**
 
 This attribution may appear alongside other third-party credits.
 
