@@ -23,9 +23,9 @@ MonoBehaviour:
   AttackModifier: 0
   DefenseModifier: 0
   SpeedModifier: 0
-  DamageReduction: 0.25
-  DefendDuration: 1
-  CounterChance: 0.75
+  DamageReduction: 0.5
+  DefendDuration: 3
+  CounterChance: 1
   CounterMultiplier: 1
   DefendAttackBuff: 1
   AttackBuffDuration: 1
