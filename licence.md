@@ -34,7 +34,7 @@ You may **not**:
 ## 4. Attribution Requirement
 If you ship or publicly release a Game that uses the Game-Kit, you must provide credit in a publicly visible area such as an in-game credits section, documentation, or release notes:
 
-> **“Uses Ryan Miller Game Core**
+> **“Uses Ryan Miller Game Core"**
 
 This attribution may appear alongside other third-party credits.
 
