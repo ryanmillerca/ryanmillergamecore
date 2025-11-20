@@ -44,11 +44,11 @@ namespace RyanMillerGameCore
             {
                 if (preserveParentObject && transform.parent != null)
                 {
-                    // Ensure the root of this singleton group is preserved
-                    Transform root = transform.root;
-                    if (root != null && root != transform)
+                    Transform parent = transform.parent;
+                    if (parent != null && parent != transform)
                     {
-                        DontDestroyOnLoad(root.gameObject);
+                        parent.SetParent(null);
+                        DontDestroyOnLoad(parent.gameObject);
                     }
                     else
                     {
