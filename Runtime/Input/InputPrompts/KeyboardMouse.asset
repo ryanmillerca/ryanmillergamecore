@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20f9e8fe422da4ebaac9e03a4d3da467, type: 3}
+  m_Name: KeyboardMouse
+  m_EditorClassIdentifier: 
+  move: {fileID: 21300000, guid: 6dc66fe72de6848978f01250c2e1f0ad, type: 3}
+  look: {fileID: 21300000, guid: e08da5966e5094d04acb589f76ca291b, type: 3}
+  attack: {fileID: 21300000, guid: b3006d9900ae74f8fa2294c45667f32b, type: 3}
+  interact: {fileID: 21300000, guid: a1747d652acaf47f4aab1a240bfa8745, type: 3}
+  dodge: {fileID: 21300000, guid: 5fb46a483f49d442787f34e2ad0ff3bc, type: 3}
+  special: {fileID: 21300000, guid: 69cbbec7cc9b447c99c467dcc6f88f59, type: 3}
+  pause: {fileID: 21300000, guid: 37660743227f5453b8316f3e2db1ae57, type: 3}

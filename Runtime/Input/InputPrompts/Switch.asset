@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20f9e8fe422da4ebaac9e03a4d3da467, type: 3}
+  m_Name: Switch
+  m_EditorClassIdentifier: 
+  move: {fileID: 21300000, guid: b8b45372546dd4fcdb2dac085103f2a7, type: 3}
+  look: {fileID: 21300000, guid: a9393f11d5c6746d580b4835e8a3e882, type: 3}
+  attack: {fileID: 21300000, guid: ac1bea3f055ee417eac15ae7f2222323, type: 3}
+  interact: {fileID: 21300000, guid: e995707aee5984fecbb759a69c818658, type: 3}
+  dodge: {fileID: 21300000, guid: 01cac5e040cf54a0ab3d2b27c07aa7c3, type: 3}
+  special: {fileID: 21300000, guid: 7283d1e900c6a4ea9bb6189a1b7600ce, type: 3}
+  pause: {fileID: 21300000, guid: b3b42875d50154b33bd242a56324b19f, type: 3}

@@ -1,3 +1,4 @@
+using System.Collections;
 namespace RyanMillerGameCore.Dialog
 {
     using Interactions;
@@ -36,10 +37,10 @@ namespace RyanMillerGameCore.Dialog
             }
         }
 
-        private void Start()
+        private IEnumerator Start()
         {
-            if (triggerDialogOn == TriggerDialogOn.Start)
-            {
+            if (triggerDialogOn == TriggerDialogOn.Start) {
+                yield return new WaitForEndOfFrame();
                 TriggerDialog();
             }
         }

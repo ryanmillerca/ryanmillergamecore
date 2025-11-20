@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 532ce9569a4302e42b4de13e8e4428fe, type: 3}
+  m_Name: Intro Dialog
+  m_EditorClassIdentifier: RyanMillerGameCore.Dialog::RyanMillerGameCore.Dialog.DialogContent
+  lines:
+  - text: 'Hi and welcome to RMGC
+
+      Thats... Ryan Miller Game Core.'
+    voiceOver: {fileID: 0}
+    centered: 0
+    speaker: {fileID: 0}
+    lookAt: {fileID: 0}
+    focusCameraOnSpeaker: 0
+    cameraOffsetRotation: 0
+    speakerAnimation: {fileID: 0}
+    lookAtAnimation: {fileID: 0}
+    navigation:
+      enabled: 0
+      targetID: {fileID: 0}
+      offset: {x: 0, y: 0, z: 0}
+      stopDistance: 0
+      faceID: {fileID: 0}
+      timeoutSeconds: 0
+  - text: "This demo will show some of the basic \nfunctionality of this kit"
+    voiceOver: {fileID: 0}
+    centered: 0
+    speaker: {fileID: 0}
+    lookAt: {fileID: 0}
+    focusCameraOnSpeaker: 0
+    cameraOffsetRotation: 0
+    speakerAnimation: {fileID: 0}
+    lookAtAnimation: {fileID: 0}
+    navigation:
+      enabled: 0
+      targetID: {fileID: 0}
+      offset: {x: 0, y: 0, z: 0}
+      stopDistance: 0
+      faceID: {fileID: 0}
+      timeoutSeconds: 0
+  - text: "as well, it contains base prefabs that you can \ncreate variants from
+      to get up and running faster!"
+    voiceOver: {fileID: 0}
+    centered: 0
+    speaker: {fileID: 0}
+    lookAt: {fileID: 0}
+    focusCameraOnSpeaker: 0
+    cameraOffsetRotation: 0
+    speakerAnimation: {fileID: 0}
+    lookAtAnimation: {fileID: 0}
+    navigation:
+      enabled: 0
+      targetID: {fileID: 0}
+      offset: {x: 0, y: 0, z: 0}
+      stopDistance: 0
+      faceID: {fileID: 0}
+      timeoutSeconds: 0
+  freezeInputs: 1
+  freezeTime: 1
+  autoAdvance: 0
+  delay: 0
+  autoAdvanceCharTime: 0.03
+  charRevealRate: 0.02

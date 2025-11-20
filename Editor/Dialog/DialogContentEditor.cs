@@ -1,316 +1,349 @@
-namespace RyanMillerGameCore.Dialog
-{
-    using UnityEditor;
-    using UnityEditor.UIElements;
-    using UnityEngine;
-    using UnityEngine.UIElements;
+namespace RyanMillerGameCore.Dialog {
+	using UnityEditor;
+	using UnityEditor.UIElements;
+	using UnityEngine;
+	using UnityEngine.UIElements;
 
-    [CustomEditor(typeof(DialogContent))]
-    public class DialogContentEditor : Editor
-    {
-        private VisualElement root;
-        private VisualElement linesUIContainer;
+	[CustomEditor(typeof(DialogContent))]
+	public class DialogContentEditor : Editor {
+		private VisualElement root;
+		private VisualElement linesUIContainer;
 
-        private void OnEnable()
-        {
-            Undo.undoRedoPerformed += OnUndoRedoPerformed;
-        }
+		private void OnEnable() {
+			Undo.undoRedoPerformed += OnUndoRedoPerformed;
+		}
 
-        private void OnDisable()
-        {
-            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
-        }
+		private void OnDisable() {
+			Undo.undoRedoPerformed -= OnUndoRedoPerformed;
+		}
 
-        private void OnUndoRedoPerformed()
-        {
-            if (root == null) return;
-            serializedObject.Update();
-            BuildDialogLinesUI();
-            root.Bind(serializedObject);
-        }
+		private void OnUndoRedoPerformed() {
+			if (root == null) return;
+			serializedObject.Update();
+			BuildDialogLinesUI();
+			root.Bind(serializedObject);
+		}
 
-        public override VisualElement CreateInspectorGUI()
-        {
-            root = new VisualElement();
-            linesUIContainer = new VisualElement();
-            var so = serializedObject;
+		public override VisualElement CreateInspectorGUI() {
+			root = new VisualElement();
+			linesUIContainer = new VisualElement();
+			var so = serializedObject;
 
-            // === Dialog Settings Foldout ===
-            var settingsFoldout = new Foldout { text = "Dialog Settings", value = true };
+			// === Dialog Settings Foldout ===
+			var settingsFoldout = new Foldout { text = "Dialog Settings", value = true };
 
-            string[] fieldNames = new[]
-            {
-                "freezeInputs", "freezeTime", "autoAdvance",
-                "delay", "autoAdvanceCharTime", "charRevealRate"
-            };
+			string[] fieldNames = new[] {
+				"freezeInputs", "freezeTime", "autoAdvance",
+				"delay", "autoAdvanceCharTime", "charRevealRate"
+			};
 
-            foreach (var fieldName in fieldNames)
-            {
-                var prop = so.FindProperty(fieldName);
-                settingsFoldout.Add(new PropertyField(prop));
-            }
+			foreach (var fieldName in fieldNames) {
+				var prop = so.FindProperty(fieldName);
+				settingsFoldout.Add(new PropertyField(prop));
+			}
 
-            root.Add(settingsFoldout);
-            root.Add(linesUIContainer);
+			root.Add(settingsFoldout);
+			root.Add(linesUIContainer);
 
-            BuildDialogLinesUI();
-            root.Bind(serializedObject);
-            return root;
-        }
+			BuildDialogLinesUI();
+			root.Bind(serializedObject);
+			return root;
+		}
 
-        private void BuildDialogLinesUI()
-        {
-            linesUIContainer.Clear();
-            serializedObject.Update();
+		private void BuildDialogLinesUI() {
+			linesUIContainer.Clear();
+			serializedObject.Update();
 
-            var linesProp = serializedObject.FindProperty("lines");
+			var linesProp = serializedObject.FindProperty("lines");
 
-            linesUIContainer.Add(new Label("Dialog Lines")
-            {
-                style = { unityFontStyleAndWeight = FontStyle.Bold }
-            });
+			linesUIContainer.Add(new Label("Dialog Lines") {
+				style = { unityFontStyleAndWeight = FontStyle.Bold }
+			});
 
-            for (int i = 0; i < linesProp.arraySize; i++)
-            {
-                int currentIndex = i;
-                var lineProp = linesProp.GetArrayElementAtIndex(i);
+			// If there are no lines, show an empty-state with an Add button so user can create the first line
+			if (linesProp.arraySize == 0) {
+				var emptyBox = new Box();
+				emptyBox.style.marginTop = 6;
+				emptyBox.style.paddingBottom = 6;
+				emptyBox.style.paddingLeft = 6;
+				emptyBox.style.paddingRight = 6;
 
-                var lineBox = new Box();
-                lineBox.style.marginTop = 6;
-                lineBox.style.paddingBottom = 6;
-                lineBox.style.paddingLeft = 6;
-                lineBox.style.paddingRight = 6;
+				var emptyLabel = new Label("No dialog lines yet.");
+				emptyBox.Add(emptyLabel);
 
-                var textProp    = lineProp.FindPropertyRelative("text");
-                var speakerProp = lineProp.FindPropertyRelative("speaker");
-                var lookAtProp  = lineProp.FindPropertyRelative("lookAt");
+				var addFirstButton = new Button(() => {
+						// Support undo
+						Undo.RecordObject(target, "Add dialog line");
+						var updated = serializedObject.FindProperty("lines");
+						// Insert at 0
+						updated.InsertArrayElementAtIndex(0);
+						// Initialize the new element's fields to safe defaults
+						var newLine = updated.GetArrayElementAtIndex(0);
+						if (newLine != null) {
+							var text = newLine.FindPropertyRelative("text");
+							if (text != null) text.stringValue = string.Empty;
 
-                // Always-visible text field with dynamic label
-                var textField = new PropertyField(textProp, string.Empty);
-                lineBox.Add(textField);
+							var speaker = newLine.FindPropertyRelative("speaker");
+							if (speaker != null) speaker.objectReferenceValue = null;
 
-                void RefreshTextLabel()
-                {
-                    var spkObj = speakerProp?.objectReferenceValue;
-                    var latObj = lookAtProp?.objectReferenceValue;
+							var lookAt = newLine.FindPropertyRelative("lookAt");
+							if (lookAt != null) lookAt.objectReferenceValue = null;
 
-                    string speakerName = spkObj != null ? spkObj.name : "";
-                    string lookAtName  = latObj != null ? latObj.name : "";
+							var nav = newLine.FindPropertyRelative("navigation");
+							if (nav != null) {
+								var enabled = nav.FindPropertyRelative("enabled");
+								if (enabled != null) enabled.boolValue = false;
+							}
+						}
 
-                    if (!string.IsNullOrEmpty(speakerName) && string.IsNullOrEmpty(lookAtName))
-                        textField.label = speakerName + " says:";
-                    else if (!string.IsNullOrEmpty(speakerName) && !string.IsNullOrEmpty(lookAtName))
-                        textField.label = speakerName + " → looking at " + lookAtName;
-                    else
-                        textField.label = "Dialog text:";
-                }
+						serializedObject.ApplyModifiedProperties();
+						BuildDialogLinesUI();
+						root.Bind(serializedObject);
+					})
+					{ text = "+ Add First Line" };
 
-                textField.RegisterCallback<GeometryChangedEvent>(_ => RefreshTextLabel());
-                RefreshTextLabel();
+				addFirstButton.style.marginTop = 6;
+				emptyBox.Add(addFirstButton);
 
-                // === Line Options Foldout ===
-                var lineOptionsFoldout = new Foldout { text = "Line Options", value = false };
+				linesUIContainer.Add(emptyBox);
+				return;
+			}
 
-                var voicePF     = new PropertyField(lineProp.FindPropertyRelative("voiceOver"));
-                var centeredPF  = new PropertyField(lineProp.FindPropertyRelative("centered"));
-                var speakerPF   = new PropertyField(speakerProp);
-                var lookAtPF    = new PropertyField(lookAtProp);
-                var focusPF     = new PropertyField(lineProp.FindPropertyRelative("focusCameraOnSpeaker"));
-                var offsetPF    = new PropertyField(lineProp.FindPropertyRelative("cameraOffsetRotation"));
-                var speakAnimPF = new PropertyField(lineProp.FindPropertyRelative("speakerAnimation"));
-                var lookAnimPF  = new PropertyField(lineProp.FindPropertyRelative("lookAtAnimation"));
+			// Otherwise render each existing line with its controls
+			for (int i = 0; i < linesProp.arraySize; i++) {
+				int currentIndex = i;
+				var lineProp = linesProp.GetArrayElementAtIndex(i);
 
-                // Remove if not present in your DialogLine anymore
-                var speakCmdProp = lineProp.FindPropertyRelative("speakerCommands");
-                var targCmdProp  = lineProp.FindPropertyRelative("targetCommands");
-                if (speakCmdProp != null) lineOptionsFoldout.Add(new PropertyField(speakCmdProp));
-                if (targCmdProp  != null) lineOptionsFoldout.Add(new PropertyField(targCmdProp));
+				var lineBox = new Box();
+				lineBox.style.marginTop = 6;
+				lineBox.style.paddingBottom = 6;
+				lineBox.style.paddingLeft = 6;
+				lineBox.style.paddingRight = 6;
 
-                speakerPF.RegisterValueChangeCallback((SerializedPropertyChangeEvent _) => RefreshTextLabel());
-                lookAtPF.RegisterValueChangeCallback((SerializedPropertyChangeEvent _) => RefreshTextLabel());
+				var textProp = lineProp.FindPropertyRelative("text");
+				var speakerProp = lineProp.FindPropertyRelative("speaker");
+				var lookAtProp = lineProp.FindPropertyRelative("lookAt");
 
-                lineOptionsFoldout.Add(voicePF);
-                lineOptionsFoldout.Add(centeredPF);
-                lineOptionsFoldout.Add(speakerPF);
-                lineOptionsFoldout.Add(lookAtPF);
-                lineOptionsFoldout.Add(focusPF);
-                lineOptionsFoldout.Add(offsetPF);
-                lineOptionsFoldout.Add(speakAnimPF);
-                lineOptionsFoldout.Add(lookAnimPF);
+				// Always-visible text field with dynamic label
+				var textField = new PropertyField(textProp, string.Empty);
+				lineBox.Add(textField);
 
-                lineBox.Add(lineOptionsFoldout);
+				void RefreshTextLabel() {
+					var spkObj = speakerProp?.objectReferenceValue;
+					var latObj = lookAtProp?.objectReferenceValue;
 
-                // === Navigation (IDs only) ===
-                var navProp = lineProp.FindPropertyRelative("navigation");
-                if (navProp != null)
-                {
-                    var navFoldout = new Foldout { text = "Navigation", value = false };
-                    var navEnabledProp = navProp.FindPropertyRelative("enabled");
+					string speakerName = spkObj != null ? spkObj.name : "";
+					string lookAtName = latObj != null ? latObj.name : "";
 
-                    var navEnabledPF = new PropertyField(navEnabledProp, "Enabled");
-                    var navTargetIDPF = new PropertyField(navProp.FindPropertyRelative("targetID"), "Target (ID)");
-                    var navOffsetPF   = new PropertyField(navProp.FindPropertyRelative("offset"), "Offset");
-                    var navStopPF     = new PropertyField(navProp.FindPropertyRelative("stopDistance"), "Stop Distance");
-                    var navFaceIDPF   = new PropertyField(navProp.FindPropertyRelative("faceID"), "Face (ID)");
-                    var navTimeoutPF  = new PropertyField(navProp.FindPropertyRelative("timeoutSeconds"), "Timeout (s)");
+					if (!string.IsNullOrEmpty(speakerName) && string.IsNullOrEmpty(lookAtName))
+						textField.label = speakerName + " says:";
+					else if (!string.IsNullOrEmpty(speakerName) && !string.IsNullOrEmpty(lookAtName))
+						textField.label = speakerName + " → looking at " + lookAtName;
+					else
+						textField.label = "Dialog text:";
+				}
 
-                    //var navBody = new VisualElement();
-                    lineOptionsFoldout.style.marginLeft = 12;
-                    lineOptionsFoldout.Add(navTargetIDPF);
-                    lineOptionsFoldout.Add(navOffsetPF);
-                    lineOptionsFoldout.Add(navStopPF);
-                    lineOptionsFoldout.Add(navFaceIDPF);
-                    lineOptionsFoldout.Add(navTimeoutPF);
+				textField.RegisterCallback<GeometryChangedEvent>(_ => RefreshTextLabel());
+				RefreshTextLabel();
 
-                    void RefreshNavEnabled()
-                    {
-                     //   navBody.SetEnabled(navEnabledProp.boolValue);
-                    }
+				// === Line Options Foldout ===
+				var lineOptionsFoldout = new Foldout { text = "Line Options", value = false };
 
-                    navEnabledPF.RegisterValueChangeCallback((SerializedPropertyChangeEvent _) => RefreshNavEnabled());
+				var voicePF = new PropertyField(lineProp.FindPropertyRelative("voiceOver"));
+				var centeredPF = new PropertyField(lineProp.FindPropertyRelative("centered"));
+				var speakerPF = new PropertyField(speakerProp);
+				var lookAtPF = new PropertyField(lookAtProp);
+				var focusPF = new PropertyField(lineProp.FindPropertyRelative("focusCameraOnSpeaker"));
+				var offsetPF = new PropertyField(lineProp.FindPropertyRelative("cameraOffsetRotation"));
+				var speakAnimPF = new PropertyField(lineProp.FindPropertyRelative("speakerAnimation"));
+				var lookAnimPF = new PropertyField(lineProp.FindPropertyRelative("lookAtAnimation"));
 
-                    lineOptionsFoldout.Add(navEnabledPF);
-                   // navFoldout.Add(navBody);
-                    lineBox.Add(lineOptionsFoldout);
+				// Remove if not present in your DialogLine anymore
+				var speakCmdProp = lineProp.FindPropertyRelative("speakerCommands");
+				var targCmdProp = lineProp.FindPropertyRelative("targetCommands");
+				if (speakCmdProp != null) lineOptionsFoldout.Add(new PropertyField(speakCmdProp));
+				if (targCmdProp != null) lineOptionsFoldout.Add(new PropertyField(targCmdProp));
 
-                    lineOptionsFoldout.RegisterCallback<GeometryChangedEvent>(_ => RefreshNavEnabled());
-                    RefreshNavEnabled();
-                }
+				speakerPF.RegisterValueChangeCallback((SerializedPropertyChangeEvent _) => RefreshTextLabel());
+				lookAtPF.RegisterValueChangeCallback((SerializedPropertyChangeEvent _) => RefreshTextLabel());
 
-                // === Remove Button ===
-                var removeButton = new Button(() =>
-                {
-                    var updatedLinesProp = serializedObject.FindProperty("lines");
-                    updatedLinesProp.DeleteArrayElementAtIndex(currentIndex);
-                    serializedObject.ApplyModifiedProperties();
-                    BuildDialogLinesUI();
-                    root.Bind(serializedObject);
-                })
-                { text = "Remove" };
-                removeButton.style.marginTop = 6;
-                lineBox.Add(removeButton);
+				lineOptionsFoldout.Add(voicePF);
+				lineOptionsFoldout.Add(centeredPF);
+				lineOptionsFoldout.Add(speakerPF);
+				lineOptionsFoldout.Add(lookAtPF);
+				lineOptionsFoldout.Add(focusPF);
+				lineOptionsFoldout.Add(offsetPF);
+				lineOptionsFoldout.Add(speakAnimPF);
+				lineOptionsFoldout.Add(lookAnimPF);
 
-                // === Controls Row: Move Up / Move Down / Add Line / Add Opposite ===
-                var controlsRow = new VisualElement();
-                controlsRow.style.flexDirection = FlexDirection.Row;
-                controlsRow.style.marginTop = 4;
-                controlsRow.style.justifyContent = Justify.FlexStart;
+				lineBox.Add(lineOptionsFoldout);
 
-                void StyleButton(Button b, bool last = false)
-                {
-                    b.style.marginRight = last ? 0 : 4;
-                    b.style.flexGrow = 1;
-                    b.style.flexBasis = 0; // even distribution
-                }
+				// === Navigation (IDs only) ===
+				var navProp = lineProp.FindPropertyRelative("navigation");
+				if (navProp != null) {
+					var navFoldout = new Foldout { text = "Navigation", value = false };
+					var navEnabledProp = navProp.FindPropertyRelative("enabled");
 
-                // Move Up
-                var moveUpButton = new Button(() =>
-                {
-                    var updated = serializedObject.FindProperty("lines");
-                    if (currentIndex > 0)
-                    {
-                        updated.MoveArrayElement(currentIndex, currentIndex - 1);
-                        serializedObject.ApplyModifiedProperties();
-                        BuildDialogLinesUI();
-                        root.Bind(serializedObject);
-                    }
-                })
-                { text = "⬆" };
-                if (currentIndex == 0) moveUpButton.SetEnabled(false);
-                StyleButton(moveUpButton);
+					var navEnabledPF = new PropertyField(navEnabledProp, "Enabled");
+					var navTargetIDPF = new PropertyField(navProp.FindPropertyRelative("targetID"), "Target (ID)");
+					var navOffsetPF = new PropertyField(navProp.FindPropertyRelative("offset"), "Offset");
+					var navStopPF = new PropertyField(navProp.FindPropertyRelative("stopDistance"), "Stop Distance");
+					var navFaceIDPF = new PropertyField(navProp.FindPropertyRelative("faceID"), "Face (ID)");
+					var navTimeoutPF = new PropertyField(navProp.FindPropertyRelative("timeoutSeconds"), "Timeout (s)");
 
-                // Move Down
-                var moveDownButton = new Button(() =>
-                {
-                    var updated = serializedObject.FindProperty("lines");
-                    if (currentIndex < updated.arraySize - 1)
-                    {
-                        updated.MoveArrayElement(currentIndex, currentIndex + 1);
-                        serializedObject.ApplyModifiedProperties();
-                        BuildDialogLinesUI();
-                        root.Bind(serializedObject);
-                    }
-                })
-                { text = "⬇" };
-                if (currentIndex >= linesProp.arraySize - 1) moveDownButton.SetEnabled(false);
-                StyleButton(moveDownButton);
+					lineOptionsFoldout.style.marginLeft = 12;
+					lineOptionsFoldout.Add(navTargetIDPF);
+					lineOptionsFoldout.Add(navOffsetPF);
+					lineOptionsFoldout.Add(navStopPF);
+					lineOptionsFoldout.Add(navFaceIDPF);
+					lineOptionsFoldout.Add(navTimeoutPF);
 
-                // Add Line (insert below)
-                var addBelowButton = new Button(() =>
-                {
-                    var updated = serializedObject.FindProperty("lines");
-                    int insertIndex = Mathf.Clamp(currentIndex + 1, 0, updated.arraySize);
-                    updated.InsertArrayElementAtIndex(insertIndex);
+					void RefreshNavEnabled() {
+						// nav toggle handling here if needed
+					}
 
-                    var newLine = updated.GetArrayElementAtIndex(insertIndex);
-                    if (newLine != null)
-                    {
-                        var text = newLine.FindPropertyRelative("text");
-                        if (text != null) text.stringValue = string.Empty;
+					navEnabledPF.RegisterValueChangeCallback((SerializedPropertyChangeEvent _) => RefreshNavEnabled());
 
-                        var nav = newLine.FindPropertyRelative("navigation");
-                        if (nav != null)
-                        {
-                            var enabled = nav.FindPropertyRelative("enabled");
-                            if (enabled != null) enabled.boolValue = false;
-                        }
-                    }
+					lineOptionsFoldout.Add(navEnabledPF);
+					lineBox.Add(lineOptionsFoldout);
 
-                    serializedObject.ApplyModifiedProperties();
-                    BuildDialogLinesUI();
-                    root.Bind(serializedObject);
-                })
-                { text = "+ Line" };
-                StyleButton(addBelowButton);
+					lineOptionsFoldout.RegisterCallback<GeometryChangedEvent>(_ => RefreshNavEnabled());
+					RefreshNavEnabled();
+				}
 
-                // Add Opposite (insert below, swap speaker/lookAt)
-                var addOppositeButton = new Button(() =>
-                {
-                    var updated = serializedObject.FindProperty("lines");
+				// === Remove Button ===
+				var removeButton = new Button(() => {
+						Undo.RecordObject(target, "Remove dialog line");
+						var updatedLinesProp = serializedObject.FindProperty("lines");
+						updatedLinesProp.DeleteArrayElementAtIndex(currentIndex);
+						serializedObject.ApplyModifiedProperties();
+						BuildDialogLinesUI();
+						root.Bind(serializedObject);
+					})
+					{ text = "Remove" };
+				removeButton.style.marginTop = 6;
+				lineBox.Add(removeButton);
 
-                    // Capture current line's speaker/lookAt
-                    Object curSpeaker = lineProp.FindPropertyRelative("speaker")?.objectReferenceValue;
-                    Object curLookAt  = lineProp.FindPropertyRelative("lookAt")?.objectReferenceValue;
+				// === Controls Row: Move Up / Move Down / Add Line / Add Opposite ===
+				var controlsRow = new VisualElement();
+				controlsRow.style.flexDirection = FlexDirection.Row;
+				controlsRow.style.marginTop = 4;
+				controlsRow.style.justifyContent = Justify.FlexStart;
 
-                    int insertIndex = Mathf.Clamp(currentIndex + 1, 0, updated.arraySize);
-                    updated.InsertArrayElementAtIndex(insertIndex);
+				void StyleButton(Button b, bool last = false) {
+					b.style.marginRight = last ? 0 : 4;
+					b.style.flexGrow = 1;
+					b.style.flexBasis = 0; // even distribution
+				}
 
-                    var newLine = updated.GetArrayElementAtIndex(insertIndex);
-                    if (newLine != null)
-                    {
-                        var newText = newLine.FindPropertyRelative("text");
-                        if (newText != null) newText.stringValue = string.Empty;
+				// Move Up
+				var moveUpButton = new Button(() => {
+						Undo.RecordObject(target, "Move dialog line up");
+						var updated = serializedObject.FindProperty("lines");
+						if (currentIndex > 0) {
+							updated.MoveArrayElement(currentIndex, currentIndex - 1);
+							serializedObject.ApplyModifiedProperties();
+							BuildDialogLinesUI();
+							root.Bind(serializedObject);
+						}
+					})
+					{ text = "⬆" };
+				if (currentIndex == 0) moveUpButton.SetEnabled(false);
+				StyleButton(moveUpButton);
 
-                        var newSpeakerProp = newLine.FindPropertyRelative("speaker");
-                        var newLookAtProp  = newLine.FindPropertyRelative("lookAt");
+				// Move Down
+				var moveDownButton = new Button(() => {
+						Undo.RecordObject(target, "Move dialog line down");
+						var updated = serializedObject.FindProperty("lines");
+						if (currentIndex < updated.arraySize - 1) {
+							updated.MoveArrayElement(currentIndex, currentIndex + 1);
+							serializedObject.ApplyModifiedProperties();
+							BuildDialogLinesUI();
+							root.Bind(serializedObject);
+						}
+					})
+					{ text = "⬇" };
+				if (currentIndex >= linesProp.arraySize - 1) moveDownButton.SetEnabled(false);
+				StyleButton(moveDownButton);
 
-                        if (newSpeakerProp != null) newSpeakerProp.objectReferenceValue = curLookAt;
-                        if (newLookAtProp  != null) newLookAtProp.objectReferenceValue  = curSpeaker;
+				// Add Line (insert below)
+				var addBelowButton = new Button(() => {
+						Undo.RecordObject(target, "Add dialog line");
+						var updated = serializedObject.FindProperty("lines");
+						int insertIndex = Mathf.Clamp(currentIndex + 1, 0, updated.arraySize);
+						updated.InsertArrayElementAtIndex(insertIndex);
 
-                        var nav = newLine.FindPropertyRelative("navigation");
-                        if (nav != null)
-                        {
-                            var enabled = nav.FindPropertyRelative("enabled");
-                            if (enabled != null) enabled.boolValue = false;
-                        }
-                    }
+						var newLine = updated.GetArrayElementAtIndex(insertIndex);
+						if (newLine != null) {
+							var text = newLine.FindPropertyRelative("text");
+							if (text != null) text.stringValue = string.Empty;
 
-                    serializedObject.ApplyModifiedProperties();
-                    BuildDialogLinesUI();
-                    root.Bind(serializedObject);
-                })
-                { text = "+ Flip" };
-                StyleButton(addOppositeButton, last: true);
+							var speaker = newLine.FindPropertyRelative("speaker");
+							if (speaker != null) speaker.objectReferenceValue = null;
 
-                controlsRow.Add(moveUpButton);
-                controlsRow.Add(moveDownButton);
-                controlsRow.Add(addBelowButton);
-                controlsRow.Add(addOppositeButton);
+							var lookAt = newLine.FindPropertyRelative("lookAt");
+							if (lookAt != null) lookAt.objectReferenceValue = null;
 
-                lineBox.Add(controlsRow);
+							var nav = newLine.FindPropertyRelative("navigation");
+							if (nav != null) {
+								var enabled = nav.FindPropertyRelative("enabled");
+								if (enabled != null) enabled.boolValue = false;
+							}
+						}
 
-                linesUIContainer.Add(lineBox);
-            }
-        }
-    }
+						serializedObject.ApplyModifiedProperties();
+						BuildDialogLinesUI();
+						root.Bind(serializedObject);
+					})
+					{ text = "+ Line" };
+				StyleButton(addBelowButton);
+
+				// Add Opposite (insert below, swap speaker/lookAt)
+				var addOppositeButton = new Button(() => {
+						Undo.RecordObject(target, "Add flipped dialog line");
+						var updated = serializedObject.FindProperty("lines");
+
+						// Capture current line's speaker/lookAt
+						Object curSpeaker = lineProp.FindPropertyRelative("speaker")?.objectReferenceValue;
+						Object curLookAt = lineProp.FindPropertyRelative("lookAt")?.objectReferenceValue;
+
+						int insertIndex = Mathf.Clamp(currentIndex + 1, 0, updated.arraySize);
+						updated.InsertArrayElementAtIndex(insertIndex);
+
+						var newLine = updated.GetArrayElementAtIndex(insertIndex);
+						if (newLine != null) {
+							var newText = newLine.FindPropertyRelative("text");
+							if (newText != null) newText.stringValue = string.Empty;
+
+							var newSpeakerProp = newLine.FindPropertyRelative("speaker");
+							var newLookAtProp = newLine.FindPropertyRelative("lookAt");
+
+							if (newSpeakerProp != null) newSpeakerProp.objectReferenceValue = curLookAt;
+							if (newLookAtProp != null) newLookAtProp.objectReferenceValue = curSpeaker;
+
+							var nav = newLine.FindPropertyRelative("navigation");
+							if (nav != null) {
+								var enabled = nav.FindPropertyRelative("enabled");
+								if (enabled != null) enabled.boolValue = false;
+							}
+						}
+
+						serializedObject.ApplyModifiedProperties();
+						BuildDialogLinesUI();
+						root.Bind(serializedObject);
+					})
+					{ text = "+ Flip" };
+				StyleButton(addOppositeButton, last: true);
+
+				controlsRow.Add(moveUpButton);
+				controlsRow.Add(moveDownButton);
+				controlsRow.Add(addBelowButton);
+				controlsRow.Add(addOppositeButton);
+
+				lineBox.Add(controlsRow);
+
+				linesUIContainer.Add(lineBox);
+			}
+		}
+	}
 }
