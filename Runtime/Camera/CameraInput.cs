@@ -29,19 +29,19 @@ namespace RyanMillerGameCore.Camera {
 		}
 
 		private void OnDisable() {
-			lookAction.performed -= OnLook;
-			lookAction.canceled -= OnLook;
-			lookAction.Disable();
-
-			zoomAction.performed -= OnZoom;
-			zoomAction.canceled -= OnZoom;
-			zoomAction.Disable();
+			if (inputActionLook != null) {
+				inputActionLook.action.Disable();
+				inputActionLook.action.performed -= OnLook;
+			}
+			if (inputActionZoom != null) {
+				inputActionZoom.action.Disable();
+				inputActionZoom.action.performed -= OnZoom;
+			}
 		}
 
 		private void Start() {
 			cameraController = GetComponent<CameraController>();
 		}
-
 
 		private void Update() {
 			if (cameraController != null) {
