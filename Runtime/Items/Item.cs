@@ -1,6 +1,7 @@
 namespace RyanMillerGameCore.Items
 {
     using UnityEngine;
+    using Utilities;
 
     [DisallowMultipleComponent]
     [RequireComponent(typeof(AutoRegisterID))]

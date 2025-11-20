@@ -7,6 +7,7 @@ namespace RyanMillerGameCore.Animation
     {
         [SerializeField] private Animator animator;
         [SerializeField] private int cosmeticAnimLayer = 1;
+        #pragma warning disable 0414
         [SerializeField] private float cosmeticAnimDuration = 5;
         [SerializeField] private float blendTime = 0.25f;
         private Coroutine _weightChanges;

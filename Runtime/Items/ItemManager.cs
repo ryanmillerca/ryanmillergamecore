@@ -2,12 +2,7 @@ namespace RyanMillerGameCore.Items
 {
     using System.Collections.Generic;
     using UnityEngine;
-
-    public interface IPoolable
-    {
-        void OnAcquire();
-        void OnRelease();
-    }
+    using Utilities;
 
     public class ItemManager : Singleton<ItemManager>
     {
