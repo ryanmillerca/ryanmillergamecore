@@ -82,7 +82,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98117656bec199041aa7ab9eead84f3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputActionAsset: {fileID: -944628639613478452, guid: fdc6b5719f67a429e920f65063475424, type: 3}
+  inputActionLook: {fileID: -5630151704836100654, guid: fdc6b5719f67a429e920f65063475424, type: 3}
+  inputActionZoom: {fileID: 8959096177680124401, guid: fdc6b5719f67a429e920f65063475424, type: 3}
 --- !u!114 &4197413393916159763
 MonoBehaviour:
   m_ObjectHideFlags: 0
