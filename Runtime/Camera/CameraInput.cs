@@ -6,7 +6,9 @@ namespace RyanMillerGameCore.Camera
 
     public class CameraInput : MonoBehaviour
     {
-        [SerializeField] private InputActionAsset inputActionAsset;
+
+        [SerializeField] private InputActionReference inputActionLook;
+        [SerializeField] private InputActionReference inputActionZoom;
         [NonSerialized] private CameraController cameraController;
         [NonSerialized] private InputAction lookAction;
         [NonSerialized] private InputAction zoomAction;
@@ -16,16 +18,17 @@ namespace RyanMillerGameCore.Camera
 
         private void OnEnable()
         {
-            var actionMap = inputActionAsset.FindActionMap("Player", true);
-            lookAction = actionMap.FindAction("Look", true);
-            lookAction.performed += OnLook;
-            lookAction.canceled += OnLook;
-            lookAction.Enable();
-
-            zoomAction = actionMap.FindAction("Zoom", true);
-            zoomAction.performed += OnZoom;
-            zoomAction.canceled += OnZoom;
-            zoomAction.Enable();
+            if (inputActionLook != null) {
+                inputActionLook.action.Enable();
+                inputActionLook.action.performed += OnLook;
+                inputActionLook.action.canceled += OnLook;
+                inputActionLook.action.Enable();
+            }
+            if (inputActionZoom != null) {
+                inputActionZoom.action.performed += OnZoom;
+                inputActionZoom.action.canceled += OnZoom;
+                inputActionZoom.action.Enable();
+            }
         }
 
         private void OnDisable()
