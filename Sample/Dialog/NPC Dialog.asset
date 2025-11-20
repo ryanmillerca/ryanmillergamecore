@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 532ce9569a4302e42b4de13e8e4428fe, type: 3}
-  m_Name: Intro Dialog
+  m_Name: NPC Dialog
   m_EditorClassIdentifier: RyanMillerGameCore.Dialog::RyanMillerGameCore.Dialog.DialogContent
   lines:
-  - text: 'Hi and welcome to RMGC
+  - text: 'Hello! Don''t attack me, please.
 
-      Thats... Ryan Miller Game Core.'
+      The doctor said I have low health.'
     voiceOver: {fileID: 0}
     centered: 0
     speaker: {fileID: 0}
@@ -31,7 +31,7 @@ MonoBehaviour:
       stopDistance: 0
       faceID: {fileID: 0}
       timeoutSeconds: 0
-  - text: "This demo will show some of the basic \nfunctionality of this kit"
+  - text: "So definitely don't press the F key \non your keyboard or X on gamepad"
     voiceOver: {fileID: 0}
     centered: 0
     speaker: {fileID: 0}
@@ -47,8 +47,7 @@ MonoBehaviour:
       stopDistance: 0
       faceID: {fileID: 0}
       timeoutSeconds: 0
-  - text: "as well, it contains base prefabs that you can \ncreate variants from
-      to get up and running faster!"
+  - text: ... because that would be pretty bad for my health!
     voiceOver: {fileID: 0}
     centered: 0
     speaker: {fileID: 0}
