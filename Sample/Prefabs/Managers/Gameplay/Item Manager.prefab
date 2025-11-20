@@ -46,10 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   preserveParentObject: 0
-  itemPrefabs:
-  - {fileID: 3036540453167417753, guid: 2afe4927078d9443299fd53e5258279e, type: 3}
-  - {fileID: 4441151112193899454, guid: 6b9e7269d39cc4b44819052e7327c234, type: 3}
-  - {fileID: 8671602556726983465, guid: 7e9e1956f16a64f04a8225ee44310d5e, type: 3}
-  - {fileID: 7933221405822436141, guid: 66bcbd570a9e346f1b144209995b693c, type: 3}
+  itemPrefabs: []
   defaultPoolAmount: 5
   enableDiagnostics: 0
