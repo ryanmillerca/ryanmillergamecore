@@ -23,9 +23,10 @@ You can add this kit to your Unity project using the **Unity Package Manager** v
 2. Go to `Window > Package Manager`
 3. Click the **+** button → **Add package from git URL**
 4. Paste the following URL: https://github.com/ryanmillerca/ryanmillergamecore.git
-
-5. Click **Add** — the package will appear in your project.
-
+5. Click **Add**. the package will appear in your project.
+6. Navigate to your Packages section inside project, find `Ryan Miller Game Core` and expand it to `/Sample/Sample Scene.prefab`
+7. Drag `/Sample/Sample Scene.prefab` into an Empty Scene and hit Play!
+   
 > Note: The package is still under active development and APIs may change frequently.
 
 For more info on using Git packages in Unity, see the [official Unity documentation](https://docs.unity3d.com/Manual/upm-ui-giturl.html).
