@@ -7,13 +7,16 @@ namespace RyanMillerGameCore.Character {
 
 	public class CharacterInput : MonoBehaviour {
 		[Header("References")]
-		[SerializeField] private bool syncMoveDirectionWithCamera = true;
 		[SerializeField] private InputActionReference inputActionMove;
 		[SerializeField] private InputActionReference inputActionAttack;
 		[SerializeField] private InputActionReference inputActionInteract;
 		[SerializeField] private InputActionReference inputActionPause;
 		[SerializeField] private InputActionReference inputActionPointerDown;
 		[SerializeField] private InputActionReference inputActionPointerPosition;
+		[Tooltip("Block CharacterInput when pointer is over any UI")]
+		[SerializeField] private bool disableInputWhenPointerOverUI;
+		[Tooltip("Directions = Screen Directions. Turn off for local Up/Left/Right/Down that doesn't necessarily match the view")]
+		[SerializeField] private bool syncMoveDirectionWithCamera = true;
 
 		[NonSerialized] private bool _inputEnabled = true;
 		[NonSerialized] private bool _hasPlayerCamera = false;
@@ -188,14 +191,17 @@ namespace RyanMillerGameCore.Character {
 		private void OnMove(InputAction.CallbackContext context) { }
 
 		private void ProcessMove() {
-
-			Vector2 move = inputActionMove.action.ReadValue<Vector2>();
-			_movementInput = Vector2.zero;
-
-			if (_inputEnabled == false || _isPointerOverGameObject) {
+			// If input is disabled or the pointer is over UI, make sure the character stops
+			if (_inputEnabled == false || IsPointerOverUI) {
+				_movementInput = Vector2.zero;
+				_characterBrain.GoToIdle(); // ensure the brain isn't left moving
 				return;
 			}
-			if (move.sqrMagnitude <= 0) {
+
+			Vector2 move = inputActionMove.action.ReadValue<Vector2>();
+			// if there's no movement, ensure idle
+			if (move.sqrMagnitude <= 0f) {
+				_movementInput = Vector2.zero;
 				_characterBrain.GoToIdle();
 				return;
 			}
@@ -243,15 +249,23 @@ namespace RyanMillerGameCore.Character {
 			}
 		}
 
+		private bool IsPointerOverUI {
+			get {
+				if (!disableInputWhenPointerOverUI) {
+					return false;
+				}
+				return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+			}
+		}
+
 		private void Update() {
 			ProcessMove();
+
 			if (IsMoving()) {
-				// calling this here will result in movement directions that stay synced with the camera
 				if (syncMoveDirectionWithCamera) {
 					UpdateMovementDirection();
 				}
 			}
-			_isPointerOverGameObject = EventSystem.current.IsPointerOverGameObject();
 		}
 
 		private void OnAttack(InputAction.CallbackContext context) {
