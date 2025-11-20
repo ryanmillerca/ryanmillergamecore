@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb7223736897549da8d38ff88884dbbb, type: 3}
+  m_Name: Dialog Skins
+  m_EditorClassIdentifier: 
+  defaultSkin:
+    speaker: {fileID: 0}
+    sounds: []
+    frameColor: {r: 0, g: 0, b: 0, a: 0.7529412}
+    bodyTextColor: {r: 1, g: 1, b: 1, a: 1}
+    characterTextColor: {r: 1, g: 1, b: 1, a: 1}
+    pitchVariance: 0
+    rate: 3
+  speakerSkins:
+  - speaker: {fileID: 11400000, guid: 8217c6af6ce577b459d84ddd5ebd1693, type: 2}
+    sounds:
+    - {fileID: 8300000, guid: 396256df6a55c4587bcbe0fa4d94ef57, type: 3}
+    frameColor: {r: 0.24387936, g: 0.3160377, b: 0.23851903, a: 1}
+    bodyTextColor: {r: 0.6603774, g: 0.6603774, b: 0.6603774, a: 1}
+    characterTextColor: {r: 1, g: 1, b: 1, a: 1}
+    pitchVariance: 0
+    rate: 0
+  - speaker: {fileID: 11400000, guid: 932a37c14d5995843bb3ef27fb69160e, type: 2}
+    sounds:
+    - {fileID: 8300000, guid: a5a0589c9d9dd483aaf0271975f1000b, type: 3}
+    frameColor: {r: 0.03773585, g: 0.1509434, b: 0.043396223, a: 1}
+    bodyTextColor: {r: 0.8634868, g: 0.8679245, b: 0.61000353, a: 1}
+    characterTextColor: {r: 1, g: 1, b: 1, a: 1}
+    pitchVariance: 0.3
+    rate: 5

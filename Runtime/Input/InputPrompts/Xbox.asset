@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20f9e8fe422da4ebaac9e03a4d3da467, type: 3}
+  m_Name: Xbox
+  m_EditorClassIdentifier: 
+  move: {fileID: 21300000, guid: dccdfb012b4b34f9ea0eb01e8182f768, type: 3}
+  look: {fileID: 21300000, guid: ee877aadd722d462e974da29ff6fa84a, type: 3}
+  attack: {fileID: 21300000, guid: dd8f13833d129449ba6ff5371ee3a9a0, type: 3}
+  interact: {fileID: 21300000, guid: 4250a22d5b3674e2db3c0191e3378ff2, type: 3}
+  dodge: {fileID: 21300000, guid: 139549e81e50b4370a94e72e12f1d8bd, type: 3}
+  special: {fileID: 21300000, guid: 642948104578048829266c0975275c37, type: 3}
+  pause: {fileID: 21300000, guid: da7d27d29afa0493e83d60c089207005, type: 3}

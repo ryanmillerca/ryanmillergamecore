@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6864598178795283410
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3512854988960663600}
+  - component: {fileID: 7272118783507186365}
+  m_Layer: 0
+  m_Name: Resolution Scaling
+  m_TagString: Untagged
+  m_Icon: {fileID: 2800000, guid: 72981193992aa4bd39da91897a9d2523, type: 3}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3512854988960663600
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6864598178795283410}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 19.369598, y: 0.3893119, z: 54.799355}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7272118783507186365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6864598178795283410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afcf138620bc84eed86e5ff313f42589, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 1
+  preserveParentObject: 1
+  sampleInterval: 1
+  sampleSizeInFrames: 20
+  automaticRenderScale: 1
+  increaseDecreaseThreshold: 0.1
+  renderScaleIncrement: 0.1
+  minimumRenderScale: 0.3
+  frameRateMethod: 2
+  targetFrameRates:
+    frameRates: 1e00000028000000320000003c0000007800000090000000a5000000f0000000
+  fixedTargetFrameRate: 60
+  showEvents: 0
+  maxQualityReached:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7609435348230655969, guid: 8ddf217fa60d8453cbcf182625d49f53, type: 3}
+        m_TargetAssemblyTypeName: ca.RyanMiller.Performance.SetAmbientOcclusion,
+          ca.RyanMiller.Performance
+        m_MethodName: SetAmbientOcclusionActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 2240947932173107803, guid: 8ddf217fa60d8453cbcf182625d49f53, type: 3}
+        m_TargetAssemblyTypeName: ca.RyanMiller.Performance.ca.RyanMiller.Performance.SetRealtimeCastShadows,
+          ca.RyanMiller.Performance
+        m_MethodName: SetAllShadowsEnabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  minQualityReached:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7609435348230655969, guid: 8ddf217fa60d8453cbcf182625d49f53, type: 3}
+        m_TargetAssemblyTypeName: ca.RyanMiller.Performance.SetAmbientOcclusion,
+          ca.RyanMiller.Performance
+        m_MethodName: SetAmbientOcclusionActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2240947932173107803, guid: 8ddf217fa60d8453cbcf182625d49f53, type: 3}
+        m_TargetAssemblyTypeName: ca.RyanMiller.Performance.ca.RyanMiller.Performance.SetRealtimeCastShadows,
+          ca.RyanMiller.Performance
+        m_MethodName: SetAllShadowsEnabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
