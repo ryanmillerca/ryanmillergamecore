@@ -1,0 +1,121 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &5521132393082870937
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 206915972607412185, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_Radius
+      value: 1.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -101.735
+      objectReference: {fileID: 0}
+    - target: {fileID: 3208194674422864565, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6911291618395496084, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: characterBrain
+      value: 
+      objectReference: {fileID: 8594500704859223734}
+    - target: {fileID: 8073312169503573864, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_Name
+      value: Static Talkable NPC Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 8764188299942020229, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 4430282769527696820, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+    - {fileID: 206915972607412185, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+    - {fileID: 8764188299942020229, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8073312169503573864, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8594500704859223734}
+  m_SourcePrefab: {fileID: 100100000, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+--- !u!114 &1402545498744832525 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6911291618395496084, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+  m_PrefabInstance: {fileID: 5521132393082870937}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecea5804e998b4d7c83125f0bf3817e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &4365441645362158577 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8073312169503573864, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+  m_PrefabInstance: {fileID: 5521132393082870937}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8594500704859223734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4365441645362158577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ce09917d037e443cb33cdc1729ee28d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RyanMillerGameCore::RyanMillerGameCore.Character.CharacterBrain
+  characterReferences: {fileID: 1402545498744832525}
+  bumpFrontAngle: 0.33
+  seeFrontAngle: 0.33
+  turnOffColliderOnDeath: 1
