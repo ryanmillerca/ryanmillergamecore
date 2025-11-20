@@ -227,7 +227,8 @@ namespace RyanMillerGameCore.Character
         {
             if (transform.parent != null)
             {
-                Debug.LogError("Don't parent Characters. Leave them in the scene root!",gameObject);
+                transform.SetParent(null);
+                Debug.LogWarning($"Unparenting Character {gameObject.name} so it will behave correctly.",gameObject);
             }
             
             RegisterToCharacterManager();

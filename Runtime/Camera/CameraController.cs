@@ -1,8 +1,6 @@
 namespace RyanMillerGameCore.Camera {
 	using UnityEngine;
 	using Character;
-	using Interactions;
-	using System.Collections;
 
 	public class CameraController : Singleton<CameraController> {
 		[Header("References")]
