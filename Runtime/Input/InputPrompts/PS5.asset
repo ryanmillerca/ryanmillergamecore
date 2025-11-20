@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20f9e8fe422da4ebaac9e03a4d3da467, type: 3}
+  m_Name: PS5
+  m_EditorClassIdentifier: 
+  move: {fileID: 21300000, guid: 2b9689b5a96904a4cb27bb08246d9f43, type: 3}
+  look: {fileID: 21300000, guid: 7a134529cea0b491ea4cbe404292952b, type: 3}
+  attack: {fileID: 21300000, guid: bdc9c3d5873c142e6aa489f210a4bbe9, type: 3}
+  interact: {fileID: 21300000, guid: 7f4afd6a1866449a1a37b6edfe74ebf6, type: 3}
+  dodge: {fileID: 21300000, guid: d8b8f3bac4e634a4bb37546312bb9114, type: 3}
+  special: {fileID: 21300000, guid: 2c7cf2b103d8d4a60942e9b669420938, type: 3}
+  pause: {fileID: 21300000, guid: f4c0d3d99cfc84961a8a1355a2cc393a, type: 3}

@@ -63,12 +63,22 @@ namespace RyanMillerGameCore.Interactions
 
         private void HidePrompt()
         {
-            UIButtonPrompt.Instance.TryHidePrompt(_promptData);
+            if (UIButtonPrompt.Instance) {
+                UIButtonPrompt.Instance.TryHidePrompt(_promptData);
+            }
+            else {
+                Debug.LogError("You need to have a UIButtonPrompt object in the scene.");
+            }
         }
 
         private void ShowPrompt()
         {
-            UIButtonPrompt.Instance.TryDisplayPrompt(_promptData);
+            if (UIButtonPrompt.Instance) {
+                UIButtonPrompt.Instance.TryDisplayPrompt(_promptData);
+            }
+            else {
+                Debug.LogError("You need to have a UIButtonPrompt object in the scene.");
+            }
         }
         
         private Vector3 GetOffset()
