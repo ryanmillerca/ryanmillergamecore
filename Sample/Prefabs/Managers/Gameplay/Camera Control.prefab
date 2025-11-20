@@ -82,7 +82,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98117656bec199041aa7ab9eead84f3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputActionAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  inputActionAsset: {fileID: -944628639613478452, guid: fdc6b5719f67a429e920f65063475424, type: 3}
 --- !u!114 &4197413393916159763
 MonoBehaviour:
   m_ObjectHideFlags: 0

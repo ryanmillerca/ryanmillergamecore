@@ -108,9 +108,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncMoveDirectionWithCamera: 1
-  inputActionMove: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  inputActionAttack: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  inputActionInteract: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  inputActionPause: {fileID: -8618474919599312967, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  inputActionPointerDown: {fileID: -1269981103003290567, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  inputActionPointerPosition: {fileID: -1755760033799314448, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  inputActionMove: {fileID: -1680190386980627800, guid: fdc6b5719f67a429e920f65063475424, type: 3}
+  inputActionAttack: {fileID: 1120369429361536294, guid: fdc6b5719f67a429e920f65063475424, type: 3}
+  inputActionInteract: {fileID: -2099379676528639254, guid: fdc6b5719f67a429e920f65063475424, type: 3}
+  inputActionPause: {fileID: -8618474919599312967, guid: fdc6b5719f67a429e920f65063475424, type: 3}
+  inputActionPointerDown: {fileID: -1269981103003290567, guid: fdc6b5719f67a429e920f65063475424, type: 3}
+  inputActionPointerPosition: {fileID: -1755760033799314448, guid: fdc6b5719f67a429e920f65063475424, type: 3}
