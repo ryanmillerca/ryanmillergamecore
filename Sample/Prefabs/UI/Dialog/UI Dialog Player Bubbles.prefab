@@ -125,6 +125,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1902380088029736474, guid: 80e5081b0a5374aecb222f385f0b8e65, type: 3}
+      propertyPath: inputActionAsset
+      value: 
+      objectReference: {fileID: -944628639613478452, guid: fdc6b5719f67a429e920f65063475424, type: 3}
+    - target: {fileID: 1902380088029736474, guid: 80e5081b0a5374aecb222f385f0b8e65, type: 3}
       propertyPath: dialogFrames.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -401,11 +405,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogPlayer: {fileID: 370381751744517932}
   layoutGroup: {fileID: 6477641064958112089}
-  canvasGroup: {fileID: 1675223288569211444}
   dialogWindow: {fileID: 3123845774828519357}
   windowOffset: {x: 0, y: 250}
   clampPosition: 0
-  dialogText: {fileID: 2158491015117646801}
+  sourceText: {fileID: 0}
 --- !u!114 &5769672831930810911
 MonoBehaviour:
   m_ObjectHideFlags: 0
