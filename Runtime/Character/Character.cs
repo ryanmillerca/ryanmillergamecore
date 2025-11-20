@@ -228,7 +228,6 @@ namespace RyanMillerGameCore.Character
             if (transform.parent != null)
             {
                 transform.SetParent(null);
-//                Debug.LogWarning($"Unparenting Character {gameObject.name} so it will behave correctly.",gameObject);
             }
             
             RegisterToCharacterManager();
