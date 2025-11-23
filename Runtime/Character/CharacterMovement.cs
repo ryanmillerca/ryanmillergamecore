@@ -1,294 +1,303 @@
-namespace RyanMillerGameCore.Character
-{
-    using UnityEngine;
-    using System;
+namespace RyanMillerGameCore.Character {
+	using UnityEngine;
+	using System;
 
-    /// <summary>
-    /// Handles physics-based character movement and rotation logic.
-    /// </summary>
-    [RequireComponent(typeof(Rigidbody))]
-    public class CharacterMovement : MonoBehaviour, IMovable
-    {
-        #region Serialized Fields
+	/// <summary>
+	/// Handles physics-based character movement and rotation logic.
+	/// </summary>
+	[RequireComponent(typeof(Rigidbody))]
+	public class CharacterMovement : MonoBehaviour, IMovable {
 
-        [Tooltip("Maximum speed this will move (from its own force)")]
-        public float maxSpeed = 5f;
 
-        [Tooltip("How quickly this object will reach max speed")]
-        public float acceleration = 10f;
+		#region Serialized Fields
 
-        [Tooltip("How quickly the object slows down when not moving")]
-        public float deceleration = 10f;
+		[Tooltip("Maximum speed this will move (from its own force)")]
+		public float maxSpeed = 5f;
 
-        [Header("Dialog/Forceful Move")]
-        [Tooltip("Max speed used by forceful/MovePosition pathing (dialog lines). Defaults to maxSpeed if 0.")]
-        public float forcefulSpeed = 0f;
+		[Tooltip("How quickly this object will reach max speed")]
+		public float acceleration = 10f;
 
-        [Tooltip("If true, a tiny snap is allowed when nearly at the target and blocked (dialog lines).")]
-        public bool allowTinyWarpNearGoal = true;
+		[Tooltip("How quickly the object slows down when not moving")]
+		public float deceleration = 10f;
 
-        [Tooltip("Max distance for the tiny warp when nearly at goal (meters).")]
-        public float tinyWarpDistance = 0.1f;
+		[Header("Dialog/Forceful Move")]
+		[Tooltip("Max speed used by forceful/MovePosition pathing (dialog lines). Defaults to maxSpeed if 0.")]
+		public float forcefulSpeed = 0f;
 
-        #endregion
+		[Tooltip("If true, a tiny snap is allowed when nearly at the target and blocked (dialog lines).")]
+		public bool allowTinyWarpNearGoal = true;
 
-        #region Private Fields
+		[Tooltip("Max distance for the tiny warp when nearly at goal (meters).")]
+		public float tinyWarpDistance = 0.1f;
 
-        private Rigidbody _rb;
-        private Vector3 _targetVelocity;
-        private bool _canMove = false;
-        private RotateFromMotor _rotateFromMotor;
+		#endregion
 
-        #endregion
 
-        #region Events
+		#region Private Fields
 
-        public event Action<float> OnVelocityApplied;
-        public event Action<Vector3> OnMoveInDirection;
+		private Rigidbody _rb;
+		private Vector3 _targetVelocity;
+		private bool _canMove = false;
+		private RotateFromMotor _rotateFromMotor;
 
-        #endregion
+		#endregion
 
-        #region Unity Events
 
-        private void Awake()
-        {
-            _rb = GetComponent<Rigidbody>();
-        }
+		#region Events
 
-        private void OnEnable()
-        {
-            Character character = GetComponent<Character>();
-            if (character)
-            {
-                character.OnKnockedBack += WasKnockedBack;
-            }
-        }
+		public event Action<float> OnVelocityApplied;
+		public event Action<Vector3> OnMoveInDirection;
 
-        private void OnDisable()
-        {
-            Character character = GetComponent<Character>();
-            if (character)
-            {
-                character.OnKnockedBack -= WasKnockedBack;
-            }
-        }
+		#endregion
 
-        #endregion
 
-        #region Monobehaviour Methods
+		#region Unity Events
 
-        private void FixedUpdate()
-        {
-            ApplyMovement();
-        }
+		private void Awake() {
+			_rb = GetComponent<Rigidbody>();
+		}
 
-        #endregion
+		private void OnEnable() {
+			Character character = GetComponent<Character>();
+			if (character) {
+				character.OnKnockedBack += WasKnockedBack;
+			}
+		}
 
-        #region IMovable Implementation
+		private void OnDisable() {
+			Character character = GetComponent<Character>();
+			if (character) {
+				character.OnKnockedBack -= WasKnockedBack;
+			}
+		}
 
-        /// <summary>
-        /// Receives movement input and applies it to the character.
-        /// </summary>
-        public void Move(Vector3 input)
-        {
-            if (!_canMove)
-            {
-                return;
-            }
+		#endregion
 
-            OnMoveInDirection?.Invoke(input);
-            _targetVelocity = input * maxSpeed;
-        }
 
-        public void Teleport(Vector3 position)
-        {
-            _rb.position = position;
-            _targetVelocity = Vector3.zero;
-            transform.position = position;
-        }
-        
-        public void Teleport(Vector3 position, Quaternion rotation)
-        {
-            _rb.position = position;
-            _targetVelocity = Vector3.zero;
-            RotateFromMotor.SetRotation(rotation);
-            transform.position = position;
-        }
+		#region Monobehaviour Methods
 
-        public void CanMove(bool can)
-        {
-            _canMove = can;
-        }
+		private void FixedUpdate() {
+			ApplyMovement();
+		}
 
-        public Vector3 Position()
-        {
-            return transform.position;
-        }
+		#endregion
 
-        public void PushForward(float amount, bool resetVelocityFirst = true)
-        {
-            if (resetVelocityFirst)
-            {
-                _rb.linearVelocity = Vector3.zero;
-            }
 
-            Vector3 force = ForwardFacing * amount;
-            force.y = 0;
-            _rb.AddForce(force, ForceMode.Force);
-        }
+		#region IMovable Implementation
 
-        #endregion
+		/// <summary>
+		/// Receives movement input and applies it to the character.
+		/// </summary>
+		public void Move(Vector3 input) {
+			if (!_canMove) {
+				return;
+			}
 
-        #region Movement Logic
+			OnMoveInDirection?.Invoke(input);
+			_targetVelocity = input * maxSpeed;
+		}
 
-        /// <summary>
-        /// Applies movement forces and clamps horizontal velocity.
-        /// </summary>
-        public void ApplyMovement()
-        {
-            if (!_canMove)
-            {
-                _targetVelocity = Vector3.zero;
-            }
+		public void Teleport(Vector3 position) {
+			_rb.position = position;
+			_targetVelocity = Vector3.zero;
+			transform.position = position;
+		}
 
-            // Skip applying force if there's no movement input
-            if (_targetVelocity.sqrMagnitude > 0.001f)
-            {
-                Vector3 velocityDifference = _targetVelocity - _rb.linearVelocity;
-                velocityDifference.y = 0;
+		public void Teleport(Vector3 position, Quaternion rotation) {
+			_rb.position = position;
+			_targetVelocity = Vector3.zero;
+			RotateFromMotor.SetRotation(rotation);
+			transform.position = position;
+		}
 
-                float forceMultiplier = _targetVelocity.magnitude > 0 ? acceleration : deceleration;
-                _rb.AddForce(velocityDifference * forceMultiplier, ForceMode.Acceleration);
-            }
+		public void CanMove(bool can) {
+			_canMove = can;
+		}
 
-            // Clamp horizontal velocity
-            Vector3 horizontalVelocity = _rb.linearVelocity;
-            horizontalVelocity.y = 0;
+		public Vector3 Position() {
+			return transform.position;
+		}
 
-            if (horizontalVelocity.magnitude > maxSpeed)
-            {
-                horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
-                _rb.linearVelocity = new Vector3(horizontalVelocity.x, _rb.linearVelocity.y, horizontalVelocity.z);
-            }
+		public void PushForward(float amount, bool resetVelocityFirst = true) {
+			if (resetVelocityFirst) {
+				_rb.linearVelocity = Vector3.zero;
+			}
 
-            OnVelocityApplied?.Invoke(_rb.linearVelocity.magnitude / Mathf.Max(0.001f, maxSpeed));
-        }
+			Vector3 force = ForwardFacing * amount;
+			force.y = 0;
+			_rb.AddForce(force, ForceMode.Force);
+		}
 
-        public void WasKnockedBack(Vector3 knockback)
-        {
-            knockback.y = 0;
-            _rb.AddForce(knockback, ForceMode.Impulse);
-        }
+		#endregion
 
-        #endregion
 
-        #region Forceful Move (Dialog)
+		#region Movement Logic
 
-        /// <summary>
-        /// Forceful, resolute movement toward a world-space point using Rigidbody.MovePosition
-        /// (ignores forces/accel; better for cinematic dialog motion).
-        /// Optionally performs a tiny warp when almost there but blocked.
-        /// Call from Update with a world target (e.g., path corner).
-        /// </summary>
-        public void MoveForcefulTowards(Vector3 worldTarget, float dt)
-        {
-            if (!_canMove)
-            {
-                return;
-            }
+		/// <summary>
+		/// Applies movement forces and clamps horizontal velocity.
+		/// </summary>
+		public void ApplyMovement()
+		{
+			if (!_canMove)
+			{
+				_targetVelocity = Vector3.zero;
+			}
 
-            float spd = (forcefulSpeed > 0f) ? forcefulSpeed : Mathf.Max(0.01f, maxSpeed);
-            Vector3 pos = _rb.position;
-            Vector3 to = worldTarget - pos;
-            to.y = 0f;
+			Vector3 currentVel = _rb.linearVelocity;
+			Vector3 currentHor = currentVel; 
+			currentHor.y = 0f;
 
-            float dist = to.magnitude;
-            if (dist < 0.0001f)
-            {
-                _targetVelocity = Vector3.zero;
-                return;
-            }
+			if (_targetVelocity.sqrMagnitude > 0.001f)
+			{
+				Vector3 targetHor = _targetVelocity;
+				targetHor.y = 0f;
 
-            Vector3 step = to.normalized * spd * dt;
+				Vector3 velDiff = targetHor - currentHor;
 
-            if (step.magnitude >= dist)
-            {
-                // Reaching this frame — either MovePosition to exact target, or tiny warp if blocked.
-                Vector3 dest = worldTarget;
-                if (allowTinyWarpNearGoal && dist <= tinyWarpDistance)
-                {
-                    // Commit to exact end even if something minor blocks (cinematic authority).
-                    _rb.position = dest; // direct set is OK for tiny snap; keeps continuity
-                }
-                else
-                {
-                    _rb.MovePosition(dest);
-                }
+				if (acceleration < 0f)
+				{
+					Vector3 newVel = new Vector3(targetHor.x, currentVel.y, targetHor.z);
+					_rb.linearVelocity = newVel; 
+				}
+				else
+				{
+					float maxDelta = acceleration * Time.fixedDeltaTime;
+					Vector3 deltaVel = Vector3.ClampMagnitude(velDiff, maxDelta);
+					_rb.AddForce(deltaVel, ForceMode.VelocityChange);
+				}
+			}
+			else
+			{
+				Vector3 velDiff = -currentHor;
 
-                _targetVelocity = Vector3.zero;
-                return;
-            }
+				if (deceleration < 0f)
+				{
+					_rb.linearVelocity = new Vector3(0f, currentVel.y, 0f);
+				}
+				else
+				{
+					float maxDelta = deceleration * Time.fixedDeltaTime;
+					Vector3 deltaVel = Vector3.ClampMagnitude(velDiff, maxDelta);
+					_rb.AddForce(deltaVel, ForceMode.VelocityChange);
+				}
+			}
 
-            _rb.MovePosition(pos + step);
-            _targetVelocity = step / Mathf.Max(0.0001f, dt); // for any listeners
-            OnMoveInDirection?.Invoke(_targetVelocity);
-        }
+			Vector3 horizontalVelocity = _rb.linearVelocity;
+			horizontalVelocity.y = 0;
 
-        #endregion
+			if (horizontalVelocity.magnitude > maxSpeed)
+			{
+				horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
+				_rb.linearVelocity = new Vector3(horizontalVelocity.x, _rb.linearVelocity.y, horizontalVelocity.z);
+			}
 
-        #region Rotation
+			OnVelocityApplied?.Invoke(_rb.linearVelocity.magnitude / Mathf.Max(0.001f, maxSpeed));
+		}
 
-        public float CharacterViewRotation
-        {
-            get { return RotateFromMotor.transform.localEulerAngles.y; }
-            set {
-                RotateFromMotor.SetRotation(Quaternion.Euler(0, value, 0));
-            }
-        }
+		public void WasKnockedBack(Vector3 knockback) {
+			knockback.y = 0;
+			_rb.AddForce(knockback, ForceMode.Impulse);
+		}
 
-        public Transform ForwardTransform
-        {
-            get { return RotateFromMotor.transform; }
-        }
+		#endregion
 
-        /// <summary>
-        /// Rotates the character to face a given world position.
-        /// </summary>
-        public void LookAt(Vector3 position)
-        {
-            Vector3 direction = position - transform.position;
-            direction.y = 0;
 
-            if (direction.sqrMagnitude < 0.0001f)
-                return;
+		#region Forceful Move (Dialog)
 
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
+		/// <summary>
+		/// Forceful, resolute movement toward a world-space point using Rigidbody.MovePosition
+		/// (ignores forces/accel; better for cinematic dialog motion).
+		/// Optionally performs a tiny warp when almost there but blocked.
+		/// Call from Update with a world target (e.g., path corner).
+		/// </summary>
+		public void MoveForcefulTowards(Vector3 worldTarget, float dt) {
+			if (!_canMove) {
+				return;
+			}
 
-            if (RotateFromMotor != null)
-            {
-                RotateFromMotor.SetRotation(lookRotation);
-            }
-            else
-            {
-                transform.rotation = lookRotation;
-            }
-        }
+			float spd = (forcefulSpeed > 0f) ? forcefulSpeed : Mathf.Max(0.01f, maxSpeed);
+			Vector3 pos = _rb.position;
+			Vector3 to = worldTarget - pos;
+			to.y = 0f;
 
-        private Vector3 ForwardFacing => RotateFromMotor.transform.forward;
+			float dist = to.magnitude;
+			if (dist < 0.0001f) {
+				_targetVelocity = Vector3.zero;
+				return;
+			}
 
-        private RotateFromMotor RotateFromMotor
-        {
-            get
-            {
-                if (_rotateFromMotor == null)
-                {
-                    _rotateFromMotor = GetComponentInChildren<RotateFromMotor>();
-                }
+			Vector3 step = to.normalized * spd * dt;
 
-                return _rotateFromMotor;
-            }
-        }
+			if (step.magnitude >= dist) {
+				// Reaching this frame — either MovePosition to exact target, or tiny warp if blocked.
+				Vector3 dest = worldTarget;
+				if (allowTinyWarpNearGoal && dist <= tinyWarpDistance) {
+					// Commit to exact end even if something minor blocks (cinematic authority).
+					_rb.position = dest; // direct set is OK for tiny snap; keeps continuity
+				}
+				else {
+					_rb.MovePosition(dest);
+				}
 
-        #endregion
-    }
+				_targetVelocity = Vector3.zero;
+				return;
+			}
+
+			_rb.MovePosition(pos + step);
+			_targetVelocity = step / Mathf.Max(0.0001f, dt); // for any listeners
+			OnMoveInDirection?.Invoke(_targetVelocity);
+		}
+
+		#endregion
+
+
+		#region Rotation
+
+		public float CharacterViewRotation {
+			get { return RotateFromMotor.transform.localEulerAngles.y; }
+			set {
+				RotateFromMotor.SetRotation(Quaternion.Euler(0, value, 0));
+			}
+		}
+
+		public Transform ForwardTransform {
+			get { return RotateFromMotor.transform; }
+		}
+
+		/// <summary>
+		/// Rotates the character to face a given world position.
+		/// </summary>
+		public void LookAt(Vector3 position) {
+			Vector3 direction = position - transform.position;
+			direction.y = 0;
+
+			if (direction.sqrMagnitude < 0.0001f)
+				return;
+
+			Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+			if (RotateFromMotor != null) {
+				RotateFromMotor.SetRotation(lookRotation);
+			}
+			else {
+				transform.rotation = lookRotation;
+			}
+		}
+
+		private Vector3 ForwardFacing => RotateFromMotor.transform.forward;
+
+		private RotateFromMotor RotateFromMotor {
+			get {
+				if (_rotateFromMotor == null) {
+					_rotateFromMotor = GetComponentInChildren<RotateFromMotor>();
+				}
+
+				return _rotateFromMotor;
+			}
+		}
+
+		#endregion
+
+
+	}
 }

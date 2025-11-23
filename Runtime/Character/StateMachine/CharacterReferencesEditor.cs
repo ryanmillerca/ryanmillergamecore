@@ -38,10 +38,11 @@ namespace RyanMillerGameCore.Character.SMB {
 		}
 
 		private void AssignComponentIfNull<T>(ref T field, CharacterReferences context) where T : Component {
-			if (field == null) {
+			if (!field) {
 				field = context.transform.root.GetComponent<T>();
-				if (field == null) {
-					field = context.transform.root.GetComponentInChildren<T>();
+				if (!field) {
+					var charRoot = context.transform.GetComponentInParent<Character>();
+					field = charRoot.GetComponentInChildren<T>();
 				}
 			}
 		}

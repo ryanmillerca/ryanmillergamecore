@@ -7,13 +7,18 @@ namespace RyanMillerGameCore.Character {
 
 	public class CharacterInput : MonoBehaviour {
 		[Header("References")]
-		[SerializeField] private bool syncMoveDirectionWithCamera = true;
 		[SerializeField] private InputActionReference inputActionMove;
 		[SerializeField] private InputActionReference inputActionAttack;
 		[SerializeField] private InputActionReference inputActionInteract;
 		[SerializeField] private InputActionReference inputActionPause;
 		[SerializeField] private InputActionReference inputActionPointerDown;
 		[SerializeField] private InputActionReference inputActionPointerPosition;
+		[Tooltip("Block CharacterInput when pointer is over any UI")]
+		[SerializeField] private bool disableInputWhenPointerOverUI;
+		[Tooltip("Directions = Screen Directions. Turn off for local Up/Left/Right/Down that doesn't necessarily match the view")]
+		[SerializeField] private bool syncMoveDirectionWithCamera = true;
+		[Tooltip("Restrict movement to 4-directional only (no diagonals)")]
+		[SerializeField] private bool cartesianMovementOnly = false;
 
 		[NonSerialized] private bool _inputEnabled = true;
 		[NonSerialized] private bool _hasPlayerCamera = false;
@@ -171,8 +176,10 @@ namespace RyanMillerGameCore.Character {
 
 		private void UpdateMovementDirection() {
 			if (_movementInput.sqrMagnitude > 0) {
-				Vector3 moveDirection = new Vector3(_movementInput.x, 0, _movementInput.y);
-				if (_hasPlayerCamera) {
+				Vector3 moveDirection;
+
+				if (syncMoveDirectionWithCamera && _hasPlayerCamera) {
+					// Use camera-relative movement
 					Vector3 cameraForward = playerCamera.transform.forward;
 					Vector3 cameraRight = playerCamera.transform.right;
 					cameraForward.y = 0;
@@ -181,6 +188,11 @@ namespace RyanMillerGameCore.Character {
 					cameraRight.Normalize();
 					moveDirection = cameraForward * _movementInput.y + cameraRight * _movementInput.x;
 				}
+				else {
+					// Use raw input for local movement
+					moveDirection = new Vector3(_movementInput.x, 0, _movementInput.y);
+				}
+
 				_characterBrain.MoveInDirection(moveDirection);
 			}
 		}
@@ -188,24 +200,29 @@ namespace RyanMillerGameCore.Character {
 		private void OnMove(InputAction.CallbackContext context) { }
 
 		private void ProcessMove() {
-
-			Vector2 move = inputActionMove.action.ReadValue<Vector2>();
-			_movementInput = Vector2.zero;
-
-			if (_inputEnabled == false || _isPointerOverGameObject) {
+			// If input is disabled or the pointer is over UI, make sure the character stops
+			if (_inputEnabled == false || IsPointerOverUI) {
+				_movementInput = Vector2.zero;
+				_characterBrain.GoToIdle(); // ensure the brain isn't left moving
 				return;
 			}
-			if (move.sqrMagnitude <= 0) {
+
+			Vector2 move = inputActionMove.action.ReadValue<Vector2>();
+
+			// Apply Cartesian restriction if enabled
+			if (cartesianMovementOnly && move != Vector2.zero) {
+				move = GetCartesianDirection(move);
+			}
+
+			// if there's no movement, ensure idle
+			if (move.sqrMagnitude <= 0f) {
+				_movementInput = Vector2.zero;
 				_characterBrain.GoToIdle();
 				return;
 			}
 
 			_movementInput = move;
 			_characterBrain.GoToMove();
-
-			if (!syncMoveDirectionWithCamera) {
-				UpdateMovementDirection();
-			}
 		}
 
 		private void OnPointerPosition(InputAction.CallbackContext context) {
@@ -220,7 +237,14 @@ namespace RyanMillerGameCore.Character {
 			Vector2 direction = posInput - (Vector2)screenPosOfTransform;
 
 			// Normalize for joystick-style vector (-1 to 1 range)
-			_movementInput = direction.normalized;
+			Vector2 movementInput = direction.normalized;
+
+			// Apply Cartesian restriction if enabled
+			if (cartesianMovementOnly && movementInput != Vector2.zero) {
+				movementInput = GetCartesianDirection(movementInput);
+			}
+
+			_movementInput = movementInput;
 			_characterBrain.GoToMove();
 
 			// only calling this here will result in the movement directions not updating when the camera rotates
@@ -243,15 +267,21 @@ namespace RyanMillerGameCore.Character {
 			}
 		}
 
+		private bool IsPointerOverUI {
+			get {
+				if (!disableInputWhenPointerOverUI) {
+					return false;
+				}
+				return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+			}
+		}
+
 		private void Update() {
 			ProcessMove();
+
 			if (IsMoving()) {
-				// calling this here will result in movement directions that stay synced with the camera
-				if (syncMoveDirectionWithCamera) {
-					UpdateMovementDirection();
-				}
+				UpdateMovementDirection();
 			}
-			_isPointerOverGameObject = EventSystem.current.IsPointerOverGameObject();
 		}
 
 		private void OnAttack(InputAction.CallbackContext context) {
@@ -282,6 +312,23 @@ namespace RyanMillerGameCore.Character {
 			}
 			if (context.performed) {
 				GameStateManager.Instance.TogglePause();
+			}
+		}
+
+		private Vector2 GetCartesianDirection(Vector2 input) {
+			// If input magnitude is very small, return zero
+			if (input.magnitude < 0.1f) {
+				return Vector2.zero;
+			}
+
+			// Determine which axis has the larger absolute value
+			if (Mathf.Abs(input.x) > Mathf.Abs(input.y)) {
+				// Horizontal movement dominates
+				return new Vector2(Mathf.Sign(input.x), 0);
+			}
+			else {
+				// Vertical movement dominates
+				return new Vector2(0, Mathf.Sign(input.y));
 			}
 		}
 	}
