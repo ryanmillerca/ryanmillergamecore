@@ -20,14 +20,18 @@ namespace RyanMillerGameCore.Character.SMB
             _attackParamHash = Animator.StringToHash(References.paramTriggerAttack);
             _interactParamHash = Animator.StringToHash(References.paramTriggerInteract);
             base.OnCharacterStateEnter(animator, stateInfo, layerIndex);
-            References.characterBrain.OnAttackAction += AttackAction;
-            References.characterBrain.OnInteractAction += InteractAction;
+            if (References.characterBrain) {
+                References.characterBrain.OnAttackAction += AttackAction;
+                References.characterBrain.OnInteractAction += InteractAction;
+            }
         }
         
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            References.characterBrain.OnAttackAction -= AttackAction;
-            References.characterBrain.OnInteractAction -= InteractAction;
+            if (References.characterBrain) {
+                References.characterBrain.OnAttackAction -= AttackAction;
+                References.characterBrain.OnInteractAction -= InteractAction;
+            }
             base.OnStateExit(animator, stateInfo, layerIndex);
         }
         

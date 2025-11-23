@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97e970344a78400f9b512f993a0aa899, type: 3}
+  m_Name: Prompt Mapping Database
+  m_EditorClassIdentifier: 
+  inputMappings:
+  - graphics: {fileID: 11400000, guid: 90706e84667bd4cde85a05112bdb52ba, type: 2}
+    deviceClassKeywords:
+    - sony
+    productNameKeywords:
+    - dualsense
+    - dualshock
+    deviceNameKeywords:
+    - playstation
+  - graphics: {fileID: 11400000, guid: f744cae5dd63a488da45d12846529964, type: 2}
+    deviceClassKeywords: []
+    productNameKeywords:
+    - switch
+    - joy-con
+    - nintendo
+    deviceNameKeywords: []
+  - graphics: {fileID: 11400000, guid: c29c2f861c0da4e7a871a47be3f74a88, type: 2}
+    deviceClassKeywords:
+    - xinput
+    productNameKeywords:
+    - xbox
+    - series
+    deviceNameKeywords: []
+  - graphics: {fileID: 11400000, guid: 54594ae2a5c1a477997ea8bf97ac2130, type: 2}
+    deviceClassKeywords:
+    - xinput
+    productNameKeywords:
+    - valve
+    - steam
+    deviceNameKeywords: []
+  - graphics: {fileID: 11400000, guid: 359136c14b0904a9cac4d693e0ddd6f3, type: 2}
+    deviceClassKeywords:
+    - keyboard
+    productNameKeywords:
+    - keyboard
+    deviceNameKeywords:
+    - keyboard
+  defaultGraphics: {fileID: 11400000, guid: c29c2f861c0da4e7a871a47be3f74a88, type: 2}

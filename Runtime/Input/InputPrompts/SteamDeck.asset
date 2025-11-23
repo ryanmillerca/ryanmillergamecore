@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20f9e8fe422da4ebaac9e03a4d3da467, type: 3}
+  m_Name: SteamDeck
+  m_EditorClassIdentifier: 
+  move: {fileID: 21300000, guid: 92970dba5e6d04572863faf664a557e5, type: 3}
+  look: {fileID: 21300000, guid: 0abbad0ee09794b0f9e02cbc3e34d314, type: 3}
+  attack: {fileID: 21300000, guid: f1ec88fe96c4449cabb182e8a1dc0472, type: 3}
+  interact: {fileID: 21300000, guid: 9087ed06f768c45f8b968218c350c688, type: 3}
+  dodge: {fileID: 21300000, guid: 7c0908e799f5e4b80a55a568a168b8a8, type: 3}
+  special: {fileID: 21300000, guid: 30a8fb5a6eb184457a883fc67a9e5cde, type: 3}
+  pause: {fileID: 21300000, guid: 813ba0ef1b87d4cefb0a0152c262293e, type: 3}

@@ -6,9 +6,10 @@ namespace RyanMillerGameCore.Dialog
 
     public class DialogManager : Singleton<DialogManager>
     {
-        [SerializeField] private List<DialogStylePair> dialogPlayers = new List<DialogStylePair>();
-
-        private Dictionary<DialogStyle, DialogPlayer> _dialogLookup;
+        [SerializeField] 
+        private List<DialogStylePair> dialogPlayers = new List<DialogStylePair>();
+        
+        private Dictionary<DialogStyle, DialogPlayer> _dialogLookup = new  Dictionary<DialogStyle, DialogPlayer>();
 
         private void Start()
         {
@@ -24,7 +25,7 @@ namespace RyanMillerGameCore.Dialog
 
         public DialogPlayer GetDialogPlayer(DialogStyle key)
         {
-            if (_dialogLookup.TryGetValue(key, out var player))
+            if (_dialogLookup != null && _dialogLookup.TryGetValue(key, out var player))
             {
                 return player;
             }

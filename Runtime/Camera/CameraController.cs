@@ -1,8 +1,6 @@
 namespace RyanMillerGameCore.Camera {
 	using UnityEngine;
 	using Character;
-	using Interactions;
-	using System.Collections;
 
 	public class CameraController : Singleton<CameraController> {
 		[Header("References")]
@@ -125,8 +123,17 @@ namespace RyanMillerGameCore.Camera {
 		private void UpdateCameraLocalPosition() {
 			if (canZoomCamera) {
 				Vector3 cameraLocalPos = _cameraTransform.localPosition;
-				_currentZoomDistance = Mathf.Lerp(cameraLocalPos.z, _targetZoomDistance,
-					Time.deltaTime * smoothingSpeedZoom);
+
+				if (smoothingSpeedZoom < 0f) {
+					// Instant follow (no smoothing)
+					_currentZoomDistance = _targetZoomDistance;
+				}
+				else {
+					// Smoothed follow (existing behaviour)
+					_currentZoomDistance = Mathf.Lerp(cameraLocalPos.z, _targetZoomDistance,
+						Time.deltaTime * smoothingSpeedZoom);
+				}
+
 				_cameraTransform.localPosition = new Vector3(0, 0, _currentZoomDistance);
 			}
 		}
@@ -139,16 +146,29 @@ namespace RyanMillerGameCore.Camera {
 			if (leadSpace > 0) {
 				CalculateLeadSpace();
 			}
+			else {
+				_currentLeadSpace = Vector3.zero;
+			}
 
 			if (!_target) {
 				_readyToTrack = false;
 				return;
 			}
 
-			transform.position = Vector3.Lerp(transform.position, _target.position + _currentLeadSpace + cameraOffset,
-				Time.deltaTime * smoothingSpeedPosition);
+			Vector3 desired = _target.position + _currentLeadSpace + cameraOffset;
+
+			if (smoothingSpeedPosition < 0f) {
+				// Instant follow
+				transform.position = desired;
+			}
+			else {
+				// Smoothed follow
+				transform.position = Vector3.Lerp(transform.position, desired,
+					Time.deltaTime * smoothingSpeedPosition);
+			}
 
 			if (_moveAudioListener) {
+				// audio listener follows target position (instant) — preserve existing behaviour
 				audioListener.transform.position = _target.position;
 			}
 		}
@@ -176,21 +196,35 @@ namespace RyanMillerGameCore.Camera {
 			// Target rotation as a Quaternion
 			Quaternion targetRotation = Quaternion.Euler(_targetXRotation, _targetYRotation, 0);
 
-			// Smoothly interpolate from current to target rotation
-			transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation, smoothingSpeedRotation * Time.deltaTime);
-		}
-
-		private void Update() {
-			UpdateCameraLocalPosition();
-			UpdateCameraWorldPosition();
-			UpdateCameraRotation();
+			// If smoothingSpeedRotation < 0 -> instant; otherwise use Slerp as before
+			if (smoothingSpeedRotation < 0f) {
+				transform.localRotation = targetRotation;
+			}
+			else {
+				transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation,
+					smoothingSpeedRotation * Time.deltaTime);
+			}
 		}
 
 		private void CalculateLeadSpace() {
 			if (_targetRigidbody) {
 				Vector3 targetLeadSpace = Vector3.ClampMagnitude(_targetRigidbody.linearVelocity, 1) * leadSpace;
-				_currentLeadSpace = Vector3.Lerp(_currentLeadSpace, targetLeadSpace, Time.deltaTime * smoothingLeadSpace);
+
+				if (smoothingLeadSpace < 0f) {
+					// Instant follow of lead space
+					_currentLeadSpace = targetLeadSpace;
+				}
+				else {
+					// Smoothed lead space
+					_currentLeadSpace = Vector3.Lerp(_currentLeadSpace, targetLeadSpace,
+						Time.deltaTime * smoothingLeadSpace);
+				}
 			}
+		}
+		private void Update() {
+			UpdateCameraLocalPosition();
+			UpdateCameraWorldPosition();
+			UpdateCameraRotation();
 		}
 
 		private float NormalizeAngle(float angle) {
