@@ -171,6 +171,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			var counterCmd = new BattleCommand(counterActor, counterAction, target);
 
+			// Raise attack started event for counter attack
+			counterActor.RaiseAttackStarted();
 			RaiseTurnEvent(TurnEventType.ActionSelected, counterActor, target, counterAction);
 
 			List<BattleResult> results = MoveResolver.Resolve(counterCmd, m_Combatants);
@@ -256,6 +258,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield break;
 			}
 
+			// Raise turn started events
+			c.RaiseTurnStarted();
 			RaiseTurnEvent(TurnEventType.TurnStarted, c);
 
 			foreach (Combatant combatant in m_Combatants) {
@@ -277,14 +281,14 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield break;
 			}
 
+			// Raise turn ended events
+			c.RaiseTurnEnded();
 			RaiseTurnEvent(TurnEventType.TurnEnded, c);
 			yield return new WaitForSeconds(m_TurnDelay);
 		}
 
-
 		private IEnumerator HandlePlayerTurn(Combatant player) {
 			var availableMoves = player.Moves?.Where(m => m != null).ToList() ?? new List<BattleAction>();
-			// NOTE: call .ToList() to keep the rest of the code (which uses .Count) intact
 			var validTargets = GetValidTargets(player).ToList();
 
 			if (availableMoves.Count == 0) {
@@ -304,20 +308,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				Timestamp = Time.time
 			};
 
-			// set waiting state and current actor/targets
 			m_WaitingForPlayerInput = true;
 			m_CurrentPlayerActor = player;
 			m_CurrentValidTargets = validTargets;
-			m_PendingPlayerCommand = null; // clear any previous pending command
+			m_PendingPlayerCommand = null;
 
-			// Fire both legacy and new style events so UI can subscribe either way
 			PlayerInputRequired?.Invoke(inputData);
 			OnPlayerActionRequested?.Invoke(player, availableMoves);
 
-			// Wait until the UI submits a command (SubmitPlayerCommand) or uses the legacy SubmitPlayerInput
 			yield return new WaitUntil(() => !m_WaitingForPlayerInput);
 
-			// If the UI submitted a BattleCommand, execute it; otherwise fallback to random selection
 			if (m_PendingPlayerCommand != null) {
 				yield return StartCoroutine(ExecuteSubmittedCommand(m_PendingPlayerCommand));
 				m_PendingPlayerCommand = null;
@@ -326,7 +326,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				yield return StartCoroutine(ExecutePlayerAction(player, availableMoves, validTargets));
 			}
 
-			// clear current actor/targets
 			m_CurrentPlayerActor = null;
 			m_CurrentValidTargets = null;
 		}
@@ -334,13 +333,22 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		private IEnumerator ExecuteSubmittedCommand(BattleCommand cmd) {
 			if (cmd == null) yield break;
 
-			// Validate the command a little
 			if (cmd.Actor == null || cmd.BattleAction == null || cmd.Target == null) {
 				RaiseBattleEvent(BattleEventType.CommandError, $"Submitted command invalid for {cmd.Actor?.CombatantName ?? "null actor"}", cmd.Actor, cmd.Target);
 				yield break;
 			}
 
-			// Fire action selected
+			// Raise skill used event for non-basic attacks
+			if (cmd.BattleAction.ActionType != ActionType.Damage || cmd.BattleAction.ActionName.ToLower() != "attack") {
+				cmd.Actor.RaiseSkillUsed(cmd.BattleAction);
+			}
+
+			// Raise attack started event for damage actions
+			if (cmd.BattleAction.ActionType == ActionType.Damage) {
+				cmd.Actor.RaiseAttackStarted();
+				yield return new WaitForSeconds(0.1f); // Small delay for windup animation
+			}
+
 			RaiseTurnEvent(TurnEventType.ActionSelected, cmd.Actor, cmd.Target, cmd.BattleAction);
 
 			List<BattleResult> results = null;
@@ -354,6 +362,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			if (results != null) {
 				foreach (var result in results) {
+					// Raise hit/miss events for damage actions
+					if (cmd.BattleAction.ActionType == ActionType.Damage && result.Target == cmd.Target) {
+						if (result.Missed) {
+							cmd.Actor.RaiseAttackMissed(cmd.Target);
+						}
+						else if (result.DamageDealt > 0) {
+							cmd.Actor.RaiseAttackHit(cmd.Target, result.DamageDealt);
+						}
+					}
+
 					try {
 						MoveResolved?.Invoke(result);
 					}
@@ -367,7 +385,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private IEnumerator ExecutePlayerAction(Combatant player, List<BattleAction> availableMoves, List<Combatant> validTargets) {
-			// fallback/random selection for when no player command was submitted
 			var action = availableMoves[Random.Range(0, availableMoves.Count)];
 			var target = validTargets[Random.Range(0, validTargets.Count)];
 
@@ -375,7 +392,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private IEnumerator HandleAITurn(Combatant ai) {
-			// call GetValidTargets and convert to List so rest of code works unchanged
 			var validTargets = GetValidTargets(ai).ToList();
 			if (validTargets.Count == 0) {
 				RaiseBattleEvent(BattleEventType.NoValidTargets, $"No valid targets found for {ai.CombatantName}. Ending turn.", ai);
@@ -412,6 +428,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					yield break;
 				}
 
+				// Raise skill used event for non-basic attacks
+				if (action.ActionType != ActionType.Damage || action.ActionName.ToLower() != "attack") {
+					actor.RaiseSkillUsed(action);
+				}
+
+				// Raise attack started event for damage actions
+				if (action.ActionType == ActionType.Damage) {
+					actor.RaiseAttackStarted();
+					yield return new WaitForSeconds(0.1f); // Small delay for windup animation
+				}
+
 				RaiseTurnEvent(TurnEventType.ActionSelected, actor, target, action);
 
 				List<BattleResult> results = null;
@@ -425,6 +452,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 				if (results != null) {
 					foreach (var result in results) {
+						// Raise hit/miss events for damage actions
+						if (action.ActionType == ActionType.Damage && result.Target == target) {
+							if (result.Missed) {
+								actor.RaiseAttackMissed(target);
+							}
+							else if (result.DamageDealt > 0) {
+								actor.RaiseAttackHit(target, result.DamageDealt);
+							}
+						}
+
 						try {
 							MoveResolved?.Invoke(result);
 						}

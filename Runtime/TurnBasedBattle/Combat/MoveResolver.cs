@@ -177,7 +177,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				result.CriticalChance = critChance;
 			}
 
-			target.TakeDamage(damage, cmd.Actor);
+			// Pass the critical hit information to TakeDamage
+			target.TakeDamage(damage, cmd.Actor, isCritical); // Modified this line
 			result.DamageDealt = damage;
 
 			string critText = isCritical ? " (CRITICAL HIT!)" : "";
