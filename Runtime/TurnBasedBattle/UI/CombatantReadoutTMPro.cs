@@ -137,7 +137,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			// stats (optional)
 			string statsLine = "";
 			if (showStats) {
-				statsLine = $"ATK {m_Combatant.Attack} • DEF {m_Combatant.Defense} • SPD {m_Combatant.Speed}";
+				statsLine = $"ATK {m_Combatant.Attack} DEF {m_Combatant.Defense} SPD {m_Combatant.Speed}";
 			}
 
 			// event message (optional)
@@ -151,7 +151,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			// Example:
 			// [Name (colored)]
 			// HP: 75/100 (75%) [DEAD?]
-			// ATK 20 • DEF 10 • SPD 8
+			// ATK 20 DEF 10 SPD 8
 			string composed =
 				$"{nameLine}\n{hpLine}{aliveMarker}" +
 				(string.IsNullOrEmpty(statsLine) ? "" : $"\n{statsLine}") +
