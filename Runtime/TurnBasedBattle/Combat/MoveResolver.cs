@@ -145,11 +145,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			counterAction.Accuracy = 1f;
 
 			var counterCmd = new BattleCommand(defender, counterAction, attacker);
+    
+			// Calculate crit chance for counter attack too
+			float critChance = CalculateCriticalHitChance(defender, counterAction);
+			bool isCritical = Random.value < critChance;
+    
 			var counterResult = CalculateDamage(counterCmd, attacker, new BattleResult {
 				Actor = defender,
 				Target = attacker,
 				BattleAction = counterAction,
-				Success = true
+				Success = true,
+				CriticalHit = isCritical
 			}, false, 1f);
 
 			counterResult.Message = $"{defender.CombatantName} counter attacks {attacker.CombatantName} for {counterResult.DamageDealt} damage!";
@@ -175,10 +181,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				damage = Mathf.FloorToInt(damage * CRIT_MULTIPLIER);
 				result.CriticalHit = true;
 				result.CriticalChance = critChance;
+        
+				// Force critical hit visual
+				Debug.Log($"CRITICAL HIT! {cmd.Actor.CombatantName} -> {target.CombatantName}: {damage} damage");
 			}
 
-			// Pass the critical hit information to TakeDamage
-			target.TakeDamage(damage, cmd.Actor, isCritical); // Modified this line
+			// CRITICAL: Make sure isCritical is passed through
+			target.TakeDamage(damage, cmd.Actor, isCritical);
 			result.DamageDealt = damage;
 
 			string critText = isCritical ? " (CRITICAL HIT!)" : "";
