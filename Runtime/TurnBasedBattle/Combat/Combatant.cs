@@ -66,12 +66,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public bool IsDefending {
 			get { return isDefending; }
 		}
-		
+
 		public float CounterChance {
 			get { return counterAttackChance; }
 			set { counterAttackChance = value; }
 		}
-		
+
 		public float CounterAttackMultiplier {
 			get { return counterAttackMultiplier; }
 		}
@@ -104,7 +104,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		private int attackBuffTurnsRemaining = 0;
 		private float attackBuffMultiplier = 1f;
 		private int originalAttack;
-		
+
 		public delegate void OnCombatantEvent(CombatantEventData eventData);
 		public event OnCombatantEvent CombatantEvent;
 
@@ -140,6 +140,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				Amount = amount,
 				Timestamp = Time.time
 			});
+		}
+
+		public void RaiseCriticalHit(int damage, Combatant attacker = null) {
+			string attackerName = attacker != null ? attacker.CombatantName : "unknown";
+			RaiseCombatantEvent(CombatantEventType.CriticalDamageTaken,
+				$"{m_CombatantName} takes a critical hit from {attackerName} for {damage} damage!", damage);
 		}
 
 		public void StartDefend(BattleAction defendAction) {
@@ -227,7 +233,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			return false;
 		}
 
-		public void TakeDamage(int dmg, Combatant attacker = null) {
+		public void TakeDamage(int dmg, Combatant attacker = null, bool isCritical = false) { // Add isCritical parameter
 			int originalDamage = dmg;
 
 			if (isDefending) {
@@ -241,8 +247,15 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 
 			string defendText = isDefending ? $" (reduced from {originalDamage} due to defense)" : "";
-			RaiseCombatantEvent(CombatantEventType.DamageTaken,
-				$"{m_CombatantName} takes {dmg} damage{defendText}. (HP: {m_CurrentHp}/{m_MaxHp})", dmg);
+
+			// Raise appropriate event based on critical hit
+			if (isCritical) {
+				RaiseCriticalHit(dmg, attacker);
+			}
+			else {
+				RaiseCombatantEvent(CombatantEventType.DamageTaken,
+					$"{m_CombatantName} takes {dmg} damage{defendText}. (HP: {m_CurrentHp}/{m_MaxHp})", dmg);
+			}
 
 			if (isDefending && attacker != null && dmg > 0) {
 				if (TryCounterAttack(attacker)) {
@@ -261,8 +274,34 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 		}
 
-		public void TakeDamage(int dmg) {
-			TakeDamage(dmg, null);
+		public void RaiseAttackStarted() {
+			RaiseCombatantEvent(CombatantEventType.AttackStarted,
+				$"{m_CombatantName} begins an attack!");
+		}
+
+		public void RaiseAttackHit(Combatant target, int damage) {
+			RaiseCombatantEvent(CombatantEventType.AttackHit,
+				$"{m_CombatantName}'s attack hits {target.CombatantName} for {damage} damage!", damage);
+		}
+
+		public void RaiseAttackMissed(Combatant target) {
+			RaiseCombatantEvent(CombatantEventType.AttackMissed,
+				$"{m_CombatantName}'s attack misses {target.CombatantName}!");
+		}
+
+		public void RaiseSkillUsed(BattleAction skill) {
+			RaiseCombatantEvent(CombatantEventType.SkillUsed,
+				$"{m_CombatantName} uses {skill.ActionName}!");
+		}
+
+		public void RaiseTurnStarted() {
+			RaiseCombatantEvent(CombatantEventType.TurnStarted,
+				$"{m_CombatantName}'s turn begins!");
+		}
+
+		public void RaiseTurnEnded() {
+			RaiseCombatantEvent(CombatantEventType.TurnEnded,
+				$"{m_CombatantName}'s turn ends!");
 		}
 
 		public void StartMultiTurnAction(BattleAction action, Combatant target) {
@@ -423,6 +462,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 	public enum CombatantEventType {
 		DamageTaken,
+		CriticalDamageTaken,
 		HealingReceived,
 		Died,
 		FullHealth,
@@ -435,7 +475,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		DefendEnded,
 		CounterAttack,
 		AttackBuffed,
-		AttackBuffEnded
+		AttackBuffEnded,
+		AttackStarted,
+		AttackHit,
+		AttackMissed,
+		SkillUsed,
+		TurnStarted,
+		TurnEnded
 	}
 
 	public struct CombatantEventData {
