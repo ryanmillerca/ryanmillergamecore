@@ -81,6 +81,9 @@ namespace RyanMillerGameCore.Character
                     transform.rotation = Quaternion.Lerp(transform.rotation, _targetRotation, DeltaTimeValue() * lerpSpeed);
                 }
             }
+            else {
+                transform.rotation = _targetRotation;
+            }
         }
 
         private float DeltaTimeValue()
