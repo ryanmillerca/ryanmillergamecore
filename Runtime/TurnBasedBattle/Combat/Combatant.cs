@@ -232,8 +232,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 			return false;
 		}
-
-		public void TakeDamage(int dmg, Combatant attacker = null, bool isCritical = false) { // Add isCritical parameter
+		
+		public void TakeDamage(int dmg) {
+			TakeDamage(dmg, null, false);
+		}
+		
+		public void TakeDamage(int dmg, Combatant attacker, bool isCritical) { 
 			int originalDamage = dmg;
 
 			if (isDefending) {
