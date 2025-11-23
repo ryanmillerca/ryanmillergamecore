@@ -155,7 +155,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 
 		private void OnMoveResolved(BattleResult result) {
 			if (result == null) {
-				AddMessage("<color=#FF0000>💥 BattleResult null!</color>");
+				AddMessage("<color=#FF0000> BattleResult null!</color>");
 				return;
 			}
 
@@ -163,7 +163,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			string colorClose = result.Actor != null ? "</color>" : "";
 
 			if (result.Missed) {
-				AddMessage($"{colorTag}❌ {result.Message ?? "Missed."}{colorClose}");
+				AddMessage($"{colorTag} {result.Message ?? "Missed."}{colorClose}");
 			}
 			else if (result.DamageDealt > 0) {
 				string critTag = result.CriticalHit ? "CRIT " : "";
