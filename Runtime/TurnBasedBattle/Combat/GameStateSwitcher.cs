@@ -5,14 +5,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 	public class GameStateSwitcher : MonoBehaviour {
 
-		[SerializeField] private Combatant[] m_Players;
-		[SerializeField] private Combatant[] m_Enemies;
-		[SerializeField] private Transform[] m_PlayerSlots;
-		[SerializeField] private Transform[] m_EnemySlots;
-
+		[SerializeField] private BattleManager m_BattleManager;
 		[SerializeField] private GameObject m_Traversal;
 		[SerializeField] private GameObject m_BattleScene;
-
 		[SerializeField] private UnityEvent m_SceneTransitionToCombatStart;
 		[SerializeField] private float m_SceneTransitionToCombatDuration = 0.5f;
 		[SerializeField] private UnityEvent m_SceneTransitionToCombatEnd;
@@ -20,19 +15,33 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		[SerializeField] private float m_SceneTransitionToTraversalDuration = 0.5f;
 		[SerializeField] private UnityEvent m_SceneTransitionToTraversalEnd;
 
-		public void SwitchToCombat(Combatant[] combatants) {
-			m_Enemies = combatants;
 
-			foreach (var combatant in m_Enemies) { }
-			StartCoroutine(SwitchToCombatCoroutine());
+		#region Events
+
+		public delegate void OnSwitchedToCombat();
+		public event OnSwitchedToCombat SwitchedToCombat;
+
+		public delegate void OnSwitchedToTraversal();
+		public event OnSwitchedToTraversal SwitchedToTraversal;
+
+		#endregion
+
+
+		public void SwitchToCombat(Combatant[] combatants) {
+			StartCoroutine(SwitchToCombatCoroutine(combatants));
 		}
 
-		IEnumerator SwitchToCombatCoroutine() {
+		public void SwitchToTraversal() {
+			StartCoroutine(SwitchToTraversalCoroutine());
+		}
+
+		IEnumerator SwitchToCombatCoroutine(Combatant[] combatants) {
 			m_SceneTransitionToCombatStart.Invoke();
 			yield return new WaitForSecondsRealtime(m_SceneTransitionToCombatDuration);
 			m_Traversal.SetActive(false);
-
 			m_BattleScene.SetActive(true);
+			SwitchedToCombat?.Invoke();
+			m_BattleManager.SetupNewBattle(combatants);
 			m_SceneTransitionToCombatEnd.Invoke();
 		}
 
@@ -40,14 +49,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			m_SceneTransitionToTraversalStart.Invoke();
 			yield return new WaitForSecondsRealtime(m_SceneTransitionToTraversalDuration);
 			m_BattleScene.SetActive(false);
-
 			m_Traversal.SetActive(true);
+			SwitchedToTraversal?.Invoke();
 			m_SceneTransitionToTraversalEnd.Invoke();
 		}
 
 		private void PlaceCombatant(Combatant combatant) { }
-
-		public void SwitchToTraversal() { }
 
 		void Start() {
 			if (transform.parent == null) {

@@ -14,7 +14,7 @@ namespace RyanMillerGameCore.SceneControl {
 		[SerializeField] private CanvasGroup sceneLoadCanvasGroup;
 
 
-		#region Static Methods
+		#region Public Methods
 
 		public void FadeToScene(string sceneName, CheckpointData checkpointData = null) {
 			StartCoroutine(FadeAndLoadScene(sceneName, checkpointData));
