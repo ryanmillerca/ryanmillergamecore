@@ -28,6 +28,9 @@ namespace RyanMillerGameCore.Character.SMB
         
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
+            if (References == null) {
+                return;
+            }
             if (References.characterBrain) {
                 References.characterBrain.OnAttackAction -= AttackAction;
                 References.characterBrain.OnInteractAction -= InteractAction;

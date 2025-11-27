@@ -26,6 +26,9 @@ namespace RyanMillerGameCore.Animation
         
         private void OnEnable()
         {
+            if (animator == null) {
+                animator = GetComponentInChildren<Animator>();
+            }
             if (sendDirectionToAnimator) {
                 _characterMovement = GetComponent<CharacterMovement>();
                 _characterMovement.OnMoveInDirection += OnMoveInDirection;
