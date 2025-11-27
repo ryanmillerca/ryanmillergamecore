@@ -4,7 +4,9 @@ using System.Collections.Generic;
 namespace RyanMillerGameCore.TurnBasedCombat {
 
     public class CombatantAnimation : MonoBehaviour {
+        [Tooltip("You don't have to set this; we'll do GetComponentInChildren on Awake")]
         [SerializeField] private Animator animator;
+        [Tooltip("You don't have to set this; we'll do GetComponent on Awake")]
         [SerializeField] private Combatant combatant;
 
         // Optional: You can make this a serialized dictionary or use a switch
@@ -23,7 +25,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
             { CombatantEventType.TurnStarted, "" },
             { CombatantEventType.TurnEnded, "" }
         };
-
 
         private void Awake() {
             if (combatant == null) {
