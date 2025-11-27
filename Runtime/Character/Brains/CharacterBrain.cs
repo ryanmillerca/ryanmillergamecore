@@ -44,12 +44,12 @@ namespace RyanMillerGameCore.Character
 
         public void GoToHurt()
         {
-            characterReferences.animator.SetTrigger(_hurtTriggerHash);
+            References.animator.SetTrigger(_hurtTriggerHash);
         }
 
         public void GoToDead()
         {
-            characterReferences.animator.SetBool(_deadBoolStringHash, true);
+            References.animator.SetBool(_deadBoolStringHash, true);
             if (turnOffColliderOnDeath)
             {
                 SetCollision(false);
@@ -68,7 +68,7 @@ namespace RyanMillerGameCore.Character
             {
                 SetCollision(true);
             }
-            characterReferences.animator.SetBool(_deadBoolStringHash, false);
+            References.animator.SetBool(_deadBoolStringHash, false);
         }
 
         public void LookAt(Vector3 point)
@@ -78,25 +78,25 @@ namespace RyanMillerGameCore.Character
 
         public void SetInputEnabled(bool inputEnabled)
         {
-            if (characterReferences.characterInput)
+            if (References.characterInput)
             {
-                characterReferences.characterInput.SetInputEnabled(inputEnabled);
+                References.characterInput.SetInputEnabled(inputEnabled);
             }
         }
 
         public void SetMovementEnabled(bool movementEnabled)
         {
-            if (characterReferences.characterInput)
+            if (References.characterInput)
             {
-                characterReferences.characterInput.SetMovementEnabled(movementEnabled);
+                References.characterInput.SetMovementEnabled(movementEnabled);
             }
         }
 
         public void SetAttackEnabled(bool attackEnabled)
         {
-            if (characterReferences.characterInput)
+            if (References.characterInput)
             {
-                characterReferences.characterInput.SetAttackEnabled(attackEnabled);
+                References.characterInput.SetAttackEnabled(attackEnabled);
             }
         }
 
@@ -122,9 +122,9 @@ namespace RyanMillerGameCore.Character
         
         public void SetInteractEnabled(bool interactEnabled)
         {
-            if (characterReferences.characterInput)
+            if (References.characterInput)
             {
-                characterReferences.characterInput.SetInteractEnabled(interactEnabled);
+                References.characterInput.SetInteractEnabled(interactEnabled);
             }
         }
 
@@ -152,7 +152,7 @@ namespace RyanMillerGameCore.Character
             }
 
             // change to aggro state
-            characterReferences.animator.SetBool(_hasAggroHash, hasAggro);
+            References.animator.SetBool(_hasAggroHash, hasAggro);
         }
 
         protected virtual void AggroTargetDied()
@@ -195,7 +195,7 @@ namespace RyanMillerGameCore.Character
 
         #region Serialized Fields
 
-        [SerializeField] protected CharacterReferences characterReferences;
+        protected CharacterReferences characterReferences;
 
         [Tooltip("This is a 0-1 Dot Product for a frontal cone"), SerializeField, Range(0, 1)]
         private float bumpFrontAngle = 0.33f;
@@ -239,9 +239,9 @@ namespace RyanMillerGameCore.Character
         {
             _collisionHandler = GetComponent<CollisionHandler>();
             _movable = GetComponent<IMovable>();
-            _hurtTriggerHash = Animator.StringToHash(characterReferences.paramTriggerHurt);
-            _deadBoolStringHash = Animator.StringToHash(characterReferences.paramBoolDead);
-            _hasAggroHash = Animator.StringToHash(characterReferences.paramBoolAggro);
+            _hurtTriggerHash = Animator.StringToHash(References.paramTriggerHurt);
+            _deadBoolStringHash = Animator.StringToHash(References.paramBoolDead);
+            _hasAggroHash = Animator.StringToHash(References.paramBoolAggro);
             _path = new NavMeshPath();
         }
 
@@ -253,7 +253,7 @@ namespace RyanMillerGameCore.Character
                 _collisionHandler.TriggerEnter += OnTrigger;
             }
 
-            characterReferences.character.Spawned += GoToRespawn;
+            References.character.Spawned += GoToRespawn;
             
             if (_movable != null)
             {
@@ -270,7 +270,7 @@ namespace RyanMillerGameCore.Character
                 _collisionHandler.TriggerEnter -= OnTrigger;
             }
             
-            characterReferences.character.Spawned -= GoToRespawn;
+            References.character.Spawned -= GoToRespawn;
 
             if (_movable != null)
             {
@@ -356,8 +356,8 @@ namespace RyanMillerGameCore.Character
 
         private void SetCollision(bool collisionEnabled)
         {
-            characterReferences.mainCollider.enabled = collisionEnabled;
-            characterReferences.rb.isKinematic = !collisionEnabled;
+            References.mainCollider.enabled = collisionEnabled;
+            References.rb.isKinematic = !collisionEnabled;
         }
 
         #endregion
