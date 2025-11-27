@@ -15,7 +15,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		[SerializeField] private UnityEvent m_SceneTransitionToTraversalStart;
 		[SerializeField] private float m_SceneTransitionToTraversalDuration = 0.5f;
 		[SerializeField] private UnityEvent m_SceneTransitionToTraversalEnd;
-
+		[SerializeField] private bool m_FreezeTimeWhenSwitching = true;
 
 		#region Events
 
@@ -36,6 +36,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		IEnumerator SwitchToCombatCoroutine(Combatant[] combatants) {
+			if (m_FreezeTimeWhenSwitching) {
+				Time.timeScale = 0;
+			}
 			m_SceneTransitionToCombatStart.Invoke();
 			yield return new WaitForSecondsRealtime(m_SceneTransitionToCombatDuration);
 			m_Traversal.SetActive(false);
@@ -43,15 +46,24 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			SwitchedToCombat?.Invoke();
 			m_BattleManager.SetupNewBattle(combatants);
 			m_SceneTransitionToCombatEnd.Invoke();
+			if (m_FreezeTimeWhenSwitching) {
+				Time.timeScale = 1;
+			}
 		}
 
 		IEnumerator SwitchToTraversalCoroutine() {
+			if (m_FreezeTimeWhenSwitching) {
+				Time.timeScale = 0;
+			}
 			m_SceneTransitionToTraversalStart.Invoke();
 			yield return new WaitForSecondsRealtime(m_SceneTransitionToTraversalDuration);
 			m_BattleScene.SetActive(false);
 			m_Traversal.SetActive(true);
 			SwitchedToTraversal?.Invoke();
 			m_SceneTransitionToTraversalEnd.Invoke();
+			if (m_FreezeTimeWhenSwitching) {
+				Time.timeScale = 1;
+			}
 		}
 
 		private void PlaceCombatant(Combatant combatant) { }
