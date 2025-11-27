@@ -5,6 +5,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 	public class GameStateSwitcher : MonoBehaviour {
 
+		[SerializeField] private GameObject m_DefaultState;
 		[SerializeField] private BattleManager m_BattleManager;
 		[SerializeField] private GameObject m_Traversal;
 		[SerializeField] private GameObject m_BattleScene;
@@ -25,7 +26,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public event OnSwitchedToTraversal SwitchedToTraversal;
 
 		#endregion
-
 
 		public void SwitchToCombat(Combatant[] combatants) {
 			StartCoroutine(SwitchToCombatCoroutine(combatants));
@@ -59,6 +59,11 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		void Start() {
 			if (transform.parent == null) {
 				DontDestroyOnLoad(gameObject);
+			}
+			if (m_DefaultState) {
+				m_BattleScene.SetActive(false);
+				m_Traversal.SetActive(false);
+				m_DefaultState.SetActive(true);
 			}
 		}
 	}
