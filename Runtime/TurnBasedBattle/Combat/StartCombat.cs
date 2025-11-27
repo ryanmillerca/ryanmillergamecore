@@ -24,9 +24,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		public void TriggerCombat() {
-			gameStateSwitcher.SwitchToCombat(m_Enemies);
 			gameStateSwitcher.SwitchedToTraversal += SwitchedToTraversal;
 			gameStateSwitcher.SwitchedToCombat += SwitchedToCombat;
+			gameStateSwitcher.SwitchToCombat(m_Enemies);
+			OnSwitchedToCombat?.Invoke();
 		}
 
 		void SwitchedToTraversal() {
