@@ -5,6 +5,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 	using UnityEngine;
 	using System;
 	using Random = UnityEngine.Random;
+	using UnityEngine.Events;
 
 	public class BattleManager : MonoBehaviour, ITargetProvider {
 
@@ -14,11 +15,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 		}
 
+		[SerializeField] private bool autoStart = true;
 		[SerializeField] private List<Combatant> m_Combatants = new List<Combatant>();
+		[SerializeField] private Combatant[] m_Players;
 		[SerializeField] private float m_GaugeThreshold = 100f;
 		[SerializeField] private float m_TickRate = 1f;
 		[SerializeField] private int m_LookaheadTurns = 5;
 		[SerializeField] private float m_TurnDelay = 0.5f;
+		[SerializeField] private Transform[] m_PlayerSlots;
+		[SerializeField] private Transform[] m_EnemySlots;
+		[SerializeField] private UnityEvent BattleDidStart;
+		[SerializeField] private UnityEvent BattleDidEnd;
 
 		private bool m_WaitingForPlayerInput = false;
 		private Combatant m_CurrentPlayerActor = null;
@@ -44,6 +51,36 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public event OnPlayerInputReceived PlayerInputReceived;
 		public event Action<Combatant, List<BattleAction>> OnPlayerActionRequested;
 		public event Action<List<Combatant>> OnTurnOrderUpdated;
+
+		public void SetupNewBattle(Combatant[] enemies) {
+			ClearCombatants();
+			int usedPlayerSlots = 0;
+			int usedEnemySlots = 0;
+			foreach (var player in m_Players) {
+				m_Combatants.Add(NewCombatant(player, m_PlayerSlots[usedPlayerSlots]));
+				usedPlayerSlots++;
+			}
+			foreach (var enemy in enemies) {
+				m_Combatants.Add(NewCombatant(enemy, m_EnemySlots[usedEnemySlots]));
+				usedEnemySlots++;
+			}
+			InitializeCombatants();
+			StartCoroutine(BattleLoop());
+		}
+
+		void ClearCombatants() {
+			for (int index = m_Combatants.Count - 1; index >= 0; index--) {
+				Combatant combatant = m_Combatants[index];
+				Destroy(combatant.gameObject);
+			}
+			Combatants.Clear();
+		}
+
+		Combatant NewCombatant(Combatant combatant, Transform slot) {
+			GameObject newObj = Instantiate(combatant.gameObject, slot);
+			newObj.transform.localPosition = Vector3.zero;
+			return newObj.GetComponent<Combatant>();
+		}
 
 		public void SubmitPlayerCommand(BattleCommand cmd) {
 			if (!m_WaitingForPlayerInput) {
@@ -135,8 +172,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		}
 
 		private void Start() {
-			InitializeCombatants();
-			StartCoroutine(BattleLoop());
+			if (autoStart) {
+				InitializeCombatants();
+				StartCoroutine(BattleLoop());
+			}
 		}
 
 		private void InitializeCombatants() {
@@ -197,6 +236,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 		private IEnumerator BattleLoop() {
 			RaiseBattleEvent(BattleEventType.BattleStarted, "Battle started!");
+			BattleDidStart?.Invoke();
 			var turnQueue = new Queue<Combatant>();
 			while (PlayersAreAlive() && EnemiesAreAlive()) {
 				FillTurnQueueEvenly(turnQueue);
@@ -223,8 +263,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				outcome = BattleOutcome.Undefined;
 				RaiseBattleEvent(BattleEventType.BattleEnded, "Battle ended unexpectedly!");
 			}
-
 			BattleEnded?.Invoke(outcome);
+			BattleDidEnd?.Invoke();
 		}
 
 		private void FillTurnQueueEvenly(Queue<Combatant> turnQueue) {
