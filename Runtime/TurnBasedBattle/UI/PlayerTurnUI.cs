@@ -3,7 +3,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 	using System.Linq;
 	using UnityEngine;
 	using TurnBasedCombat;
-	using System;
+	using UnityEngine.EventSystems;
 
 	/// <summary>
 	/// UI controller for player turn input
@@ -90,6 +90,8 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 					m_actionButtons[i].gameObject.SetActive(false);
 				}
 			}
+			
+			EventSystem.current.SetSelectedGameObject(m_actionButtons[0].gameObject);
 		}
 
 		/// <summary>
@@ -191,6 +193,8 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 					m_targetButtons[i].gameObject.SetActive(false);
 				}
 			}
+
+			EventSystem.current.SetSelectedGameObject(m_targetButtons[0].gameObject);
 
 			// If there are zero targets (shouldn't happen normally), submit action with actor as fallback
 			if (m_currentTargets.Count == 0)
