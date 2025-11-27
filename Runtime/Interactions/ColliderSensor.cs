@@ -319,7 +319,6 @@ namespace RyanMillerGameCore.Interactions {
 			if (detectOnlyPlayer) {
 				Character character = TryGetCharacterFromCollider(c);
 				if (character == null || !character.IsPlayer()) {
-					Debug.Log($"{c} is not character or player", c.gameObject);
 					return;
 				}
 			}
