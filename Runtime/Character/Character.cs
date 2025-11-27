@@ -227,7 +227,7 @@ namespace RyanMillerGameCore.Character
         {
             if (transform.parent != null)
             {
-                transform.SetParent(null);
+                //transform.SetParent(null);
             }
             
             RegisterToCharacterManager();

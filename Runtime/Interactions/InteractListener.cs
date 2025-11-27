@@ -17,11 +17,11 @@ namespace RyanMillerGameCore.Interactions
             }
             if (_characterBrain == null)
             {
-                _characterBrain = transform.root.GetComponent<CharacterBrain>();
+                _characterBrain = transform.GetComponentInParent<CharacterBrain>();
             }
             if (_character == null)
             {
-                _character = transform.root.GetComponent<Character>();
+                _character = transform.GetComponentInParent<Character>();
             }
             _characterBrain.OnInteractAction += InteractAction;
         }
