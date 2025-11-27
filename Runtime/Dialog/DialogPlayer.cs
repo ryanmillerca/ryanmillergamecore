@@ -362,6 +362,7 @@ namespace RyanMillerGameCore.Dialog
             if (controlCanvasAlpha)
             {
                 _canvasGroup.alpha = newValue;
+                _canvasGroup.interactable = Mathf.Approximately(_canvasGroup.alpha, 1);
             }
         }
 
