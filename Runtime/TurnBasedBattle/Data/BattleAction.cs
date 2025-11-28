@@ -63,7 +63,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		Buff,
 		Debuff,
 		Item,
-		Defend
+		Defend,
+		Minigame
 	}
 
 	public enum ChargeTurnBehavior {
