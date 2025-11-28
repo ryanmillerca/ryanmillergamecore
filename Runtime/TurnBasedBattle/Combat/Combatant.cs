@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RyanMillerGameCore.TurnBasedCombat {
 
-	public class Combatant : MonoBehaviour {
+	public class Combatant : MonoBehaviour, ICombatant {
 
 		// returns the combatant's actions in a List<BattleAction> form for UI compatibility
 		public List<BattleAction> MovesAsActions() {
@@ -40,6 +40,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 		public int CurrentHp {
 			get { return m_CurrentHp; }
+		}
+
+		public bool IsAlive {
+			get {
+				return m_CurrentHp > 0;
+			}
 		}
 
 		public List<BattleAction> Moves {
