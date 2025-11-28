@@ -15,6 +15,38 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 		}
 
+		public Combatant GetRandomEnemy() {
+			var enemies = Combatants.Where(c => c.Team == Team.Enemy).ToList();
+			if (enemies.Count == 0) {
+				return null;
+			}
+			return enemies[Random.Range(0, enemies.Count)];
+		}
+
+		public Combatant GetRandomPlayer() {
+			var player = Combatants.Where(c => c.Team == Team.Player).ToList();
+			if (player.Count == 0) {
+				return null;
+			}
+			return player[Random.Range(0, player.Count)];
+		}
+
+		public Combatant GetPlayerByIndex(int index) {
+			var player = Combatants.Where(c => c.Team == Team.Player).ToList();
+			if (player.Count == 0) {
+				return null;
+			}
+			return player[index];
+		}
+
+		public Combatant GetEnemyByIndex(int index) {
+			var enemy = Combatants.Where(c => c.Team == Team.Enemy).ToList();
+			if (enemy.Count == 0) {
+				return null;
+			}
+			return enemy[index];
+		}
+
 		[SerializeField] private bool autoStart = true;
 		[SerializeField] private List<Combatant> m_Combatants = new List<Combatant>();
 		[SerializeField] private Combatant[] m_Players;
