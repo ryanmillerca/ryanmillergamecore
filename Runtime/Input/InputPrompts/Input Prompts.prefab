@@ -225,3 +225,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mappingDatabase: {fileID: 11400000, guid: 01d70fe77708942f9a5ad24e9c0c1135, type: 2}
   _inputDebounceTime: 0.2
+  m_Pairs:
+  - inputActionReference: {fileID: 1120369429361536294, guid: 6afc89c9204544954ac9ee41285b3246, type: 3}
+    promptAction: 2
+  - inputActionReference: {fileID: 7040659881675835329, guid: 6afc89c9204544954ac9ee41285b3246, type: 3}
+    promptAction: 4
+  - inputActionReference: {fileID: -2099379676528639254, guid: 6afc89c9204544954ac9ee41285b3246, type: 3}
+    promptAction: 3
+  - inputActionReference: {fileID: 1781555164194001046, guid: 6afc89c9204544954ac9ee41285b3246, type: 3}
+    promptAction: 5
