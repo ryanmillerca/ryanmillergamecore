@@ -90,7 +90,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 					m_actionButtons[i].gameObject.SetActive(false);
 				}
 			}
-			
+
 			EventSystem.current.SetSelectedGameObject(m_actionButtons[0].gameObject);
 		}
 
@@ -145,8 +145,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			HideAllPanels();
 		}
 
-		private void BuildAndShowTargets()
-		{
+		private void BuildAndShowTargets() {
 			ClearTargetSelectionState();
 
 			if (m_ActionPanel != null) m_ActionPanel.SetActive(false);
@@ -155,8 +154,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			m_currentTargets.Clear();
 
 			// Determine targets based on selected action's target type
-			switch (m_selectedAction.TargetType)
-			{
+			switch (m_selectedAction.TargetType) {
 				case ActionTargetType.Self:
 					m_currentTargets.Add(m_currentActor);
 					break;
@@ -179,16 +177,13 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			PrepareTargetButtons(m_currentTargets.Count);
 
 			int count = Mathf.Min(m_targetButtons.Count, m_currentTargets.Count);
-			for (int i = 0; i < m_targetButtons.Count; i++)
-			{
+			for (int i = 0; i < m_targetButtons.Count; i++) {
 				bool used = i < count;
-				if (used)
-				{
+				if (used) {
 					m_targetButtons[i].gameObject.SetActive(true);
 					m_targetButtons[i].Configure(this, m_currentTargets[i]);
 				}
-				else
-				{
+				else {
 					if (m_targetButtons[i] != null) m_targetButtons[i].Reset();
 					m_targetButtons[i].gameObject.SetActive(false);
 				}
@@ -197,8 +192,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			EventSystem.current.SetSelectedGameObject(m_targetButtons[0].gameObject);
 
 			// If there are zero targets (shouldn't happen normally), submit action with actor as fallback
-			if (m_currentTargets.Count == 0)
-			{
+			if (m_currentTargets.Count == 0) {
 				var cmd = new BattleCommand(
 					m_currentActor,
 					m_selectedAction ?? m_currentActions.FirstOrDefault(),

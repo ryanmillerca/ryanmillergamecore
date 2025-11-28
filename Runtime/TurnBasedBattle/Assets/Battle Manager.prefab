@@ -603,8 +603,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<color=#FFAB51><b>Enemy Brawler</b></color>\nHP: 50/50 (100%)\nATK 10
-    \u2022 DEF 10 \u2022 SPD 10"
+  m_text: '<color=#FFAB51><b>Enemy Brawler</b></color>
+
+    HP: 50/50 (100%)
+
+    ATK
+    10 DEF 10 SPD 10'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -784,8 +788,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<color=#FF5151><b>Enemy Healer</b></color>\nHP: 50/50 (100%)\nATK 10 \u2022
-    DEF 10 \u2022 SPD 10"
+  m_text: '<color=#FF5151><b>Enemy Healer</b></color>
+
+    HP: 50/50 (100%)
+
+    ATK
+    10 DEF 10 SPD 10'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -883,7 +891,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5653140175842191116}
   - component: {fileID: 1345791621070557168}
-  - component: {fileID: 7578225939541802295}
   - component: {fileID: 5647191635077676322}
   - component: {fileID: 7680489995143050988}
   - component: {fileID: 2108204416563336088}
@@ -937,20 +944,6 @@ MonoBehaviour:
   m_Team: 0
   m_Color: {r: 0.3160377, g: 0.42215344, b: 1, a: 1}
   m_AIBrain: {fileID: 0}
---- !u!114 &7578225939541802295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4707586355035247784}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21557621ec8642f6b3f25ee241e368a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedCombat.PlayerInputHandler
-  m_BattleManager: {fileID: 0}
-  m_UIBattleMenu: {fileID: 0}
 --- !u!222 &5647191635077676322
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -979,8 +972,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<color=#516CFF><b>Player 1</b></color>\nHP: 100/100 (100%)\nATK 20 \u2022
-    DEF 10 \u2022 SPD 10"
+  m_text: '<color=#516CFF><b>Player 1</b></color>
+
+    HP: 100/100 (100%)
+
+    ATK
+    20 DEF 10 SPD 10'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1231,7 +1228,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4426979509677971637}
-  - component: {fileID: 732284476164222490}
   - component: {fileID: 3400927390327532626}
   m_Layer: 5
   m_Name: Battle UI
@@ -1261,18 +1257,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1022.0914, y: 275.475}
   m_Pivot: {x: 0.5, y: 0}
---- !u!114 &732284476164222490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5570162416151408051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c87ae32311874de6bceaa9b9f94be4f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedCombat.UI.UIBattleMenu
 --- !u!114 &3400927390327532626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1338,14 +1322,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4166b581b6b242cc8e30f9849e469c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.BattleManager
+  autoStart: 1
   m_Combatants:
   - {fileID: 5890895403630120371}
   - {fileID: 5669372029704281225}
   - {fileID: 1345791621070557168}
+  m_Players: []
   m_GaugeThreshold: 1
   m_TickRate: 3
   m_LookaheadTurns: 5
   m_TurnDelay: 3
+  m_PlayerSlots: []
+  m_EnemySlots: []
+  BattleDidStart:
+    m_PersistentCalls:
+      m_Calls: []
+  BattleDidEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &6159012377075298837
 MonoBehaviour:
   m_ObjectHideFlags: 0
