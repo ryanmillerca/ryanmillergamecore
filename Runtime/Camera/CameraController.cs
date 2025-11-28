@@ -125,15 +125,17 @@ namespace RyanMillerGameCore.Camera {
 				Vector3 cameraLocalPos = _cameraTransform.localPosition;
 
 				if (smoothingSpeedZoom < 0f) {
-					// Instant follow (no smoothing)
 					_currentZoomDistance = _targetZoomDistance;
 				}
 				else {
-					// Smoothed follow (existing behaviour)
 					_currentZoomDistance = Mathf.Lerp(cameraLocalPos.z, _targetZoomDistance,
 						Time.deltaTime * smoothingSpeedZoom);
 				}
 
+				if (float.IsNaN(_currentZoomDistance))
+				{
+					_currentZoomDistance = _cameraTransform.localPosition.z;
+				}
 				_cameraTransform.localPosition = new Vector3(0, 0, _currentZoomDistance);
 			}
 		}
