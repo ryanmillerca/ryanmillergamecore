@@ -26,6 +26,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		[SerializeField] private Transform[] m_EnemySlots;
 		[SerializeField] private UnityEvent BattleDidStart;
 		[SerializeField] private UnityEvent BattleDidEnd;
+		[SerializeField] private MinigameResolver m_MinigameResolver;
 
 		private bool m_WaitingForPlayerInput = false;
 		private Combatant m_CurrentPlayerActor = null;
@@ -359,7 +360,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			yield return new WaitUntil(() => !m_WaitingForPlayerInput);
 
 			if (m_PendingPlayerCommand != null) {
-				yield return StartCoroutine(ExecuteSubmittedCommand(m_PendingPlayerCommand));
+
+				// start mini game
+				if (m_PendingPlayerCommand.BattleAction.ActionType == ActionType.Minigame) {
+					AbstractMinigame abstractMinigame = m_MinigameResolver.GetMinigameWithName(m_PendingPlayerCommand.BattleAction.ActionName);
+					if (abstractMinigame) {
+						abstractMinigame.BattleManager = this;
+						abstractMinigame.BattleCommand = m_PendingPlayerCommand;
+						yield return m_MinigameResolver.StartMinigame(abstractMinigame);
+					}
+				}
+				ExecuteBattleCommand(m_PendingPlayerCommand);
 				m_PendingPlayerCommand = null;
 			}
 			else {
@@ -370,12 +381,14 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			m_CurrentValidTargets = null;
 		}
 
-		private IEnumerator ExecuteSubmittedCommand(BattleCommand cmd) {
-			if (cmd == null) yield break;
+		public void ExecuteBattleCommand(BattleCommand cmd) {
+			if (cmd == null) {
+				return;
+			}
 
 			if (cmd.Actor == null || cmd.BattleAction == null || cmd.Target == null) {
 				RaiseBattleEvent(BattleEventType.CommandError, $"Submitted command invalid for {cmd.Actor?.CombatantName ?? "null actor"}", cmd.Actor, cmd.Target);
-				yield break;
+				return;
 			}
 
 			// Raise skill used event for non-basic attacks
@@ -386,7 +399,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			// Raise attack started event for damage actions
 			if (cmd.BattleAction.ActionType == ActionType.Damage) {
 				cmd.Actor.RaiseAttackStarted();
-				yield return new WaitForSeconds(0.1f); // Small delay for windup animation
 			}
 
 			RaiseTurnEvent(TurnEventType.ActionSelected, cmd.Actor, cmd.Target, cmd.BattleAction);
@@ -397,7 +409,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			}
 			catch (System.Exception ex) {
 				RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {cmd.Actor.CombatantName}: {ex}", cmd.Actor);
-				yield break;
+				return;
 			}
 
 			if (results != null) {
@@ -420,8 +432,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 					}
 				}
 			}
-
-			yield return null;
 		}
 
 		private IEnumerator ExecutePlayerAction(Combatant player, List<BattleAction> availableMoves, List<Combatant> validTargets) {
