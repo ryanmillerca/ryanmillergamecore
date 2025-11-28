@@ -58,9 +58,6 @@ namespace RyanMillerGameCore.Dialog {
 		private bool _playingDialog = false;
 		private float _prevTimeScale = 1f;
 		private InputActionMap _actionMap;
-		private InputAction _clickAction;
-		private InputAction _submitAction;
-		private InputAction _cancelAction;
 		private bool _isTextRevealed = false;
 		private bool _waitingForAdvance = false;
 		private bool _uiVisible = false;
@@ -99,18 +96,13 @@ namespace RyanMillerGameCore.Dialog {
 			SetCanvasAlpha(0);
 			_uiVisible = false;
 
-			m_InputSubmitAction.action.Enable();
 			m_InputSubmitAction.action.performed += OnDialogButtonPressed;
+			m_InputSubmitAction.action.Enable();
 		}
 
 		private void OnDisable() {
-			if (_clickAction != null) {
-				_clickAction.performed -= OnDialogButtonPressed;
-			}
-
-			if (_submitAction != null) {
-				_submitAction.performed -= OnDialogButtonPressed;
-			}
+			m_InputSubmitAction.action.performed -= OnDialogButtonPressed;
+			m_InputSubmitAction.action.Disable();
 		}
 
 		#endregion
@@ -294,10 +286,6 @@ namespace RyanMillerGameCore.Dialog {
 		#region Input Handlers
 
 		private void OnDialogButtonPressed(InputAction.CallbackContext ctx) {
-			if (!ctx.performed) {
-				return;
-			}
-
 			DoDialogAdvance();
 		}
 
