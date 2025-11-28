@@ -53,10 +53,6 @@ namespace RyanMillerGameCore.Camera {
 			}
 		}
 
-		private void OnEnable() {
-			_readyToTrack = false;
-		}
-
 		private void Start() {
 			_cameraComponent = GetComponentInChildren<Camera>();
 			_cameraTransform = _cameraComponent.transform;
