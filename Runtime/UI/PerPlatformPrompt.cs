@@ -4,11 +4,13 @@ namespace RyanMillerGameCore.UI
     using UnityEngine.InputSystem;
     using System.Collections.Generic;
     using UnityEngine.InputSystem.Controls;
-
+    using System;
+    
     public class PerPlatformPrompt : MonoBehaviour
     {
         [SerializeField] private PromptMappingDatabase _mappingDatabase;
         [SerializeField] private float _inputDebounceTime = 0.2f;
+        [SerializeField] private InputActionPromptPair[] m_Pairs = new InputActionPromptPair[] { };
 
         private PromptGraphics _currentGraphics;
         private InputDevice _activeDevice;
@@ -155,7 +157,16 @@ namespace RyanMillerGameCore.UI
                     _eligibleGamepads.Add(device);
             }
         }
-
+        
+        public Sprite GetSpriteForInputActionReference(InputActionReference inputActionReference) {
+            Sprite sprite = null;
+            foreach (var inputActionPromptPair in m_Pairs) {
+                if (inputActionPromptPair.inputActionReference.Equals(inputActionReference)) {
+                    sprite = GetSpriteFor(inputActionPromptPair.promptAction);
+                }
+            }
+            return sprite;
+        }
         public Sprite GetSpriteFor(PromptAction action) => action switch
         {
             PromptAction.Attack => _currentGraphics?.attack,
@@ -168,6 +179,13 @@ namespace RyanMillerGameCore.UI
             _ => null
         };
 
+        
         public event System.Action<PromptGraphics> OnPromptGraphicsChanged;
+    }
+    
+    [Serializable]
+    public class InputActionPromptPair {
+        public InputActionReference inputActionReference;
+        public PromptAction promptAction;
     }
 }
