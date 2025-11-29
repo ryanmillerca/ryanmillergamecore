@@ -5,9 +5,8 @@ namespace RyanMillerGameCore.Interactions
     using UI;
     
     [RequireComponent(typeof(Interactive))]
-    public class DisplayButtonPrompt : MonoBehaviour
-    {
-        [SerializeField] private float verticalOffset = 0.5f;
+    public class DisplayButtonPrompt : MonoBehaviour {
+        [SerializeField] private Vector3 promptOffset = new Vector3(0f, 0.5f, 0f);
         [SerializeField] private PromptAction _promptAction;
 
         private Interactive _interactive;
@@ -83,12 +82,11 @@ namespace RyanMillerGameCore.Interactions
         
         private Vector3 GetOffset()
         {
-            Vector3 offset = Vector3.zero;
+            Vector3 offset = promptOffset;
             if (_targetCollider != null)
             {
                 offset.y += _targetCollider.bounds.extents.y;
             }
-            offset.y += verticalOffset;
             return offset;
         }
     }
