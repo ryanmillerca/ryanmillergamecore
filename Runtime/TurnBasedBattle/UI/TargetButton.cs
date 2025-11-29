@@ -21,18 +21,24 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 			this.playerTurnUI = playerTurnUI;
 			this.combatant = combatant;
 			if (combatant) {
-				label.SetText(combatant.CombatantName);
+				if (label) {
+					label.SetText(combatant.CombatantName);
+				}
 				button.interactable = true;
 			}
 			else {
-				label.SetText("");
+				if (label) {
+					label.SetText("");
+				}
 				button.interactable = false;
 			}
 		}
 
 		public void Reset() {
 			this.combatant = null;
-			label.SetText("");
+			if (label) {
+				label.SetText("");
+			}
 		}
 
 		public void OnClick() {
