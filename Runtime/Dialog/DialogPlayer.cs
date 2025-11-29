@@ -319,12 +319,13 @@ namespace RyanMillerGameCore.Dialog {
 		private void SetSpeakerColor(ID speaker) {
 			_currentSpeakerSkin = dialogSkins.DefaultSkin;
 			foreach (SpeakerSkin speakerSkin in dialogSkins.SpeakerSkins) {
-				if (speakerSkin.speaker.Equals(speaker)) {
-					_currentSpeakerSkin = speakerSkin;
-					break;
+				if (speakerSkin != null && speakerSkin.speaker) {
+					if (speakerSkin.speaker.Equals(speaker)) {
+						_currentSpeakerSkin = speakerSkin;
+						break;
+					}
 				}
 			}
-
 			SetSkin(_currentSpeakerSkin);
 		}
 
