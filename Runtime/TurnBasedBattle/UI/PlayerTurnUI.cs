@@ -13,9 +13,9 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
         [SerializeField] private BattleManager m_BattleManager;
         [SerializeField] private GameObject m_ActionButtonPrefab;
         [SerializeField] private GameObject m_TargetButtonPrefab;
+        [SerializeField] private GameObject m_TurnPanel;
         [SerializeField] private GameObject m_ActionPanel;
         [SerializeField] private GameObject m_TargetPanel;
-
         [SerializeField] private CombatActionButton[] m_ActionButtons = new CombatActionButton[0];
         [SerializeField] private TargetButton[] m_TargetButtons = new TargetButton[0];
 
@@ -58,6 +58,9 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
             m_currentActions = (availableActions != null && availableActions.Count > 0)
                 ? availableActions
                 : (actor.Moves ?? new List<BattleAction>());
+            if (m_TurnPanel) {
+                m_TurnPanel.SetActive(true);
+            }
             ShowActionPanel();
         }
 
@@ -78,6 +81,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
             }
 
             // Ensure there are enough buttons
+            m_actionButtons.Clear();
             PrepareActionButtons(m_currentActions.Count);
 
             // Enable and populate prepopulated action buttons up to array length
@@ -94,10 +98,16 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
                 }
             }
 
-            EventSystem.current.SetSelectedGameObject(m_actionButtons[0].gameObject);
+            // Ensure selection is set
+            if (m_actionButtons.Count > 0 && m_actionButtons[0] != null) {
+                EventSystem.current.SetSelectedGameObject(m_actionButtons[0].gameObject);
+            }
         }
 
         private void PrepareActionButtons(int numberOfButtons) {
+            // Clear the internal list first to avoid duplicates
+            m_actionButtons.Clear();
+            
             if (m_ActionButtons != null && m_ActionButtons.Length > 0) {
                 // Use manually assigned buttons first
                 for (int i = 0; i < m_ActionButtons.Length; i++) {
@@ -157,7 +167,9 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
         private void BuildAndShowTargets() {
             ClearTargetSelectionState();
 
-            if (m_ActionPanel != null) m_ActionPanel.SetActive(false);
+            if (m_ActionPanel != null) {
+                m_ActionPanel.SetActive(false);
+            }
             if (m_TargetPanel != null) m_TargetPanel.SetActive(true);
 
             m_currentTargets.Clear();
@@ -193,7 +205,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
                 bool used = i < count;
                 if (used) {
                     m_targetButtons[i].gameObject.SetActive(true);
-                    
+
                     // Set selection only once if not already set
                     if (!selectionSet && m_targetButtons[i] != null) {
                         EventSystem.current.SetSelectedGameObject(m_targetButtons[i].gameObject);
@@ -233,7 +245,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
 
         private System.Collections.IEnumerator DelayedSelection() {
             yield return new WaitForSeconds(0.05f);
-            if (m_targetButtons.Count > 0 && m_targetButtons[0] != null && 
+            if (m_targetButtons.Count > 0 && m_targetButtons[0] != null &&
                 m_targetButtons[0].gameObject.activeInHierarchy) {
                 EventSystem.current.SetSelectedGameObject(m_targetButtons[0].gameObject);
             }
@@ -242,7 +254,7 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
         void PrepareTargetButtons(int numberOfButtons) {
             // Clear the internal list first to avoid duplicates
             m_targetButtons.Clear();
-            
+
             if (m_TargetButtons != null && m_TargetButtons.Length > 0) {
                 // Use manually assigned buttons first
                 for (int i = 0; i < m_TargetButtons.Length; i++) {
@@ -282,8 +294,15 @@ namespace RyanMillerGameCore.TurnBasedCombat.UI {
         }
 
         private void HideAllPanels() {
-            if (m_ActionPanel != null) m_ActionPanel.SetActive(false);
-            if (m_TargetPanel != null) m_TargetPanel.SetActive(false);
+            if (m_TurnPanel) {
+                m_TurnPanel.SetActive(false);
+            }
+            if (m_ActionPanel) {
+                m_ActionPanel.SetActive(false);
+            }
+            if (m_TargetPanel) {
+                m_TargetPanel.SetActive(false);
+            }
             ClearActionSelectionState();
             ClearTargetSelectionState();
             m_currentActor = null;
