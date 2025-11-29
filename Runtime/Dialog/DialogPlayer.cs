@@ -39,6 +39,7 @@ namespace RyanMillerGameCore.Dialog {
 		[SerializeField] private TextMeshProUGUI speakerField;
 		[SerializeField] private DialogSkins dialogSkins;
 		[SerializeField] private InputActionReference m_InputSubmitAction;
+		[SerializeField] private Image portraitImage;
 
 		[Header("Params")] [SerializeField] private float durationShow = 0.5f;
 		[SerializeField] private float durationHide = 1f;
@@ -177,11 +178,19 @@ namespace RyanMillerGameCore.Dialog {
 
 				_state = DialogState.Running;
 
-				// ==== Indexed loop for better control/logging ====
 				for (int li = 0; li < dialogContent.Lines.Count; li++) {
 					using (MarkerLine.Auto()) {
 						var line = dialogContent.Lines[li];
 						LogLineHeader(li, line);
+
+						if (line.portrait && portraitImage) {
+							portraitImage.sprite = line.portrait;
+							portraitImage.enabled = true;
+						}
+						else {
+							portraitImage.sprite = null;
+							portraitImage.enabled = false;
+						}
 
 						Character speakingCharacter;
 						GameObject lookTarget;
