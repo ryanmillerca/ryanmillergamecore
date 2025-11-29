@@ -261,14 +261,7 @@ namespace RyanMillerGameCore.Character {
 		}
 
 		public Transform ForwardTransform {
-			get {
-				if (RotateFromMotor) {
-					return RotateFromMotor.transform;
-				}
-				else {
-					return transform;
-				}
-			}
+			get { return RotateFromMotor != null ? RotateFromMotor.transform : transform; }
 		}
 
 		/// <summary>
