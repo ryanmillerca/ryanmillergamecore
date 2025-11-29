@@ -55,6 +55,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
             if (motion.resetAtEnd) {
                 combatantTransform.position = combatantPosition;
             }
+            if (motion.disableAtEnd) {
+                combatantTransform.gameObject.SetActive(false);
+            }
         }
     }
 

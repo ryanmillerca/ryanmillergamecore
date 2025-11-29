@@ -14,5 +14,6 @@ namespace RyanMillerGameCore {
 		public float duration = 0.5f;
 		public float multiplier = 1.0f;
 		public bool resetAtEnd = true;
+		public bool disableAtEnd = false;
 	}
 }
