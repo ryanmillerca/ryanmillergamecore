@@ -48,6 +48,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
         }
 
         private void OnCombatantEvent(CombatantEventData eventData) {
+            if (!animator) {
+                return;
+            }
             if (animationMap.TryGetValue(eventData.EventType, out string animationName)) {
                 if (!string.IsNullOrEmpty(animationMap[eventData.EventType])) {
                     animator.Play(animationName);
