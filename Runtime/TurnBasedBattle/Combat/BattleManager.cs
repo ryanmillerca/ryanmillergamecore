@@ -196,11 +196,11 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			});
 		}
 
-		private bool PlayersAreAlive() {
+		public bool PlayersAreAlive() {
 			return m_Combatants.Any(c => c.isAlive && c.Team == Team.Player);
 		}
 
-		private bool EnemiesAreAlive() {
+		public bool EnemiesAreAlive() {
 			return m_Combatants.Any(c => c.isAlive && c.Team == Team.Enemy);
 		}
 
