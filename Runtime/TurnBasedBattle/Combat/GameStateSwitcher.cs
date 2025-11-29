@@ -72,9 +72,13 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			if (transform.parent == null) {
 				DontDestroyOnLoad(gameObject);
 			}
-			if (m_DefaultState) {
+			if (m_BattleScene) {
 				m_BattleScene.SetActive(false);
+			}
+			if (m_Traversal) {
 				m_Traversal.SetActive(false);
+			}
+			if (m_DefaultState) {
 				m_DefaultState.SetActive(true);
 			}
 		}
