@@ -1,9 +1,8 @@
-using System;
-using System.Collections;
-using log4net.Appender;
-using UnityEngine;
-
 namespace RyanMillerGameCore.TurnBasedCombat {
+    using System;
+    using RyanMillerGameCore;
+    using System.Collections;
+    using UnityEngine;
 
     public class CombatantTransformAnimation : MonoBehaviour {
         [Tooltip("You don't have to set this; we'll do GetComponent on Awake")]
@@ -37,6 +36,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
         }
 
         IEnumerator PlayTransformAnimation(TransformMotion motion) {
+            if (motion.initialDelay > 0) {
+                yield return new WaitForSeconds(motion.initialDelay);
+            }
             Transform combatantTransform = combatant.transform;
             Vector3 combatantPosition = combatantTransform.position;
             for (float i = 0; i <= motion.duration; i += Time.deltaTime) {
@@ -54,18 +56,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
                 combatantTransform.position = combatantPosition;
             }
         }
-    }
-
-    [Serializable]
-    public class TransformMotion {
-        public AnimationCurve animOnX;
-        public AnimationCurve animOnY;
-        public AnimationCurve animOnZ;
-        public Vector3 startOffset = Vector3.zero;
-        public Vector3 endOffset = Vector3.zero;
-        public float duration = 0.5f;
-        public float multiplier = 1.0f;
-        public bool resetAtEnd = true;
     }
 
     [Serializable]
