@@ -114,6 +114,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		public delegate void OnCombatantEvent(CombatantEventData eventData);
 		public event OnCombatantEvent CombatantEvent;
 
+		public delegate void OnHealthChanged(int currentHp, int maxHp, float healthPercent);
+		public event OnHealthChanged HealthChanged;
+
 		public bool m_IsPlayer {
 			get { return m_Team == Team.Player; }
 			set { m_Team = value ? Team.Player : Team.Enemy; }
@@ -266,7 +269,10 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				RaiseCombatantEvent(CombatantEventType.DamageTaken,
 					$"{m_CombatantName} takes {dmg} damage{defendText}. (HP: {m_CurrentHp}/{m_MaxHp})", dmg);
 			}
-
+			
+			// Raise health changed event
+			HealthChanged?.Invoke(m_CurrentHp, m_MaxHp, (float)m_CurrentHp / m_MaxHp);
+			
 			if (isDefending && attacker != null && dmg > 0) {
 				if (TryCounterAttack(attacker)) {
 					RaiseCombatantEvent(CombatantEventType.CounterAttack,
@@ -429,6 +435,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			if (m_CurrentHp == m_MaxHp) {
 				RaiseCombatantEvent(CombatantEventType.FullHealth, $"{m_CombatantName} is at full health!");
 			}
+			
+			// Raise health changed event
+			HealthChanged?.Invoke(m_CurrentHp, m_MaxHp, (float)m_CurrentHp / m_MaxHp);
 		}
 	}
 
