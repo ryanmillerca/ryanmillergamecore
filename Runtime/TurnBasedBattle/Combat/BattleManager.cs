@@ -392,17 +392,31 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			yield return new WaitUntil(() => !m_WaitingForPlayerInput);
 
 			if (m_PendingPlayerCommand != null) {
-
-				// start mini game
-				if (m_PendingPlayerCommand.BattleAction.ActionType == ActionType.Minigame) {
-					AbstractMinigame abstractMinigame = m_MinigameResolver.GetMinigameWithName(m_PendingPlayerCommand.BattleAction.ActionName);
-					if (abstractMinigame) {
-						abstractMinigame.BattleManager = this;
-						abstractMinigame.BattleCommand = m_PendingPlayerCommand;
-						yield return m_MinigameResolver.StartMinigame(abstractMinigame);
+				MinigameResult? minigameResult = null;
+				
+				// Check if this BattleAction has an associated minigame
+				if (m_PendingPlayerCommand.BattleAction is BattleAction battleAction && battleAction.MinigameType != MinigameType.None) {
+					AbstractMinigame minigame = m_MinigameResolver.GetMinigameByType(battleAction.MinigameType);
+					if (minigame != null) {
+						minigame.BattleManager = this;
+						minigame.BattleCommand = m_PendingPlayerCommand;
+						
+						yield return m_MinigameResolver.StartMinigame(minigame);
+						
+						minigameResult = minigame.Result;
+						
+						// Check if action should fail based on minigame result
+						if (battleAction.RequireMinigameSuccess && !minigameResult.Value.success) {
+							RaiseBattleEvent(BattleEventType.CommandError, 
+								$"{m_PendingPlayerCommand.Actor.CombatantName}'s {battleAction.ActionName} failed due to minigame failure!", 
+								m_PendingPlayerCommand.Actor);
+							m_PendingPlayerCommand = null;
+							yield break;
+						}
 					}
 				}
-				ExecuteBattleCommand(m_PendingPlayerCommand);
+				
+				ExecuteBattleCommand(m_PendingPlayerCommand, minigameResult);
 				m_PendingPlayerCommand = null;
 			}
 			else {
@@ -413,9 +427,17 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			m_CurrentValidTargets = null;
 		}
 
-		public void ExecuteBattleCommand(BattleCommand cmd) {
+		public void ExecuteBattleCommand(BattleCommand cmd, MinigameResult? minigameResult = null) {
 			if (cmd == null) {
 				return;
+			}
+			
+			// TODO: Apply minigame result to modify action effects
+			if (minigameResult.HasValue) {
+				// Stub for future implementation
+				Debug.Log($"Minigame result - Success: {minigameResult.Value.success}, " +
+				          $"Multiplier: {minigameResult.Value.performanceMultiplier}, " +
+				          $"Perfect: {minigameResult.Value.perfectExecution}");
 			}
 
 			if (cmd.Actor == null || cmd.BattleAction == null || cmd.Target == null) {
