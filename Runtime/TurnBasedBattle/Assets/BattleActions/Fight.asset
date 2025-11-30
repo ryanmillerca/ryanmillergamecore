@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01970ece3270a462d96a2d9a82ffdf69, type: 3}
   m_Name: Fight
   m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.BattleAction
+  MinigameType: 0
+  RequireMinigameSuccess: 0
   ActionName: Fight
   ActionType: 0
   TargetType: 1
