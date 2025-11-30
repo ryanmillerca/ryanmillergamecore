@@ -8,7 +8,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		private const float PLAYER_CRIT_MODIFIER = 1.0f;
 		private const float ENEMY_CRIT_MODIFIER = 1.0f;
 
-		public static List<BattleResult> Resolve(BattleCommand cmd, List<Combatant> allCombatants = null, bool isChargedAction = false, float chargeMultiplier = 1.0f) {
+		public static List<BattleResult> Resolve(BattleCommand cmd, List<Combatant> allCombatants = null, bool isChargedAction = false, float chargeMultiplier = 1.0f, MinigameResult? minigameResult = null) {
 			var results = new List<BattleResult>();
 
 			if (!cmd.Actor || !cmd.BattleAction) {
@@ -99,18 +99,30 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 						if (isChargedAction) {
 							healAmount = Mathf.RoundToInt(healAmount * chargeMultiplier);
 						}
+						
+						// Apply minigame performance multiplier
+						if (minigameResult.HasValue) {
+							healAmount = Mathf.RoundToInt(healAmount * minigameResult.Value.performanceMultiplier);
+						}
+						
+						if (healAmount <= 0) {
+							healAmount = Mathf.CeilToInt(cmd.Actor.MaxHp * 0.15f) +
+							             Mathf.RoundToInt(cmd.Actor.Attack * 0.2f);
+						}
 
 						target.Heal(healAmount);
 						result.HealingDone = healAmount;
 
 						string healChargeText = isChargedAction ? " (FULLY CHARGED!)" : "";
+						string healPerfectText = (minigameResult.HasValue && minigameResult.Value.perfectExecution) ? " (PERFECT!)" : "";
 						result.Message = cmd.BattleAction.TargetSelf
-						? $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} to heal self.{healChargeText}"
-						: $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} to heal {target.CombatantName}.{healChargeText}";
+						? $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} to heal self.{healChargeText}{healPerfectText}"
+						: $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} to heal {target.CombatantName}.{healChargeText}{healPerfectText}";
 						break;
 
 					case ActionType.Damage:
-						result = CalculateDamage(cmd, target, result, isChargedAction, chargeMultiplier);
+						result = CalculateDamage(cmd, target, result, isChargedAction, chargeMultiplier, minigameResult);
+						target.LastAttacker = cmd.Actor;
 						break;
 
 					case ActionType.Buff:
@@ -163,7 +175,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			return counterResult;
 		}
 
-		private static BattleResult CalculateDamage(BattleCommand cmd, Combatant target, BattleResult result, bool isChargedAction, float chargeMultiplier) {
+		private static BattleResult CalculateDamage(BattleCommand cmd, Combatant target, BattleResult result, bool isChargedAction, float chargeMultiplier, MinigameResult? minigameResult = null) {
 			float attack = cmd.Actor.Attack * cmd.BattleAction.StatMultiplier;
 			float defense = Mathf.Max(1, target.Defense);
 			float baseDamage = cmd.BattleAction.Power * (attack / defense);
@@ -173,9 +185,16 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 			if (isChargedAction) {
 				damage = Mathf.RoundToInt(damage * chargeMultiplier);
 			}
+			
+			// Apply minigame performance multiplier
+			if (minigameResult.HasValue) {
+				damage = Mathf.RoundToInt(damage * minigameResult.Value.performanceMultiplier);
+				damage = Mathf.Max(1, damage); // Ensure at least 1 damage
+			}
 
 			float critChance = CalculateCriticalHitChance(cmd.Actor, cmd.BattleAction);
-			bool isCritical = Random.value < critChance;
+			// Perfect execution guarantees a critical hit
+			bool isCritical = (minigameResult.HasValue && minigameResult.Value.perfectExecution) || Random.value < critChance;
 
 			if (isCritical) {
 				damage = Mathf.FloorToInt(damage * CRIT_MULTIPLIER);
@@ -192,7 +211,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			string critText = isCritical ? " (CRITICAL HIT!)" : "";
 			string chargeText = isChargedAction ? " (FULLY CHARGED!)" : "";
-			result.Message = $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} on {target.CombatantName}{critText}{chargeText} for {damage} damage.";
+			string perfectText = (minigameResult.HasValue && minigameResult.Value.perfectExecution) ? " (PERFECT!)" : "";
+			result.Message = $"{cmd.Actor.CombatantName} used {cmd.BattleAction.ActionName} on {target.CombatantName}{critText}{chargeText}{perfectText} for {damage} damage.";
 
 			return result;
 		}

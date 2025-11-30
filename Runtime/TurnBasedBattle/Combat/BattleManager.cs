@@ -432,10 +432,9 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				return;
 			}
 			
-			// TODO: Apply minigame result to modify action effects
+			// Apply minigame result to modify action effects via MoveResolver
 			if (minigameResult.HasValue) {
-				// Stub for future implementation
-				Debug.Log($"Minigame result - Success: {minigameResult.Value.success}, " +
+				Debug.Log($"Applying minigame result - Success: {minigameResult.Value.success}, " +
 				          $"Multiplier: {minigameResult.Value.performanceMultiplier}, " +
 				          $"Perfect: {minigameResult.Value.perfectExecution}");
 			}
@@ -459,7 +458,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 			List<BattleResult> results = null;
 			try {
-				results = MoveResolver.Resolve(cmd, m_Combatants);
+				results = MoveResolver.Resolve(cmd, m_Combatants, false, 1.0f, minigameResult);
 			}
 			catch (System.Exception ex) {
 				RaiseBattleEvent(BattleEventType.ResolutionError, $"MoveResolver.Resolve threw for {cmd.Actor.CombatantName}: {ex}", cmd.Actor);
