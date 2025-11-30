@@ -36,6 +36,16 @@ namespace RyanMillerGameCore.SceneControl {
 			DoFade(1, 0);
 		}
 
+		public void FadeInAndOut() {
+			StartCoroutine(FadeAndOutCoroutine());
+		}
+
+		IEnumerator FadeAndOutCoroutine() {
+			FadeIn();
+			yield return new WaitForSeconds(fadeInTime);
+			FadeOut();
+		}
+
 		public void DoFade(float from, float to) {
 			StartCoroutine(DoFadeCoroutine(from, to));
 		}
