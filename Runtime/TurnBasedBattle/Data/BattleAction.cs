@@ -3,6 +3,15 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 	[CreateAssetMenu(menuName = "Battle/Action")]
 	public class BattleAction : ScriptableObject {
+
+		[Header("Minigame Integration")]
+		
+		[Tooltip("Optional: Minigame to play when this action is used")]
+		public MinigameType MinigameType = MinigameType.None;
+		
+		[Tooltip("If true, minigame must succeed for action to execute")]
+		public bool RequireMinigameSuccess = false;
+
 		[Header("Basic Info")]
 		public string ActionName = "Tackle";
 		public ActionType ActionType = ActionType.Damage;
@@ -47,6 +56,12 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 		[Header("Other")]
 		public bool TargetSelf = false;
+
+	}	
+
+	public enum MinigameType {
+		BarkHero,
+		None
 	}
 
 	public enum ActionTargetType {

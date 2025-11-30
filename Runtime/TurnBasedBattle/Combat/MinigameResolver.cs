@@ -8,15 +8,19 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 		[SerializeField] private MinigamePair[] m_Minigames;
 
-		public AbstractMinigame GetMinigameWithName(string miniGameName) {
+		public AbstractMinigame GetMinigameByType(MinigameType minigameType) {
+			if (minigameType == MinigameType.None) {
+				return null;
+			}
+			
 			foreach (var mini in m_Minigames) {
-				if (mini.name.Equals(miniGameName)) {
+				if (mini.minigameType == minigameType) {
 					if (mini.miniGame) {
 						return mini.miniGame;
 					}
 				}
 			}
-			Debug.Log($"No minigame found with name " + miniGameName);
+			Debug.LogWarning($"No minigame found with type {minigameType}");
 			return null;
 		}
 
@@ -31,7 +35,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 
 	[Serializable]
 	public class MinigamePair {
-		public string name;
+		public MinigameType minigameType;
 		public AbstractMinigame miniGame;
 	}
 }
