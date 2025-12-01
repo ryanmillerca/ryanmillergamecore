@@ -258,7 +258,9 @@ namespace RyanMillerGameCore.Dialog {
 					yield return HideUIIfVisible();
 				}
 
-				CameraController.Instance.RestoreCameraTarget();
+				if (CameraController.Instance) {
+					CameraController.Instance.RestoreCameraTarget();
+				}
 
 				_playingDialog = false;
 				_state = DialogState.Idle;
@@ -266,8 +268,10 @@ namespace RyanMillerGameCore.Dialog {
 				Log("DialogComplete");
 
 				if (dialogContent.freezeInputs) {
-					CharacterManager.Instance.Player.Brain.SetInputEnabled(true);
-					Log("Inputs re-enabled.");
+					if (CharacterManager.Instance) {
+						CharacterManager.Instance.Player.Brain.SetInputEnabled(true);
+						Log("Inputs re-enabled.");
+					}
 				}
 			}
 		}
@@ -496,8 +500,10 @@ namespace RyanMillerGameCore.Dialog {
 
 		private void ApplyFreezeInput(DialogContent dialogContent) {
 			if (dialogContent.freezeInputs) {
-				CharacterManager.Instance.Player.Brain.SetInputEnabled(false);
-				Log("Inputs disabled (freezeInputs).");
+				if (CharacterManager.Instance) {
+					CharacterManager.Instance.Player.Brain.SetInputEnabled(false);
+					Log("Inputs disabled (freezeInputs).");
+				}
 			}
 		}
 
@@ -524,6 +530,11 @@ namespace RyanMillerGameCore.Dialog {
 
 		private void HandleSpeakerAndLookTargets(DialogLine line, out Character speakingCharacter,
 		                                         out GameObject lookTarget) {
+			if (CharacterManager.Instance == null) {
+				speakingCharacter = null;
+				lookTarget = null;
+				return;
+			}
 			speakingCharacter = CharacterManager.Instance.GetCharacter(line.speaker as CharacterID);
 			if (speakingCharacter != null) {
 				SpeakerChanged?.Invoke(speakingCharacter.transform);
