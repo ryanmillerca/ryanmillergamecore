@@ -1,68 +1,60 @@
-namespace RyanMillerGameCore.Interactions
-{
-    using UnityEngine;
-    using System.Linq;
-    
-    public class InteractiveObjectColliderSensor : ColliderSensor
-    {
-        [SerializeField] private Interactive currentInteractive; 
-       
-        public Interactive CurrentInteractive => currentInteractive;
-        
-        protected override void ItemEnteredTrigger(Collider item)
-        {
-            Interactive interactive = item.GetComponent<Interactive>();
-            if (interactive)
-            {
-                if (interactive.enabled == false)
-                {
-                    return;
-                }
-                
-                DigestInteractives();
+namespace RyanMillerGameCore.Interactions {
+	using UnityEngine;
+	using System.Linq;
 
-                if (currentInteractive)
-                {
-                    currentInteractive.SetSelected(true);
-                }
-            }
-        }
+	public class InteractiveObjectColliderSensor : ColliderSensor {
 
-        
-        /// <summary>
-        /// Sorts all the interactives in the collider by distance, closest first
-        /// </summary>
-        private void DigestInteractives()
-        {
-            if (currentInteractive)
-            {
-                currentInteractive.SetSelected(false);
-            }
+		private IInteractive m_currentInteractive;
+		public IInteractive CurrentInteractive {
+			get {
+				return m_currentInteractive;
+			}
+		}
 
-            Collider[] colliders = GetCollidersAsArray();
-            colliders = FilterColliders(colliders, requireActiveGameObject: true, requireEnabled: true);
+		protected override void ItemEnteredTrigger(Collider item) {
+			IInteractive interactive = item.GetComponent<IInteractive>();
+			if ((Component)interactive) {
+				if (interactive.enabled == false) {
+					return;
+				}
 
-            var interactives = colliders
-                .Select(c => c.GetComponent<Interactive>())
-                .Where(i => i != null && i.enabled && i.gameObject.activeInHierarchy)
-                .OrderBy(i => Vector3.Distance(transform.position, i.transform.position))
-                .ToList();
+				DigestInteractives();
 
-            currentInteractive = interactives.FirstOrDefault();
-        }
-        
-        
-        protected override void ItemExitedTrigger(Collider item) 
-        {
-            Interactive interactive = item.GetComponent<Interactive>();
-            if (interactive)
-            {
-                interactive.SetSelected(false);
-                if (interactive == currentInteractive)
-                {
-                    DigestInteractives();
-                }
-            }
-        }
-    }
+				if ((Component)m_currentInteractive) {
+					m_currentInteractive.SetSelected(true);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Sorts all the interactives in the collider by distance, closest first
+		/// </summary>
+		private void DigestInteractives() {
+			if ((Component)m_currentInteractive) {
+				m_currentInteractive.SetSelected(false);
+			}
+
+			Collider[] colliders = GetCollidersAsArray();
+			colliders = FilterColliders(colliders, requireActiveGameObject: true, requireEnabled: true);
+
+			var interactives = colliders
+				.Select(c => c.GetComponent<IInteractive>())
+				.Where(i => i != null && i.enabled && i.gameObject.activeInHierarchy)
+				.OrderBy(i => Vector3.Distance(transform.position, i.transform.position))
+				.ToList();
+
+			m_currentInteractive = interactives.FirstOrDefault();
+		}
+
+
+		protected override void ItemExitedTrigger(Collider item) {
+			IInteractive interactive = item.GetComponent<IInteractive>();
+			if ((Component)interactive) {
+				interactive.SetSelected(false);
+				if (interactive == m_currentInteractive) {
+					DigestInteractives();
+				}
+			}
+		}
+	}
 }

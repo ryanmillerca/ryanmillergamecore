@@ -46,6 +46,10 @@ namespace RyanMillerGameCore.Interactions
     
     public interface IInteractive
     {
+        bool enabled { get; set; }
+        GameObject gameObject { get; }
+        Transform transform { get; }
+        event Action<bool> WasSelected;
         void Interact(Character character);
         void SetSelected(bool active);
         event Action InteractionComplete;
