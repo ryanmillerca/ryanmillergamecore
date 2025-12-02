@@ -33,8 +33,8 @@ namespace RyanMillerGameCore.Interactions
 
         private void InteractAction()
         {
-            Interactive interactive = _interactiveObjectColliderSensor.CurrentInteractive;
-            if (interactive)
+            IInteractive interactive = _interactiveObjectColliderSensor.CurrentInteractive;
+            if ((Component)interactive)
             {
                 interactive.Interact(_character);
             }

@@ -56,8 +56,8 @@ namespace RyanMillerGameCore.Character.SMB
             }
             animator.ResetTrigger(_interactParamHash);
             animator.SetTrigger(_interactParamHash);
-            Interactive interactive = References.interactColliderSensor.CurrentInteractive; 
-            if (interactive)
+            IInteractive interactive = References.interactColliderSensor.CurrentInteractive;
+            if ((Component)interactive)
             {
                 interactive.Interact(References.character);
             }
