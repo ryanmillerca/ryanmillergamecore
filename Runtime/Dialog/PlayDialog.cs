@@ -15,6 +15,7 @@ namespace RyanMillerGameCore.Dialog {
 		[SerializeField] private TriggerDialogOn triggerDialogOn = TriggerDialogOn.Interact;
 		[SerializeField] private bool triggerOnlyOnce = true;
 		[SerializeField] private bool disableOnComplete = true;
+		[SerializeField] private UnityEvent dialogStartedEvent;
 		[SerializeField] private UnityEvent dialogCompleteEvent;
 		[SerializeField] private float cooldownTrigger = 1;
 		[SerializeField] private DialogStyle dialogStyle = DialogStyle.BottomBox;
@@ -62,7 +63,6 @@ namespace RyanMillerGameCore.Dialog {
 				Debug.LogError("DialogTrigger can't be played because DialogPlayer is missing.", gameObject);
 				return;
 			}
-
 			bool playDialogSuccess = DialogPlayer.PlayDialog(content);
 			if (playDialogSuccess == false) {
 				return;
@@ -70,6 +70,7 @@ namespace RyanMillerGameCore.Dialog {
 			if (m_interactive) {
 				m_interactive.SetSelected(false);
 			}
+			dialogStartedEvent?.Invoke();
 			m_triggered = true;
 			m_subscribed = true;
 			DialogPlayer.DialogComplete += OnDialogComplete;
