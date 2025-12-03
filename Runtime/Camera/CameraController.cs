@@ -96,6 +96,10 @@ namespace RyanMillerGameCore.Camera {
 			}
 		}
 
+		public void SetCameraTarget(Transform target) {
+			_target = target;
+		}
+
 		public void SetTemporaryCameraTarget(Transform newTarget, float yRotationOffset) {
 			_target = newTarget;
 			_targetYRotation = newTarget.forward.y + yRotationOffset;
