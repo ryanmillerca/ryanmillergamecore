@@ -11,7 +11,14 @@ namespace RyanMillerGameCore.Interactions {
 		[SerializeField] private float m_DelayDuration = 0.5f;
 		[SerializeField] private bool m_PreventInterruption = false;
 		[SerializeField] private bool m_UseUnscaledTime = false;
+		[SerializeField] private bool m_SelfStarter = false;
 		private bool isRunning = false;
+
+		private void Start() {
+			if (m_SelfStarter) {
+				TriggerEvent();
+			}
+		}
 
 		public void TriggerEvent() {
 			if (isRunning && m_PreventInterruption) {
