@@ -8,6 +8,7 @@ namespace RyanMillerGameCore.Dialog {
 		[Tooltip("Leave empty to use child objects")]
 		[SerializeField] private PlayDialog[] dialogs;
 		[SerializeField] private int currentDialogIndex = 0;
+		[SerializeField] private bool repeatLastDialog = true;
 		public UnityEvent OnInteract;
 		public UnityEvent OnSelected;
 		public UnityEvent OnDeselected;
@@ -22,10 +23,13 @@ namespace RyanMillerGameCore.Dialog {
 		}
 
 		private void SetCurrentInteraction(int index) {
-			if (index >= dialogs.Length) {
-				this.enabled = false;
-				return;
+			if (!repeatLastDialog) {
+				if (index >= dialogs.Length) {
+					this.enabled = false;
+					return;
+				}
 			}
+			index = Mathf.Clamp(index, 0, dialogs.Length - 1);
 			dialogs[currentDialogIndex].DialogCompleteEvent.RemoveListener(OnDialogComplete);
 			currentDialogIndex = index;
 			for (int i = 0; i < dialogs.Length; i++) {
