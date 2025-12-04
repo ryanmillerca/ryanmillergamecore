@@ -40,7 +40,7 @@ namespace RyanMillerGameCore.TurnBasedCombat {
                 yield return new WaitForSeconds(motion.initialDelay);
             }
             Transform combatantTransform = combatant.transform;
-            Vector3 combatantPosition = combatantTransform.position;
+            Vector3 combatantPosition = combatantTransform.localPosition;
             for (float i = 0; i <= motion.duration; i += Time.deltaTime) {
                 float t = i / motion.duration;
                 Vector3 curveValue = new Vector3(
@@ -49,11 +49,11 @@ namespace RyanMillerGameCore.TurnBasedCombat {
                     motion.animOnZ.Evaluate(t)
                 ) * motion.multiplier;
                 Vector3 offsetPos = Vector3.Lerp(motion.startOffset * motion.multiplier, motion.endOffset * motion.multiplier, t);
-                combatantTransform.position = combatantPosition + offsetPos + curveValue;
+                combatantTransform.localPosition = combatantPosition + offsetPos + curveValue;
                 yield return new WaitForEndOfFrame();
             }
             if (motion.resetAtEnd) {
-                combatantTransform.position = combatantPosition;
+                combatantTransform.localPosition = combatantPosition;
             }
             if (motion.disableAtEnd) {
                 combatantTransform.gameObject.SetActive(false);
