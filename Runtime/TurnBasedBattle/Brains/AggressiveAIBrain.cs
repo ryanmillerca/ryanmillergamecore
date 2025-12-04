@@ -24,10 +24,14 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 			// Select weighted random move
 			var selectedMove = WeightedRandomSelection(weightedMoves);
 
-			// For aggressive AI, always target lowest HP enemy
-			var target = GetLowestHPTarget(validTargets);
-
-			return (selectedMove, target);
+			if (m_TargetChoice == TargetChoice.LowestHp) {
+				return (selectedMove, GetLowestHPTarget(validTargets));
+			}
+			if (m_TargetChoice == TargetChoice.Random) {
+				return (selectedMove, GetRandomTarget(validTargets));
+			}
+			// for now return random on ELSE to be safe
+			return (selectedMove, GetRandomTarget(validTargets));
 		}
 
 		private float GetMoveWeight(BattleAction move) {
@@ -66,6 +70,10 @@ namespace RyanMillerGameCore.TurnBasedCombat.Brains {
 					lowestHPTarget = target;
 			}
 			return lowestHPTarget;
+		}
+
+		private Combatant GetRandomTarget(List<Combatant> targets) {
+			return targets[Random.Range(0, targets.Count)];
 		}
 	}
 }
