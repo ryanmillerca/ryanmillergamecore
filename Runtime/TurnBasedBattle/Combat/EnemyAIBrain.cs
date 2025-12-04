@@ -3,6 +3,8 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 	using UnityEngine;
 
 	abstract public class EnemyAIBrain : ScriptableObject {
+		public TargetChoice m_TargetChoice = TargetChoice.Random;
+
 		abstract public (BattleAction action, Combatant target) ChooseAction(Combatant self, List<Combatant> validTargets, List<BattleAction> availableMoves);
 
 		private BattleManager battleManager;
@@ -13,6 +15,11 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 				}
 				return battleManager;
 			}
+		}
+
+		public enum TargetChoice {
+			LowestHp = 0,
+			Random = 1
 		}
 	}
 }
