@@ -124,9 +124,9 @@ namespace RyanMillerGameCore.Interactions {
 
 		protected Collider[] FilterColliders(Collider[] colliders, bool requireActiveGameObject = false, bool requireEnabled = false) {
 			return colliders.Where(c =>
-			c != null &&
-			(!requireActiveGameObject || c.gameObject.activeInHierarchy) &&
-			(!requireEnabled || c.enabled)
+				c != null &&
+				(!requireActiveGameObject || c.gameObject.activeInHierarchy) &&
+				(!requireEnabled || c.enabled)
 			).ToArray();
 		}
 
@@ -281,7 +281,7 @@ namespace RyanMillerGameCore.Interactions {
 
 		protected virtual void AddToSensor(Collider c) {
 			if (CollidersInSensor.Add(c)) {
-				if (!detectSelf && c.transform.root == transform.root) {
+				if (!detectSelf && c.transform == transform) {
 					return;
 				}
 
@@ -317,7 +317,7 @@ namespace RyanMillerGameCore.Interactions {
 
 			// Check if collider is player
 			if (detectOnlyPlayer) {
-				ICharacter character = c.GetComponent<ICharacter>();
+				Character character = TryGetCharacterFromCollider(c);
 				if (character == null || !character.IsPlayer()) {
 					return;
 				}
@@ -328,8 +328,15 @@ namespace RyanMillerGameCore.Interactions {
 				return;
 			}
 
-			// add it!
 			AddToSensor(c);
+		}
+
+		protected virtual Character TryGetCharacterFromCollider(Collider c) {
+			Character character = c.GetComponent<Character>();
+			if (!character) {
+				character = c.GetComponentInParent<Character>();
+			}
+			return character;
 		}
 
 		private bool IsWithinHeightTolerance(Collider c) {

@@ -149,6 +149,8 @@ namespace RyanMillerGameCore.Dialog {
 				// === Line Options Foldout ===
 				var lineOptionsFoldout = new Foldout { text = "Line Options", value = false };
 
+				var portraitPF = new PropertyField(lineProp.FindPropertyRelative("portrait"));
+				portraitPF.style.marginTop = 6;
 				var voicePF = new PropertyField(lineProp.FindPropertyRelative("voiceOver"));
 				var centeredPF = new PropertyField(lineProp.FindPropertyRelative("centered"));
 				var speakerPF = new PropertyField(speakerProp);
@@ -167,6 +169,7 @@ namespace RyanMillerGameCore.Dialog {
 				speakerPF.RegisterValueChangeCallback((SerializedPropertyChangeEvent _) => RefreshTextLabel());
 				lookAtPF.RegisterValueChangeCallback((SerializedPropertyChangeEvent _) => RefreshTextLabel());
 
+				lineOptionsFoldout.Add(portraitPF);
 				lineOptionsFoldout.Add(voicePF);
 				lineOptionsFoldout.Add(centeredPF);
 				lineOptionsFoldout.Add(speakerPF);

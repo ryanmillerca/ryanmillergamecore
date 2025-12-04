@@ -54,6 +54,7 @@ namespace RyanMillerGameCore.Dialog
         public float cameraOffsetRotation = 30f;
         public AnimationClip speakerAnimation;
         public AnimationClip lookAtAnimation;
+        public Sprite portrait;
 
         [Header("Navigation (Optional)")]
         [Tooltip(

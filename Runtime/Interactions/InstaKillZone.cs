@@ -6,9 +6,8 @@ namespace RyanMillerGameCore.Interactions
     
     public class InstaKillZone : ColliderSensor
     {
-        protected override void ItemEnteredTrigger(Collider item)
-        {
-            Character character = item.transform.root.GetComponent<Character>();
+        protected override void ItemEnteredTrigger(Collider item) {
+            Character character = TryGetCharacterFromCollider(item);
             if (character)
             {
                 character.ReceiveDamage(float.MaxValue);

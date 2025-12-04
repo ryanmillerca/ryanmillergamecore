@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01970ece3270a462d96a2d9a82ffdf69, type: 3}
+  m_Name: Big Swing
+  m_EditorClassIdentifier: TurnBasedBattle::RyanMillerGameCore.TurnBasedBattle.BattleAction
+  MinigameType: 0
+  RequireMinigameSuccess: 1
+  ActionName: Big Swing
+  ActionType: 0
+  TargetType: 1
+  Accuracy: 0.5
+  CritChance: 1
+  Power: 30
+  StatMultiplier: 1
+  Duration: 0
+  AttackModifier: 0
+  DefenseModifier: 0
+  SpeedModifier: 0
+  DamageReduction: 0.5
+  DefendDuration: 1
+  CounterChance: 0
+  CounterMultiplier: 1
+  DefendAttackBuff: 1
+  AttackBuffDuration: 1
+  IsMultiTurn: 0
+  TurnCost: 1
+  ChargeTurnBehavior: 0
+  ChargeMessage: ' is charging...'
+  ChargeMultiplier: 1.5
+  TargetSelf: 0

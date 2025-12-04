@@ -53,12 +53,13 @@ namespace RyanMillerGameCore.Tiles
             }
         }
 
+        
         public void RegeneratePrefabs()
         {
             DeleteAllTiles();
             CreateNewTileObjects();
         }
-
+#endif
         private void DeleteAllTiles()
         {
             for (int i = transform.childCount-1; i >= 0; i--)
@@ -69,7 +70,9 @@ namespace RyanMillerGameCore.Tiles
                 }
                 else
                 {
+#if UNITY_EDITOR
                     DestroyImmediate(transform.GetChild(i).gameObject);
+#endif
                 }
             }
         }
@@ -107,9 +110,6 @@ namespace RyanMillerGameCore.Tiles
                 k.PostInitialize();
             }
         }
-
-#endif
-
         
         private void CreateNewTileObjects()
         {
@@ -133,7 +133,9 @@ namespace RyanMillerGameCore.Tiles
                     }
                     else
                     {
+#if UNITY_EDITOR
                         DestroyImmediate(transform.GetChild(i).gameObject);
+#endif
                     }
                 }
             }
@@ -170,7 +172,7 @@ namespace RyanMillerGameCore.Tiles
         private TileBase SpawnTile()
         {
             GameObject ktbGameObject;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
                 if (Application.isPlaying == false)
                 {
                     ktbGameObject = PrefabUtility.InstantiatePrefab(tilePrefab.gameObject, transform) as GameObject;
@@ -179,9 +181,9 @@ namespace RyanMillerGameCore.Tiles
                 {
                     ktbGameObject = Instantiate(tilePrefab.gameObject, transform, true) as GameObject;
                 }
-            #else
+#else
             ktbGameObject = Instantiate(tilePrefab.gameObject, transform, true) as GameObject;
-            #endif
+#endif
             return ktbGameObject.GetComponent<TileBase>();
         }
         

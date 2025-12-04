@@ -76,12 +76,12 @@ MonoBehaviour:
   - {fileID: 5316121271967108792}
   textField: {fileID: 194147939239105255}
   speakerField: {fileID: 3275713270351879155}
-  inputActionAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   dialogSkins: {fileID: 11400000, guid: 2202dcf07af734e549a056fd9d5c7817, type: 2}
-  freezeCommandSo: {fileID: 11400000, guid: 45a467b68ae495242a8f900fcb2b1de3, type: 2}
+  m_InputSubmitAction: {fileID: 392368643174621059, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   durationShow: 0.25
   durationHide: 0.25
   controlCanvasAlpha: 1
+  verboseLogging: 0
 --- !u!82 &2633580688311390549
 AudioSource:
   m_ObjectHideFlags: 0
@@ -246,8 +246,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Character Name
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d9fe977a4753e4ed2b1d8acb590df260, type: 2}
-  m_sharedMaterial: {fileID: 1191376732404090724, guid: d9fe977a4753e4ed2b1d8acb590df260, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -521,8 +521,8 @@ MonoBehaviour:
 
     This is the third line.'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d9fe977a4753e4ed2b1d8acb590df260, type: 2}
-  m_sharedMaterial: {fileID: 1191376732404090724, guid: d9fe977a4753e4ed2b1d8acb590df260, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
