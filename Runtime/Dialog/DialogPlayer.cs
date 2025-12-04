@@ -97,13 +97,17 @@ namespace RyanMillerGameCore.Dialog {
 			SetCanvasAlpha(0);
 			_uiVisible = false;
 
-			m_InputSubmitAction.action.performed += OnDialogButtonPressed;
-			m_InputSubmitAction.action.Enable();
+			if (m_InputSubmitAction) {
+				m_InputSubmitAction.action.performed += OnDialogButtonPressed;
+				m_InputSubmitAction.action.Enable();
+			}
 		}
 
 		private void OnDisable() {
-			m_InputSubmitAction.action.performed -= OnDialogButtonPressed;
-			m_InputSubmitAction.action.Disable();
+			if (m_InputSubmitAction) {
+				m_InputSubmitAction.action.performed -= OnDialogButtonPressed;
+				m_InputSubmitAction.action.Disable();
+			}
 		}
 
 		#endregion

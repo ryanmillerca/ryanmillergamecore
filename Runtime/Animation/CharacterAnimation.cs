@@ -21,13 +21,16 @@ namespace RyanMillerGameCore.Animation
         [SerializeField] private int directionIndexOffset = 0;
         [SerializeField] private float paramMultiplier = 0.1f;
         [SerializeField] private float minThreshold = 0.001f;
+        
         private Coroutine _weightChanges;
         private CharacterMovement _characterMovement;
+        private bool _animHasDirectionParam = false;
         
         private void OnEnable()
         {
             if (animator == null) {
                 animator = GetComponentInChildren<Animator>();
+                _animHasDirectionParam = animator.HasParameter(directionParameterName);
             }
             if (sendDirectionToAnimator) {
                 _characterMovement = GetComponent<CharacterMovement>();
@@ -41,15 +44,15 @@ namespace RyanMillerGameCore.Animation
             }
         }
 
-        private void OnMoveInDirection(Vector3 inputDirection)
-        {
-            if (inputDirection.sqrMagnitude > minThreshold)
-            {
-                float angle = Mathf.Atan2(inputDirection.z, inputDirection.x);
-                float angleDegrees = -angle * Mathf.Rad2Deg;
-                float normalizedAngle = Mathf.Repeat(angleDegrees, 360f);
-                float rotationIndex = (Mathf.FloorToInt(normalizedAngle / 90f) + 1) % 4;
-                animator.SetFloat(directionParameterName, rotationIndex * paramMultiplier);
+        private void OnMoveInDirection(Vector3 inputDirection) {
+            if (_animHasDirectionParam) {
+                if (inputDirection.sqrMagnitude > minThreshold) {
+                    float angle = Mathf.Atan2(inputDirection.z, inputDirection.x);
+                    float angleDegrees = -angle * Mathf.Rad2Deg;
+                    float normalizedAngle = Mathf.Repeat(angleDegrees, 360f);
+                    float rotationIndex = (Mathf.FloorToInt(normalizedAngle / 90f) + 1) % 4;
+                    animator.SetFloat(directionParameterName, rotationIndex * paramMultiplier);
+                }
             }
         }
 
