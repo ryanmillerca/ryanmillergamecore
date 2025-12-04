@@ -69,9 +69,6 @@ namespace RyanMillerGameCore.TurnBasedCombat {
 		private void PlaceCombatant(Combatant combatant) { }
 
 		void Start() {
-			if (transform.parent == null) {
-				DontDestroyOnLoad(gameObject);
-			}
 			if (m_BattleScene) {
 				m_BattleScene.SetActive(false);
 			}
