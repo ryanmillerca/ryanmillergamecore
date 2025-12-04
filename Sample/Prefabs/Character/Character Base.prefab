@@ -346,6 +346,11 @@ MonoBehaviour:
   cosmeticAnimLayer: 1
   cosmeticAnimDuration: 5
   blendTime: 0.25
+  sendDirectionToAnimator: 1
+  directionParameterName: Direction
+  directionIndexOffset: 0
+  paramMultiplier: 0.1
+  minThreshold: 0.001
 --- !u!114 &1791461654542484843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -388,7 +393,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ce09917d037e443cb33cdc1729ee28d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterReferences: {fileID: 3785551034004355221}
   bumpFrontAngle: 0.33
   seeFrontAngle: 0.33
   turnOffColliderOnDeath: 1
@@ -609,6 +613,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38eef37b32829416888eaf27274b0aa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Owner: {fileID: 5180513476387175604}
   sensorMode: 2
   sensorConfig: 0
   editorDisplayObjectsInSensor: []
@@ -777,6 +782,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5388db74bdfac4a07ad7f66c69ceffa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Owner: {fileID: 5180513476387175604}
   sensorMode: 2
   sensorConfig: 3
   editorDisplayObjectsInSensor: []
@@ -795,7 +801,6 @@ MonoBehaviour:
   objectExitedSensor:
     m_PersistentCalls:
       m_Calls: []
-  currentInteractive: {fileID: 0}
 --- !u!1 &5816543861242080449
 GameObject:
   m_ObjectHideFlags: 0
