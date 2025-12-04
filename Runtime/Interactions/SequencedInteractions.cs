@@ -13,7 +13,6 @@ namespace RyanMillerGameCore.Interactions
             {
                 interactives = GetComponentsInChildren<Interactive>();
             }
-
             SetCurrentInteraction(currentInteractiveIndex);
         }
 

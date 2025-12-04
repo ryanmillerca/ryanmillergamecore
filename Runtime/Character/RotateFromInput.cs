@@ -15,7 +15,7 @@ namespace RyanMillerGameCore.Character
         {
             if (characterBrain == null)
             {
-                characterBrain = transform.root.GetComponent<CharacterBrain>();
+                characterBrain = transform.GetComponentInParent<CharacterBrain>();
             }
             characterBrain.OnMoveCameraSpace += MoveCameraSpace;
         }

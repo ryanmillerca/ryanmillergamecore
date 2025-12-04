@@ -35,7 +35,7 @@ namespace RyanMillerGameCore.Character
                 {
                     continue;
                 }
-                if (c.transform.root != transform.root)
+                if (c.transform != transform)
                 {
                     DealDamageTo(c, sourceObject.transform.position, damageAmount);
                 }

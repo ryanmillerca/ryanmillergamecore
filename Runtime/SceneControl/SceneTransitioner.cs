@@ -1,9 +1,9 @@
-using RyanMillerGameCore.SaveSystem;
 namespace RyanMillerGameCore.SceneControl {
 	using UnityEngine;
 	using UnityEngine.SceneManagement;
 	using System.Collections;
 	using Character;
+	using SaveSystem;
 
 	public class SceneTransitioner : Singleton<SceneTransitioner> {
 		[SerializeField] [Range(0, 5)] private float fadeInTime = 1f;
@@ -14,7 +14,7 @@ namespace RyanMillerGameCore.SceneControl {
 		[SerializeField] private CanvasGroup sceneLoadCanvasGroup;
 
 
-		#region Static Methods
+		#region Public Methods
 
 		public void FadeToScene(string sceneName, CheckpointData checkpointData = null) {
 			StartCoroutine(FadeAndLoadScene(sceneName, checkpointData));
@@ -28,10 +28,41 @@ namespace RyanMillerGameCore.SceneControl {
 			FadeToScene(sceneLocation.SceneName, sceneLocation.CheckpointData);
 		}
 
+		public void FadeIn() {
+			DoFade(0, 1);
+		}
+
+		public void FadeOut() {
+			DoFade(1, 0);
+		}
+
+		public void FadeInAndOut() {
+			StartCoroutine(FadeAndOutCoroutine());
+		}
+
+		IEnumerator FadeAndOutCoroutine() {
+			FadeIn();
+			yield return new WaitForSeconds(fadeInTime);
+			FadeOut();
+		}
+
+		public void DoFade(float from, float to) {
+			StartCoroutine(DoFadeCoroutine(from, to));
+		}
+
 		#endregion
 
 
 		#region Private Methods
+
+		private IEnumerator DoFadeCoroutine(float from, float to) {
+			for (float i = 0; i <= fadeInTime; i += Time.unscaledDeltaTime) {
+				float t = i / fadeInTime;
+				sceneLoadCanvasGroup.alpha = Mathf.Lerp(from, to, t);
+				yield return new WaitForEndOfFrame();
+			}
+			sceneLoadCanvasGroup.alpha = to;
+		}
 
 		private IEnumerator FadeAndLoadScene(string sceneName, CheckpointData checkpointData = null) {
 			if (freezeTimeOnTransition) {

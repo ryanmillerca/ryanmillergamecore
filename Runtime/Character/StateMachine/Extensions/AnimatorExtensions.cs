@@ -21,6 +21,9 @@ namespace RyanMillerGameCore.Character.SMB
 
         public static CharacterReferences GetComponentReference(this Animator animator)
         {
+            if (animator == null) {
+                return null;
+            }
             _characterRefs.TryGetValue(animator, out var reference);
             return reference;
         }
