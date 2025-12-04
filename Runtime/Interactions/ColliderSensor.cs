@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 namespace RyanMillerGameCore.Interactions {
 	using System;
 	using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace RyanMillerGameCore.Interactions {
 
 		#region Configuration
 
+		[SerializeField] private Transform m_Owner;
 		[SerializeField] private ColliderSensorMode sensorMode = ColliderSensorMode.TriggerEnterExit;
 		[SerializeField] private SensorConfig sensorConfig = SensorConfig.Player;
 #if UNITY_EDITOR
@@ -281,6 +283,11 @@ namespace RyanMillerGameCore.Interactions {
 
 		protected virtual void AddToSensor(Collider c) {
 			if (CollidersInSensor.Add(c)) {
+				if (m_Owner && !detectSelf) {
+					if (c.transform.IsChildOf(m_Owner)) {
+						return;
+					}
+				}
 				if (!detectSelf && c.transform == transform) {
 					return;
 				}
@@ -304,7 +311,7 @@ namespace RyanMillerGameCore.Interactions {
 		}
 
 		protected virtual void FireObjectEnteredEvents(Collider c) {
-			objectEnteredSensor?.Invoke(c);
+			objectEnteredSensor.Invoke(c);
 			ObjectEnteredSensor?.Invoke(c);
 			ItemEnteredTrigger(c);
 		}
@@ -326,6 +333,13 @@ namespace RyanMillerGameCore.Interactions {
 			// check if this already exists in collidersInSensor list
 			if (CollidersInSensor.Contains(c)) {
 				return;
+			}
+
+			// check if this is also part of the same owner
+			if (m_Owner) {
+				if (c.transform.IsChildOf(m_Owner)) {
+					return;
+				}
 			}
 
 			AddToSensor(c);
@@ -351,7 +365,7 @@ namespace RyanMillerGameCore.Interactions {
 		}
 
 		protected void RemoveItem(Collider c) {
-			if (c == null) {
+			if (!c) {
 				return;
 			}
 			if (CollidersInSensor.Contains(c) == false) {

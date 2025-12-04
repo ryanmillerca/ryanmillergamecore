@@ -16,6 +16,12 @@ namespace RyanMillerGameCore.Character
             base.OnEnable();
             
             // subscribe to sensors
+            if (characterReferences == null) {
+                Debug.LogWarning("CharacterReferences is null",gameObject);
+            }
+            if (characterReferences.aggroColliderSensor == null) {
+                Debug.LogWarning("characterReferences.aggroColliderSensor is null",gameObject);
+            }
             characterReferences.aggroColliderSensor.ObjectEnteredSensor += OnObjectEnteredAggroColliderSensor;
             characterReferences.aggroColliderSensor.ObjectExitedSensor += OnObjectExitedAggroColliderSensor;
             characterReferences.attackColliderSensor.ObjectEnteredSensor += OnObjectEnteredAttackColliderSensor;
