@@ -187,13 +187,15 @@ namespace RyanMillerGameCore.Dialog {
 						var line = dialogContent.Lines[li];
 						LogLineHeader(li, line);
 
-						if (line.portrait && portraitImage) {
-							portraitImage.sprite = line.portrait;
-							portraitImage.enabled = true;
-						}
-						else {
-							portraitImage.sprite = null;
-							portraitImage.enabled = false;
+						if (portraitImage) {
+							if (line.portrait) {
+								portraitImage.sprite = line.portrait;
+								portraitImage.enabled = true;
+							}
+							else {
+								portraitImage.sprite = null;
+								portraitImage.enabled = false;
+							}
 						}
 
 						Character speakingCharacter;
