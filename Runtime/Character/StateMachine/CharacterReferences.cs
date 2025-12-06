@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 namespace RyanMillerGameCore.Character.SMB
 {
     using UnityEngine;
@@ -9,22 +10,37 @@ namespace RyanMillerGameCore.Character.SMB
     /// </summary>
     public class CharacterReferences : MonoBehaviour
     {
+        [FormerlySerializedAs("movement")]
         [Header("References")]
-        public CharacterMovement movement;
-        public Collider mainCollider;
-        public CharacterInput characterInput;
-        public CharacterAnimation characterAnimation;
-        public Character character;
-        public CharacterBrain characterBrain;
-        public PlayerCharacter playerCharacter;
-        public ColliderSensor attackColliderSensor;
-        public InteractiveObjectColliderSensor interactColliderSensor;
-        public ColliderSensor aggroColliderSensor;
-        public Rigidbody rb;
-        public DamageDealer damageDealer;
-        public Animator animator;
-        public Renderer[] renderers;
-        public CharacterPathfind characterPathfind;
+        public CharacterMovement _movement;
+        [FormerlySerializedAs("mainCollider")]
+        public Collider _mainCollider;
+        [FormerlySerializedAs("characterInput")]
+        public CharacterInput _characterInput;
+        [FormerlySerializedAs("characterAnimation")]
+        public CharacterAnimation _characterAnimation;
+        [FormerlySerializedAs("character")]
+        public Character _character;
+        [FormerlySerializedAs("characterBrain")]
+        public CharacterBrain _characterBrain;
+        [FormerlySerializedAs("playerCharacter")]
+        public PlayerCharacter _playerCharacter;
+        [FormerlySerializedAs("attackColliderSensor")]
+        public ColliderSensor _attackColliderSensor;
+        [FormerlySerializedAs("interactColliderSensor")]
+        public InteractiveObjectColliderSensor _interactColliderSensor;
+        [FormerlySerializedAs("aggroColliderSensor")]
+        public ColliderSensor _aggroColliderSensor;
+        [FormerlySerializedAs("rb")]
+        public Rigidbody _rb;
+        [FormerlySerializedAs("damageDealer")]
+        public DamageDealer _damageDealer;
+        [FormerlySerializedAs("animator")]
+        public Animator _animator;
+        [FormerlySerializedAs("renderers")]
+        public Renderer[] _renderers;
+        [FormerlySerializedAs("characterPathfind")]
+        public CharacterPathfind _characterPathfind;
         
         [Header("Animation Parameters")]
         public string paramTriggerHurt = "hurt";
@@ -39,18 +55,18 @@ namespace RyanMillerGameCore.Character.SMB
         
         void Awake()
         {
-            if (animator == null)
+            if (_animator == null)
             {
-                animator = GetComponent<Animator>();
+                _animator = GetComponent<Animator>();
             }
-            animator.SetComponentReference(this);
+            _animator.SetComponentReference(this);
         }
 
         void OnDestroy()
         {
-            if (animator != null)
+            if (_animator != null)
             {
-                animator.ClearComponentReference();
+                _animator.ClearComponentReference();
             }
         }
     }

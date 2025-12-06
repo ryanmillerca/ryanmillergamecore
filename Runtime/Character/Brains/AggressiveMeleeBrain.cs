@@ -19,23 +19,23 @@ namespace RyanMillerGameCore.Character
             if (characterReferences == null) {
                 Debug.LogWarning("CharacterReferences is null",gameObject);
             }
-            if (characterReferences.aggroColliderSensor == null) {
+            if (characterReferences._aggroColliderSensor == null) {
                 Debug.LogWarning("characterReferences.aggroColliderSensor is null",gameObject);
             }
-            characterReferences.aggroColliderSensor.ObjectEnteredSensor += OnObjectEnteredAggroColliderSensor;
-            characterReferences.aggroColliderSensor.ObjectExitedSensor += OnObjectExitedAggroColliderSensor;
-            characterReferences.attackColliderSensor.ObjectEnteredSensor += OnObjectEnteredAttackColliderSensor;
-            characterReferences.attackColliderSensor.ObjectExitedSensor += OnObjectExitedAttackColliderSensor;
+            characterReferences._aggroColliderSensor.ObjectEnteredSensor += OnObjectEnteredAggroColliderSensor;
+            characterReferences._aggroColliderSensor.ObjectExitedSensor += OnObjectExitedAggroColliderSensor;
+            characterReferences._attackColliderSensor.ObjectEnteredSensor += OnObjectEnteredAttackColliderSensor;
+            characterReferences._attackColliderSensor.ObjectExitedSensor += OnObjectExitedAttackColliderSensor;
 
             // Check if the aggro sensor has any objects in it at the start
-            Collider c = characterReferences.aggroColliderSensor.GetFirstItemInSensor();
+            Collider c = characterReferences._aggroColliderSensor.GetFirstItemInSensor();
             if (c)
             {
                 OnObjectEnteredAggroColliderSensor(c);
             }
             
             // Check if the attack sensor has any objects in it at the start
-            c = characterReferences.attackColliderSensor.GetFirstItemInSensor();
+            c = characterReferences._attackColliderSensor.GetFirstItemInSensor();
             if (c)
             {
                 OnObjectEnteredAttackColliderSensor(c);
@@ -47,10 +47,10 @@ namespace RyanMillerGameCore.Character
             base.OnDisable();
             
             // unsubscribe from sensors
-            characterReferences.aggroColliderSensor.ObjectEnteredSensor -= OnObjectEnteredAggroColliderSensor;
-            characterReferences.aggroColliderSensor.ObjectExitedSensor -= OnObjectExitedAggroColliderSensor;
-            characterReferences.attackColliderSensor.ObjectEnteredSensor -= OnObjectEnteredAttackColliderSensor;
-            characterReferences.attackColliderSensor.ObjectExitedSensor -= OnObjectExitedAttackColliderSensor;
+            characterReferences._aggroColliderSensor.ObjectEnteredSensor -= OnObjectEnteredAggroColliderSensor;
+            characterReferences._aggroColliderSensor.ObjectExitedSensor -= OnObjectExitedAggroColliderSensor;
+            characterReferences._attackColliderSensor.ObjectEnteredSensor -= OnObjectEnteredAttackColliderSensor;
+            characterReferences._attackColliderSensor.ObjectExitedSensor -= OnObjectExitedAttackColliderSensor;
             
             SetAggroTarget(null, false);
         }

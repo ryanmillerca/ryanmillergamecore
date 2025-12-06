@@ -150,7 +150,7 @@ namespace RyanMillerGameCore.Character
 
             Transform effectiveTarget = _explicitTargetTransform != null
                 ? _explicitTargetTransform
-                : (references != null && references.characterBrain != null ? references.characterBrain.Target : null);
+                : (references != null && references._characterBrain != null ? references._characterBrain.Target : null);
 
             if (effectiveTarget == null)
             {
@@ -217,17 +217,17 @@ namespace RyanMillerGameCore.Character
                 moveDir = Vector3.zero;
             }
 
-            if (references && references.movement)
+            if (references && references._movement)
             {
                 if (_forceful)
                 {
                     // Decisive cinematic movement (MovePosition) using CharacterMovement's forceful method
-                    references.movement.MoveForcefulTowards(next, Time.deltaTime);
+                    references._movement.MoveForcefulTowards(next, Time.deltaTime);
                 }
                 else
                 {
                     // Gameplay style (forces)
-                    references.movement.Move(moveDir);
+                    references._movement.Move(moveDir);
                 }
             }
 
@@ -311,7 +311,7 @@ namespace RyanMillerGameCore.Character
 
             Transform effective = options.targetTransform != null
                 ? options.targetTransform
-                : (references.characterBrain != null ? references.characterBrain.Target : null);
+                : (references._characterBrain != null ? references._characterBrain.Target : null);
 
             if (effective == null)
             {
@@ -324,9 +324,9 @@ namespace RyanMillerGameCore.Character
 
             _path ??= new NavMeshPath();
 
-            if (references.movement != null)
+            if (references._movement != null)
             {
-                references.movement.CanMove(true);
+                references._movement.CanMove(true);
             }
 
             _currentCornerIndex = 1;
@@ -351,9 +351,9 @@ namespace RyanMillerGameCore.Character
         public void Cancel()
         {
             _isNavigating = false;
-            if (references != null && references.movement != null)
+            if (references != null && references._movement != null)
             {
-                references.movement.Move(Vector3.zero);
+                references._movement.Move(Vector3.zero);
             }
         }
 
@@ -439,7 +439,7 @@ namespace RyanMillerGameCore.Character
         private float GetApproxSpeakerRadius()
         {
             // approximate radius as half the min dimension in XZ
-            var size = references.mainCollider.bounds.size;
+            var size = references._mainCollider.bounds.size;
             return 0.5f * Mathf.Min(size.x, size.z);
         }
 
@@ -474,11 +474,11 @@ namespace RyanMillerGameCore.Character
         private void RecalculateExpectedDuration()
         {
             float moveSpeed = 100f;
-            if (references != null && references.movement != null && references.movement.maxSpeed > 0f)
+            if (references != null && references._movement != null && references._movement.maxSpeed > 0f)
             {
-                moveSpeed = references.movement.maxSpeed;
-                if (_forceful && references.movement.forcefulSpeed > 0f)
-                    moveSpeed = references.movement.forcefulSpeed;
+                moveSpeed = references._movement.maxSpeed;
+                if (_forceful && references._movement.forcefulSpeed > 0f)
+                    moveSpeed = references._movement.forcefulSpeed;
             }
 
             if (!HasUsablePath())
@@ -499,9 +499,9 @@ namespace RyanMillerGameCore.Character
         private void Complete()
         {
             _isNavigating = false;
-            if (references != null && references.movement != null)
+            if (references != null && references._movement != null)
             {
-                references.movement.Move(Vector3.zero);
+                references._movement.Move(Vector3.zero);
             }
 
             PathCompleted?.Invoke(Time.time - _startTime);
@@ -510,9 +510,9 @@ namespace RyanMillerGameCore.Character
         private void Fail(string reason)
         {
             _isNavigating = false;
-            if (references != null && references.movement != null)
+            if (references != null && references._movement != null)
             {
-                references.movement.Move(Vector3.zero);
+                references._movement.Move(Vector3.zero);
             }
 
             PathFailed?.Invoke(reason);

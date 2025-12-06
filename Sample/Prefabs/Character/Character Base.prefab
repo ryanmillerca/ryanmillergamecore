@@ -110,22 +110,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecea5804e998b4d7c83125f0bf3817e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movement: {fileID: 8302141704080009450}
-  mainCollider: {fileID: 6276998569089883695}
-  characterInput: {fileID: 0}
-  characterAnimation: {fileID: 4281931283517321042}
-  character: {fileID: 1791461654542484843}
-  characterBrain: {fileID: 4883974804810804768}
-  playerCharacter: {fileID: 0}
-  attackColliderSensor: {fileID: 6507270822162368684}
-  interactColliderSensor: {fileID: 4907828329546544004}
-  aggroColliderSensor: {fileID: 0}
-  rb: {fileID: 7619823330534572677}
-  damageDealer: {fileID: 9167538621912994157}
-  animator: {fileID: 6583291971729094936}
-  renderers:
-  - {fileID: 0}
-  characterPathfind: {fileID: 1205099524361834224}
+  _movement: {fileID: 8302141704080009450}
+  _mainCollider: {fileID: 6276998569089883695}
+  _characterInput: {fileID: 0}
+  _characterAnimation: {fileID: 4281931283517321042}
+  _character: {fileID: 1791461654542484843}
+  _characterBrain: {fileID: 4883974804810804768}
+  _playerCharacter: {fileID: 0}
+  _attackColliderSensor: {fileID: 6507270822162368684}
+  _interactColliderSensor: {fileID: 4907828329546544004}
+  _aggroColliderSensor: {fileID: 6507270822162368684}
+  _rb: {fileID: 7619823330534572677}
+  _damageDealer: {fileID: 9167538621912994157}
+  _animator: {fileID: 6583291971729094936}
+  _renderers:
+  - {fileID: 6092074166571465732}
+  - {fileID: 5927816787916160020}
+  - {fileID: 4250925253235643915}
+  - {fileID: 7545764847667014868}
+  - {fileID: 3037117857438316981}
+  - {fileID: 4173194502051484113}
+  - {fileID: 3011103731500000419}
+  - {fileID: 3335747619943947792}
+  _characterPathfind: {fileID: 1205099524361834224}
   paramTriggerHurt: hurt
   paramBoolDead: isDead
   paramBoolAggro: HasAggro
@@ -344,11 +351,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   cosmeticAnimLayer: 1
-  cosmeticAnimDuration: 5
   blendTime: 0.25
   sendDirectionToAnimator: 1
   directionParameterName: Direction
-  directionIndexOffset: 0
   paramMultiplier: 0.1
   minThreshold: 0.001
 --- !u!114 &1791461654542484843

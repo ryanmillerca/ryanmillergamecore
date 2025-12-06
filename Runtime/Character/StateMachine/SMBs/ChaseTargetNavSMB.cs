@@ -17,17 +17,17 @@ namespace RyanMillerGameCore.Character.SMB
             _hasAggroHash = Animator.StringToHash(hasAggroParam);
 
             // subscribe
-            if (!References.characterPathfind)
+            if (!References._characterPathfind)
             {
-                Debug.LogError(References.character.gameObject + " has no pathfind.", References.character.gameObject);
+                Debug.LogError(References._character.gameObject + " has no pathfind.", References._character.gameObject);
                 return;
             }
 
-            References.characterPathfind.StartPath(References.characterBrain.Target);
-            References.characterPathfind.PathCompleted += OnPathComplete;
-            References.characterPathfind.PathFailed += OnPathFailedStuck;
-            References.characterPathfind.PathTakingTooLong += OnPathTakingTooLong;
-            References.attackColliderSensor.ObjectEnteredSensor += AttackColliderSensorOnObjectEnteredSensor;
+            References._characterPathfind.StartPath(References._characterBrain.Target);
+            References._characterPathfind.PathCompleted += OnPathComplete;
+            References._characterPathfind.PathFailed += OnPathFailedStuck;
+            References._characterPathfind.PathTakingTooLong += OnPathTakingTooLong;
+            References._attackColliderSensor.ObjectEnteredSensor += AttackColliderSensorOnObjectEnteredSensor;
         }
 
         private void AttackColliderSensorOnObjectEnteredSensor(Collider obj)
@@ -55,14 +55,14 @@ namespace RyanMillerGameCore.Character.SMB
             base.OnCharacterStateExit(animator, stateInfo, layerIndex);
 
             // unsubscribe 
-            References.attackColliderSensor.ObjectEnteredSensor -= AttackColliderSensorOnObjectEnteredSensor;
-            References.characterPathfind.PathCompleted -= OnPathComplete;
-            References.characterPathfind.PathFailed -= OnPathFailedStuck;
-            References.characterPathfind.PathTakingTooLong -= OnPathTakingTooLong;
+            References._attackColliderSensor.ObjectEnteredSensor -= AttackColliderSensorOnObjectEnteredSensor;
+            References._characterPathfind.PathCompleted -= OnPathComplete;
+            References._characterPathfind.PathFailed -= OnPathFailedStuck;
+            References._characterPathfind.PathTakingTooLong -= OnPathTakingTooLong;
 
             // stop movement
-            References.movement.Move(Vector3.zero);
-            References.movement.ApplyMovement();
+            References._movement.Move(Vector3.zero);
+            References._movement.ApplyMovement();
         }
     }
 }

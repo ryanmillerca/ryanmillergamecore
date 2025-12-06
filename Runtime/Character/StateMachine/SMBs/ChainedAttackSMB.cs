@@ -33,12 +33,12 @@ namespace RyanMillerGameCore.Character.SMB
                 return;
             }
             _listeningForAttack = true;
-            References.characterBrain.OnAttackAction += AttackAction;
+            References._characterBrain.OnAttackAction += AttackAction;
         }
 
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            References.characterBrain.OnAttackAction -= AttackAction;
+            References._characterBrain.OnAttackAction -= AttackAction;
             base.OnStateExit(animator, stateInfo, layerIndex);
         }
         

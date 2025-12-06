@@ -81,11 +81,27 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: _damageDealer
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
       propertyPath: characterBrain
       value: 
       objectReference: {fileID: 4430282769527696820}
     - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: _characterBrain
+      value: 
+      objectReference: {fileID: 4430282769527696820}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
       propertyPath: characterPathfind
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: _characterPathfind
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: _aggroColliderSensor
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
@@ -97,7 +113,19 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: _attackColliderSensor
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: _renderers.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
       propertyPath: interactColliderSensor
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: _interactColliderSensor
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
@@ -122,6 +150,22 @@ PrefabInstance:
       objectReference: {fileID: 5947856297709565904}
     - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
       propertyPath: 'renderers.Array.data[5]'
+      value: 
+      objectReference: {fileID: 4803295039696470690}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: '_renderers.Array.data[2]'
+      value: 
+      objectReference: {fileID: 276651034778684117}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: '_renderers.Array.data[3]'
+      value: 
+      objectReference: {fileID: 4703780123201183668}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: '_renderers.Array.data[4]'
+      value: 
+      objectReference: {fileID: 5947856297709565904}
+    - target: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: '_renderers.Array.data[5]'
       value: 
       objectReference: {fileID: 4803295039696470690}
     - target: {fileID: 4281931283517321042, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
@@ -258,17 +302,6 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 4173194502051484113, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
   m_PrefabInstance: {fileID: 7737515663272977921}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6911291618395496084 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3785551034004355221, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
-  m_PrefabInstance: {fileID: 7737515663272977921}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6947533582888735200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecea5804e998b4d7c83125f0bf3817e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6947533582888735200 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 795929302272456673, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
@@ -291,14 +324,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5810196f3229e493abae60beb2245aac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RyanMillerGameCore::RyanMillerGameCore.Character.WanderingBrain
-  characterReferences: {fileID: 6911291618395496084}
   bumpFrontAngle: 0.33
   seeFrontAngle: 0.33
   turnOffColliderOnDeath: 1
+  wanderType: 0
+  wanderDirection: 0
   wanderTimeMin: 2
   wanderTimeMax: 5
   wanderInterval: 3
   wanderRadius: 5
+  stuckThreshold: 0.1
+  stuckTime: 2
+  wanderOnAwake: 1
 --- !u!114 &5422931359350941703
 MonoBehaviour:
   m_ObjectHideFlags: 0

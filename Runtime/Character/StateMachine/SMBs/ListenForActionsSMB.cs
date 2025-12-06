@@ -20,9 +20,9 @@ namespace RyanMillerGameCore.Character.SMB
             _attackParamHash = Animator.StringToHash(References.paramTriggerAttack);
             _interactParamHash = Animator.StringToHash(References.paramTriggerInteract);
             base.OnCharacterStateEnter(animator, stateInfo, layerIndex);
-            if (References.characterBrain) {
-                References.characterBrain.OnAttackAction += AttackAction;
-                References.characterBrain.OnInteractAction += InteractAction;
+            if (References._characterBrain) {
+                References._characterBrain.OnAttackAction += AttackAction;
+                References._characterBrain.OnInteractAction += InteractAction;
             }
         }
         
@@ -31,9 +31,9 @@ namespace RyanMillerGameCore.Character.SMB
             if (References == null) {
                 return;
             }
-            if (References.characterBrain) {
-                References.characterBrain.OnAttackAction -= AttackAction;
-                References.characterBrain.OnInteractAction -= InteractAction;
+            if (References._characterBrain) {
+                References._characterBrain.OnAttackAction -= AttackAction;
+                References._characterBrain.OnInteractAction -= InteractAction;
             }
             base.OnStateExit(animator, stateInfo, layerIndex);
         }
@@ -56,10 +56,10 @@ namespace RyanMillerGameCore.Character.SMB
             }
             animator.ResetTrigger(_interactParamHash);
             animator.SetTrigger(_interactParamHash);
-            IInteractive interactive = References.interactColliderSensor.CurrentInteractive;
+            IInteractive interactive = References._interactColliderSensor.CurrentInteractive;
             if ((Component)interactive)
             {
-                interactive.Interact(References.character);
+                interactive.Interact(References._character);
             }
         }
     }

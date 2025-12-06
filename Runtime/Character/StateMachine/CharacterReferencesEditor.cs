@@ -13,26 +13,26 @@ namespace RyanMillerGameCore.Character.SMB {
 
 			var characterRefs = (CharacterReferences)target;
 
-			if (characterRefs.animator == null && GUILayout.Button("Auto Assign Animator")) {
-				characterRefs.animator = characterRefs.GetComponent<Animator>();
+			if (characterRefs._animator == null && GUILayout.Button("Auto Assign Animator")) {
+				characterRefs._animator = characterRefs.GetComponent<Animator>();
 				EditorUtility.SetDirty(characterRefs);
 			}
 			if (GUILayout.Button("Get References")) {
-				AssignComponentIfNull(ref characterRefs.movement, characterRefs);
-				AssignComponentIfNull(ref characterRefs.mainCollider, characterRefs);
-				AssignComponentIfNull(ref characterRefs.characterInput, characterRefs);
-				AssignComponentIfNull(ref characterRefs.characterAnimation, characterRefs);
-				AssignComponentIfNull(ref characterRefs.character, characterRefs);
-				AssignComponentIfNull(ref characterRefs.characterBrain, characterRefs);
-				AssignComponentIfNull(ref characterRefs.playerCharacter, characterRefs);
-				AssignComponentIfNull(ref characterRefs.attackColliderSensor, characterRefs);
-				AssignComponentIfNull(ref characterRefs.interactColliderSensor, characterRefs);
-				AssignComponentIfNull(ref characterRefs.aggroColliderSensor, characterRefs);
-				AssignComponentIfNull(ref characterRefs.rb, characterRefs);
-				AssignComponentIfNull(ref characterRefs.animator, characterRefs);
-				AssignComponentIfNull(ref characterRefs.damageDealer, characterRefs);
-				AssignComponentIfNull(ref characterRefs.characterPathfind, characterRefs);
-				characterRefs.renderers = characterRefs.gameObject.GetComponentsInChildren<Renderer>();
+				AssignComponentIfNull(ref characterRefs._movement, characterRefs);
+				AssignComponentIfNull(ref characterRefs._mainCollider, characterRefs);
+				AssignComponentIfNull(ref characterRefs._characterInput, characterRefs);
+				AssignComponentIfNull(ref characterRefs._characterAnimation, characterRefs);
+				AssignComponentIfNull(ref characterRefs._character, characterRefs);
+				AssignComponentIfNull(ref characterRefs._characterBrain, characterRefs);
+				AssignComponentIfNull(ref characterRefs._playerCharacter, characterRefs);
+				AssignComponentIfNull(ref characterRefs._attackColliderSensor, characterRefs);
+				AssignComponentIfNull(ref characterRefs._interactColliderSensor, characterRefs);
+				AssignComponentIfNull(ref characterRefs._aggroColliderSensor, characterRefs);
+				AssignComponentIfNull(ref characterRefs._rb, characterRefs);
+				AssignComponentIfNull(ref characterRefs._animator, characterRefs);
+				AssignComponentIfNull(ref characterRefs._damageDealer, characterRefs);
+				AssignComponentIfNull(ref characterRefs._characterPathfind, characterRefs);
+				characterRefs._renderers = characterRefs.gameObject.GetComponentsInChildren<Renderer>();
 				EditorUtility.SetDirty(characterRefs);
 			}
 		}

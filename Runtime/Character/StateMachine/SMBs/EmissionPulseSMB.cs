@@ -27,7 +27,7 @@ namespace RyanMillerGameCore.Character.SMB
             // Get all materials from all renderers (shared instances, not instanced copies)
             if (_materials == null)
             {
-                _materials = GetAllMaterials(References.renderers);
+                _materials = GetAllMaterials(References._renderers);
                 foreach (var mat in _materials)
                 {
                     if (mat.HasProperty("_EmissionColor"))

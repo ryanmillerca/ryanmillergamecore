@@ -22,7 +22,7 @@ namespace RyanMillerGameCore.Character.SMB
             _attacked = false;
             if (References.attackDashForce > 0)
             {
-                References.movement.PushForward(References.attackDashForce);
+                References._movement.PushForward(References.attackDashForce);
             }
         }
 
@@ -44,7 +44,7 @@ namespace RyanMillerGameCore.Character.SMB
         private void PerformAttack()
         {
             _attacked = true;
-            References.damageDealer.DealDamage(References.character.gameObject);
+            References._damageDealer.DealDamage(References._character.gameObject);
         }
     }
 }

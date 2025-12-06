@@ -73,6 +73,9 @@ MonoBehaviour:
   triggerDialogOn: 2
   triggerOnlyOnce: 0
   disableOnComplete: 0
+  dialogStartedEvent:
+    m_PersistentCalls:
+      m_Calls: []
   dialogCompleteEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -111,7 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4909c5ea55a2f4e7cba72441b65e6ebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RyanMillerGameCore::RyanMillerGameCore.Interactions.DisplayButtonPrompt
-  verticalOffset: 0.5
+  promptOffset: {x: 0, y: 0.5, z: 0}
   _promptAction: 3
 --- !u!1818360608 &2831463088881770756
 PositionConstraint:

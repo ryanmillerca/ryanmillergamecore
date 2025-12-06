@@ -27,7 +27,7 @@ namespace RyanMillerGameCore.Character
                 if (i == index)
                 {
                     brains[i].enabled = true;
-                    characterReferences.characterBrain = brains[i];
+                    characterReferences._characterBrain = brains[i];
                 }
                 else
                 {

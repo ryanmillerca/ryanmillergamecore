@@ -18,7 +18,7 @@ namespace RyanMillerGameCore.Character.SMB
             
             _paramHash = Animator.StringToHash(References.paramSpeedHorizontal);
             base.OnCharacterStateEnter(animator, stateInfo, layerIndex);
-            References.movement.OnVelocityApplied += OnVelocityApplied;
+            References._movement.OnVelocityApplied += OnVelocityApplied;
         }
 
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -26,7 +26,7 @@ namespace RyanMillerGameCore.Character.SMB
             if (References == null) {
                 return;
             }
-            References.movement.OnVelocityApplied -= OnVelocityApplied;
+            References._movement.OnVelocityApplied -= OnVelocityApplied;
             base.OnStateExit(animator, stateInfo, layerIndex);
         }
         

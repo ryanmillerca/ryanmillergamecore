@@ -44,12 +44,12 @@ namespace RyanMillerGameCore.Character
 
         public void GoToHurt()
         {
-            CharacterReferences.animator.SetTrigger(_hurtTriggerHash);
+            CharacterReferences._animator.SetTrigger(_hurtTriggerHash);
         }
 
         public void GoToDead()
         {
-            CharacterReferences.animator.SetBool(_deadBoolStringHash, true);
+            CharacterReferences._animator.SetBool(_deadBoolStringHash, true);
             if (turnOffColliderOnDeath)
             {
                 SetCollision(false);
@@ -68,7 +68,7 @@ namespace RyanMillerGameCore.Character
             {
                 SetCollision(true);
             }
-            CharacterReferences.animator.SetBool(_deadBoolStringHash, false);
+            CharacterReferences._animator.SetBool(_deadBoolStringHash, false);
         }
 
         public void LookAt(Vector3 point)
@@ -78,25 +78,25 @@ namespace RyanMillerGameCore.Character
 
         public void SetInputEnabled(bool inputEnabled)
         {
-            if (CharacterReferences.characterInput)
+            if (CharacterReferences._characterInput)
             {
-                CharacterReferences.characterInput.SetInputEnabled(inputEnabled);
+                CharacterReferences._characterInput.SetInputEnabled(inputEnabled);
             }
         }
 
         public void SetMovementEnabled(bool movementEnabled)
         {
-            if (CharacterReferences.characterInput)
+            if (CharacterReferences._characterInput)
             {
-                CharacterReferences.characterInput.SetMovementEnabled(movementEnabled);
+                CharacterReferences._characterInput.SetMovementEnabled(movementEnabled);
             }
         }
 
         public void SetAttackEnabled(bool attackEnabled)
         {
-            if (CharacterReferences.characterInput)
+            if (CharacterReferences._characterInput)
             {
-                CharacterReferences.characterInput.SetAttackEnabled(attackEnabled);
+                CharacterReferences._characterInput.SetAttackEnabled(attackEnabled);
             }
         }
 
@@ -122,9 +122,9 @@ namespace RyanMillerGameCore.Character
         
         public void SetInteractEnabled(bool interactEnabled)
         {
-            if (CharacterReferences.characterInput)
+            if (CharacterReferences._characterInput)
             {
-                CharacterReferences.characterInput.SetInteractEnabled(interactEnabled);
+                CharacterReferences._characterInput.SetInteractEnabled(interactEnabled);
             }
         }
 
@@ -152,7 +152,7 @@ namespace RyanMillerGameCore.Character
             }
 
             // change to aggro state
-            CharacterReferences.animator.SetBool(_hasAggroHash, hasAggro);
+            CharacterReferences._animator.SetBool(_hasAggroHash, hasAggro);
         }
 
         protected virtual void AggroTargetDied()
@@ -247,7 +247,7 @@ namespace RyanMillerGameCore.Character
                 _collisionHandler.TriggerEnter += OnTrigger;
             }
 
-            CharacterReferences.character.Spawned += GoToRespawn;
+            CharacterReferences._character.Spawned += GoToRespawn;
             
             if (_movable != null)
             {
@@ -264,7 +264,7 @@ namespace RyanMillerGameCore.Character
                 _collisionHandler.TriggerEnter -= OnTrigger;
             }
             
-            CharacterReferences.character.Spawned -= GoToRespawn;
+            CharacterReferences._character.Spawned -= GoToRespawn;
 
             if (_movable != null)
             {
@@ -350,8 +350,8 @@ namespace RyanMillerGameCore.Character
 
         private void SetCollision(bool collisionEnabled)
         {
-            CharacterReferences.mainCollider.enabled = collisionEnabled;
-            CharacterReferences.rb.isKinematic = !collisionEnabled;
+            CharacterReferences._mainCollider.enabled = collisionEnabled;
+            CharacterReferences._rb.isKinematic = !collisionEnabled;
         }
 
         #endregion
