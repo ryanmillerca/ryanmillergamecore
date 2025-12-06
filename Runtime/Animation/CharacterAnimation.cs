@@ -11,14 +11,12 @@ namespace RyanMillerGameCore.Animation
         
         [Header("Params")]
         [SerializeField] private int cosmeticAnimLayer = 1;
-        [SerializeField] private float cosmeticAnimDuration = 5;
         [SerializeField] private float blendTime = 0.25f;
         
         [Header("Direction/Facing")]
         [Tooltip("Sends rotation/direction to animator as 0-3 value (0=N, 1=E, 2=S, 3=W")]
         [SerializeField] private bool sendDirectionToAnimator = true;
         [SerializeField] private string directionParameterName = "Direction";
-        [SerializeField] private int directionIndexOffset = 0;
         [SerializeField] private float paramMultiplier = 0.1f;
         [SerializeField] private float minThreshold = 0.001f;
         

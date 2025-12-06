@@ -13,6 +13,7 @@ namespace RyanMillerGameCore.Dialog {
 		public UnityEvent OnSelected;
 		public UnityEvent OnDeselected;
 		public event Action<bool> WasSelected;
+		public event Action InteractionComplete;
 
 		private void Start() {
 			gameObject.layer = LayerMask.NameToLayer("Interactive");
@@ -45,6 +46,7 @@ namespace RyanMillerGameCore.Dialog {
 
 		private void OnDialogComplete() {
 			SetCurrentInteraction(currentDialogIndex + 1);
+			InteractionComplete?.Invoke();
 		}
 
 		private void OnDisable() {
@@ -66,7 +68,5 @@ namespace RyanMillerGameCore.Dialog {
 			}
 			WasSelected?.Invoke(active);
 		}
-
-		public event Action InteractionComplete;
 	}
 }
