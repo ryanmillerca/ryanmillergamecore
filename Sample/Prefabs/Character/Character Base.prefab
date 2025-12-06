@@ -118,9 +118,9 @@ MonoBehaviour:
   _characterBrain: {fileID: 4883974804810804768}
   _playerCharacter: {fileID: 0}
   _attackColliderSensor: {fileID: 6507270822162368684}
-  _interactColliderSensor: {fileID: 4907828329546544004}
   _aggroColliderSensor: {fileID: 6507270822162368684}
-  _rb: {fileID: 7619823330534572677}
+  _interactColliderSensor: {fileID: 4907828329546544004}
+  m_Rb: {fileID: 0}
   _damageDealer: {fileID: 9167538621912994157}
   _animator: {fileID: 6583291971729094936}
   _renderers:
@@ -133,12 +133,7 @@ MonoBehaviour:
   - {fileID: 3011103731500000419}
   - {fileID: 3335747619943947792}
   _characterPathfind: {fileID: 1205099524361834224}
-  paramTriggerHurt: hurt
-  paramBoolDead: isDead
-  paramBoolAggro: HasAggro
-  paramSpeedHorizontal: speed_horizontal
-  paramTriggerAttack: attack
-  paramTriggerInteract: interact
+  _characterAnimParamMappings: {fileID: 11400000, guid: 60660c9c877e744649e62daad754ad58, type: 2}
   attackDashForce: 300
 --- !u!95 &6583291971729094936
 Animator:
@@ -469,7 +464,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cacca9f94006448f843f3cca1bd0fd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  references: {fileID: 3785551034004355221}
   arrivalRadius: 0.4
   cornerAdvanceRadius: 0.5
   pathRecalcCooldown: 0.2

@@ -19,11 +19,11 @@ namespace RyanMillerGameCore.Character.SMB
             base.OnCharacterStateEnter(animator,stateInfo,layerIndex);
             if (canMoveOnEnter != Ternary.Undefined)
             {
-                References._movement.CanMove(canMoveOnEnter == Ternary.True);
+                referenceProvider.Movement.CanMove(canMoveOnEnter == Ternary.True);
             }
             if (canInteractOnEnter != Ternary.Undefined)
             {
-                References._characterBrain.SetInteractEnabled(canInteractOnEnter == Ternary.True);
+                referenceProvider.CharacterBrain.SetInteractEnabled(canInteractOnEnter == Ternary.True);
             }
         }
 
@@ -33,11 +33,11 @@ namespace RyanMillerGameCore.Character.SMB
             base.OnStateExit(animator, stateInfo, layerIndex, controller);
             if (canMoveOnExit != Ternary.Undefined)
             {
-                References._movement.CanMove(canMoveOnExit == Ternary.True);
+                referenceProvider.Movement.CanMove(canMoveOnExit == Ternary.True);
             }
             if (canInteractOnExit != Ternary.Undefined)
             {
-                References._characterBrain.SetInteractEnabled(canInteractOnExit == Ternary.True);
+                referenceProvider.CharacterBrain.SetInteractEnabled(canInteractOnExit == Ternary.True);
             }
         }
     }

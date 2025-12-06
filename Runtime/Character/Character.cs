@@ -28,15 +28,15 @@ namespace RyanMillerGameCore.Character
         [Foldout("Unity Events"), SerializeField] private UnityEvent knockedBack;
         [Foldout("Unity Events"), SerializeField] private UnityEvent died;
 
-        public CharacterReferences References
+        public CharacterReferenceProvider referenceProvider
         {
             get
             {
-                if (_characterReferences == null)
+                if (m_characterReferenceProvider == null)
                 {
-                    _characterReferences = GetComponentInChildren<CharacterReferences>();
+                    m_characterReferenceProvider = GetComponentInChildren<CharacterReferenceProvider>();
                 }
-                return _characterReferences;
+                return m_characterReferenceProvider;
             }
         }
         
@@ -47,7 +47,7 @@ namespace RyanMillerGameCore.Character
         public event Action Died;
         public event Action Spawned;
 
-        private CharacterReferences _characterReferences;
+        private CharacterReferenceProvider m_characterReferenceProvider;
         private CharacterMovement _characterMovement;
         private CharacterBrain _characterBrain;
         private static bool isQuitting = false;

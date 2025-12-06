@@ -15,7 +15,7 @@ namespace RyanMillerGameCore.Character.SMB
 
         protected override void OnCharacterStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            _attackParamHash = Animator.StringToHash(References.paramTriggerAttack);
+            _attackParamHash = Animator.StringToHash(referenceProvider.CharacterAnimParamMappings.m_ParamTriggerAttack);
             _listeningForAttack = false;
             base.OnCharacterStateEnter(animator, stateInfo, layerIndex);
         }
@@ -33,12 +33,12 @@ namespace RyanMillerGameCore.Character.SMB
                 return;
             }
             _listeningForAttack = true;
-            References._characterBrain.OnAttackAction += AttackAction;
+            referenceProvider.CharacterBrain.OnAttackAction += AttackAction;
         }
 
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            References._characterBrain.OnAttackAction -= AttackAction;
+            referenceProvider.CharacterBrain.OnAttackAction -= AttackAction;
             base.OnStateExit(animator, stateInfo, layerIndex);
         }
         

@@ -12,21 +12,21 @@ namespace RyanMillerGameCore.Character.SMB
         
         protected override void OnCharacterStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            if (References == null) {
+            if (referenceProvider == null) {
                 Debug.Log($"References are null for {animator.gameObject.name}", animator.gameObject);
             }
             
-            _paramHash = Animator.StringToHash(References.paramSpeedHorizontal);
+            _paramHash = Animator.StringToHash(referenceProvider.CharacterAnimParamMappings.m_ParamSpeedHorizontal);
             base.OnCharacterStateEnter(animator, stateInfo, layerIndex);
-            References._movement.OnVelocityApplied += OnVelocityApplied;
+            referenceProvider.Movement.OnVelocityApplied += OnVelocityApplied;
         }
 
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            if (References == null) {
+            if (referenceProvider == null) {
                 return;
             }
-            References._movement.OnVelocityApplied -= OnVelocityApplied;
+            referenceProvider.Movement.OnVelocityApplied -= OnVelocityApplied;
             base.OnStateExit(animator, stateInfo, layerIndex);
         }
         
