@@ -75,8 +75,7 @@ namespace RyanMillerGameCore.Items
 
                 if (enableDiagnostics)
                 {
-                    Debug.Log(
-                        $"[ItemManager] Initialized pool for '{entry.prefab.name}' with {defaultPoolAmount} items.");
+                    Debug.Log($"[ItemManager] Initialized pool for '{entry.prefab.name}' with {defaultPoolAmount} items.");
                 }
             }
         }
@@ -85,7 +84,7 @@ namespace RyanMillerGameCore.Items
         {
             if (!poolLookup.TryGetValue(identifier, out var itemPool))
             {
-                Debug.LogError($"[ItemManager] No pool found for ID: {identifier.name}");
+                Debug.LogWarning($"[ItemManager] No pool found for ID: {identifier.name}");
                 return null;
             }
 
