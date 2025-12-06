@@ -110,20 +110,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecea5804e998b4d7c83125f0bf3817e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movement: {fileID: 8302141704080009450}
-  _mainCollider: {fileID: 6276998569089883695}
-  _characterInput: {fileID: 0}
-  _characterAnimation: {fileID: 4281931283517321042}
-  _character: {fileID: 1791461654542484843}
-  _characterBrain: {fileID: 4883974804810804768}
-  _playerCharacter: {fileID: 0}
-  _attackColliderSensor: {fileID: 6507270822162368684}
-  _aggroColliderSensor: {fileID: 6507270822162368684}
-  _interactColliderSensor: {fileID: 4907828329546544004}
-  m_Rb: {fileID: 0}
-  _damageDealer: {fileID: 9167538621912994157}
-  _animator: {fileID: 6583291971729094936}
-  _renderers:
+  m_Movement: {fileID: 8302141704080009450}
+  m_MainCollider: {fileID: 6276998569089883695}
+  m_CharacterInput: {fileID: 0}
+  m_CharacterAnimation: {fileID: 4281931283517321042}
+  m_Character: {fileID: 1791461654542484843}
+  m_CharacterBrain: {fileID: 4883974804810804768}
+  m_PlayerCharacter: {fileID: 0}
+  m_AttackColliderSensor: {fileID: 6507270822162368684}
+  m_AggroColliderSensor: {fileID: 6507270822162368684}
+  m_InteractColliderSensor: {fileID: 4907828329546544004}
+  m_Rb: {fileID: 7619823330534572677}
+  m_DamageDealer: {fileID: 9167538621912994157}
+  m_Animator: {fileID: 6583291971729094936}
+  m_Renderers:
   - {fileID: 6092074166571465732}
   - {fileID: 5927816787916160020}
   - {fileID: 4250925253235643915}
@@ -132,9 +132,9 @@ MonoBehaviour:
   - {fileID: 4173194502051484113}
   - {fileID: 3011103731500000419}
   - {fileID: 3335747619943947792}
-  _characterPathfind: {fileID: 1205099524361834224}
-  _characterAnimParamMappings: {fileID: 11400000, guid: 60660c9c877e744649e62daad754ad58, type: 2}
-  attackDashForce: 300
+  m_CharacterPathfind: {fileID: 1205099524361834224}
+  m_CharacterAnimParamMappings: {fileID: 11400000, guid: 60660c9c877e744649e62daad754ad58, type: 2}
+  m_AttackDashForce: 500
 --- !u!95 &6583291971729094936
 Animator:
   serializedVersion: 7

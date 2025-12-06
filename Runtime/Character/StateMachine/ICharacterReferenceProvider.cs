@@ -1,4 +1,4 @@
-namespace RyanMillerGameCore.Character.SMB {
+namespace RyanMillerGameCore.Character {
 	using UnityEngine;
 	using Animation;
 	using Interactions;
@@ -8,7 +8,7 @@ namespace RyanMillerGameCore.Character.SMB {
 		Collider MainCollider { get; set; }
 		CharacterInput CharacterInput { get; set; }
 		CharacterAnimation CharacterAnimation { get; set; }
-		Character Character { get; set; }
+		ICharacter Character { get; set; }
 		CharacterBrain CharacterBrain { get; set; }
 		PlayerCharacter PlayerCharacter { get; set; }
 		ColliderSensor AttackColliderSensor { get; set; }

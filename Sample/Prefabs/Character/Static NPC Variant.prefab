@@ -72,6 +72,10 @@ PrefabInstance:
       propertyPath: _characterBrain
       value: 
       objectReference: {fileID: 8594500704859223734}
+    - target: {fileID: 6911291618395496084, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_CharacterBrain
+      value: 
+      objectReference: {fileID: 8594500704859223734}
     - target: {fileID: 8073312169503573864, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
       propertyPath: m_Name
       value: Static NPC Variant

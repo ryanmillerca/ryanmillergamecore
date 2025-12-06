@@ -19,7 +19,7 @@ namespace RyanMillerGameCore.Character.SMB
             // subscribe
             if (!referenceProvider.CharacterPathfind)
             {
-                Debug.LogError(referenceProvider.Character.gameObject + " has no pathfind.", referenceProvider.Character.gameObject);
+                Debug.LogError(referenceProvider.Character.Transform.gameObject + " has no pathfind.", referenceProvider.Character.Transform.gameObject);
                 return;
             }
 

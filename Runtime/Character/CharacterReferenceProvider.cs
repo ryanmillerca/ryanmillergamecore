@@ -1,52 +1,53 @@
-namespace RyanMillerGameCore.Character.SMB {
+namespace RyanMillerGameCore.Character {
 	using UnityEngine;
 	using Animation;
 	using Interactions;
+	using SMB;
 
 	/// <summary>
 	/// Provides controlled access to character components with lazy initialization
 	/// </summary>
 	public class CharacterReferenceProvider : MonoBehaviour, ICharacterReferenceProvider {
 		[Header("Component References")]
-		[SerializeField] private CharacterMovement _movement;
-		[SerializeField] private Collider _mainCollider;
-		[SerializeField] private CharacterInput _characterInput;
-		[SerializeField] private CharacterAnimation _characterAnimation;
-		[SerializeField] private Character _character;
-		[SerializeField] private CharacterBrain _characterBrain;
-		[SerializeField] private PlayerCharacter _playerCharacter;
-		[SerializeField] private ColliderSensor _attackColliderSensor;
-		[SerializeField] private ColliderSensor _aggroColliderSensor;
-		[SerializeField] private InteractiveObjectColliderSensor _interactColliderSensor;
+		[SerializeField] private CharacterMovement m_Movement;
+		[SerializeField] private Collider m_MainCollider;
+		[SerializeField] private CharacterInput m_CharacterInput;
+		[SerializeField] private CharacterAnimation m_CharacterAnimation;
+		[SerializeField] private Component m_Character;
+		[SerializeField] private CharacterBrain m_CharacterBrain;
+		[SerializeField] private PlayerCharacter m_PlayerCharacter;
+		[SerializeField] private ColliderSensor m_AttackColliderSensor;
+		[SerializeField] private ColliderSensor m_AggroColliderSensor;
+		[SerializeField] private InteractiveObjectColliderSensor m_InteractColliderSensor;
 		[SerializeField] private Rigidbody m_Rb;
-		[SerializeField] private DamageDealer _damageDealer;
-		[SerializeField] private Animator _animator;
-		[SerializeField] private Renderer[] _renderers;
-		[SerializeField] private CharacterPathfind _characterPathfind;
-		[SerializeField] private CharacterAnimParamMappings _characterAnimParamMappings;
+		[SerializeField] private DamageDealer m_DamageDealer;
+		[SerializeField] private Animator m_Animator;
+		[SerializeField] private Renderer[] m_Renderers;
+		[SerializeField] private CharacterPathfind m_CharacterPathfind;
+		[SerializeField] private CharacterAnimParamMappings m_CharacterAnimParamMappings;
 
 		[Header("Stats")]
-		public float attackDashForce = 500;
+		public float m_AttackDashForce = 500;
 
-		private bool _isInitialized = false;
+		private bool m_isInitialized = false;
 
 		private void Awake() {
 			Initialize();
 		}
 
 		private void Initialize() {
-			if (_isInitialized) return;
+			if (m_isInitialized) return;
 
 			// Ensure animator is set up
-			if (_animator == null) {
-				_animator = GetComponent<Animator>();
+			if (m_Animator == null) {
+				m_Animator = GetComponent<Animator>();
 			}
 
-			if (_animator != null) {
-				_animator.SetComponentReference(this);
+			if (m_Animator != null) {
+				m_Animator.SetComponentReference(this);
 			}
 
-			_isInitialized = true;
+			m_isInitialized = true;
 		}
 
 		// Simple redirect method - minimal boilerplate
@@ -57,53 +58,53 @@ namespace RyanMillerGameCore.Character.SMB {
 
 		// All properties now have getters and setters
 		public CharacterMovement Movement {
-			get => _movement;
-			set => _movement = value;
+			get => m_Movement;
+			set => m_Movement = value;
 		}
 
 		public Collider MainCollider {
-			get => _mainCollider;
-			set => _mainCollider = value;
+			get => m_MainCollider;
+			set => m_MainCollider = value;
 		}
 
 		public CharacterInput CharacterInput {
-			get => _characterInput;
-			set => _characterInput = value;
+			get => m_CharacterInput;
+			set => m_CharacterInput = value;
 		}
 
 		public CharacterAnimation CharacterAnimation {
-			get => _characterAnimation;
-			set => _characterAnimation = value;
+			get => m_CharacterAnimation;
+			set => m_CharacterAnimation = value;
 		}
 
-		public Character Character {
-			get => _character;
-			set => _character = value;
+		public ICharacter Character {
+			get => (ICharacter)m_Character;
+			set => m_Character = (Component)value;
 		}
 
 		public CharacterBrain CharacterBrain {
-			get => _characterBrain;
-			set => _characterBrain = value;
+			get => m_CharacterBrain;
+			set => m_CharacterBrain = value;
 		}
 
 		public PlayerCharacter PlayerCharacter {
-			get => _playerCharacter;
-			set => _playerCharacter = value;
+			get => m_PlayerCharacter;
+			set => m_PlayerCharacter = value;
 		}
 
 		public ColliderSensor AttackColliderSensor {
-			get => _attackColliderSensor;
-			set => _attackColliderSensor = value;
+			get => m_AttackColliderSensor;
+			set => m_AttackColliderSensor = value;
 		}
 
 		public ColliderSensor AggroColliderSensor {
-			get => _aggroColliderSensor;
-			set => _aggroColliderSensor = value;
+			get => m_AggroColliderSensor;
+			set => m_AggroColliderSensor = value;
 		}
 
 		public InteractiveObjectColliderSensor InteractColliderSensor {
-			get => _interactColliderSensor;
-			set => _interactColliderSensor = value;
+			get => m_InteractColliderSensor;
+			set => m_InteractColliderSensor = value;
 		}
 
 		public Rigidbody Rb {
@@ -112,43 +113,43 @@ namespace RyanMillerGameCore.Character.SMB {
 		}
 
 		public DamageDealer DamageDealer {
-			get => _damageDealer;
-			set => _damageDealer = value;
+			get => m_DamageDealer;
+			set => m_DamageDealer = value;
 		}
 
 		public Animator Animator {
-			get => _animator;
-			set => _animator = value;
+			get => m_Animator;
+			set => m_Animator = value;
 		}
 
 		public Renderer[] Renderers {
-			get => _renderers;
-			set => _renderers = value;
+			get => m_Renderers;
+			set => m_Renderers = value;
 		}
 
 		public CharacterPathfind CharacterPathfind {
-			get => _characterPathfind;
-			set => _characterPathfind = value;
+			get => m_CharacterPathfind;
+			set => m_CharacterPathfind = value;
 		}
 
 		// Type-safe sensor access
 		public ColliderSensor GetColliderSensor(ColliderSensorType sensorType) {
 			return sensorType switch {
-				ColliderSensorType.Attack => _attackColliderSensor,
-				ColliderSensorType.Aggro => _aggroColliderSensor,
-				ColliderSensorType.Interact => _interactColliderSensor,
+				ColliderSensorType.Attack => m_AttackColliderSensor,
+				ColliderSensorType.Aggro => m_AggroColliderSensor,
+				ColliderSensorType.Interact => m_InteractColliderSensor,
 				_ => null
 			};
 		}
 
 		public CharacterAnimParamMappings CharacterAnimParamMappings {
-			get => _characterAnimParamMappings;
-			set => _characterAnimParamMappings = value;
+			get => m_CharacterAnimParamMappings;
+			set => m_CharacterAnimParamMappings = value;
 		}
 
 		private void OnDestroy() {
-			if (_animator != null) {
-				_animator.ClearComponentReference();
+			if (m_Animator != null) {
+				m_Animator.ClearComponentReference();
 			}
 		}
 	}

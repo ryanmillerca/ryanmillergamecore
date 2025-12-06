@@ -4,12 +4,18 @@ namespace RyanMillerGameCore.Character
     using System;
     using Interactions;
     
-    public interface ICharacter
-    {
+    public interface ICharacter {
+        Transform Transform { get; }
         CharacterID ID();
         void Interact(IInteractive interactive);
         void Reset();
         bool IsPlayer();
+        public event Action<float> OnReceiveDamage;
+        public event Action<float> OnReceiveHeal;
+        public event Action<Character> OnDied;
+        public event Action<Vector3> OnKnockedBack;
+        public event Action Died;
+        public event Action Spawned;
     }
     
     public interface IMovable

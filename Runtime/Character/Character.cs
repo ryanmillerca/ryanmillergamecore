@@ -40,6 +40,8 @@ namespace RyanMillerGameCore.Character
             }
         }
         
+        public Transform Transform => transform;
+        
         public event Action<float> OnReceiveDamage;
         public event Action<float> OnReceiveHeal;
         public event Action<Character> OnDied;
