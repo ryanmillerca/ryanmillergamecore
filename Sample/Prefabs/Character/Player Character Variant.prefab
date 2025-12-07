@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: identifier
       value: 
       objectReference: {fileID: 11400000, guid: 5d9a2dc6af61a44aa8af12fd5b659bb1, type: 2}
+    - target: {fileID: 1791461654542484843, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: m_IsPlayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1975680716783051113, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
       propertyPath: m_Name
       value: Player Character Variant

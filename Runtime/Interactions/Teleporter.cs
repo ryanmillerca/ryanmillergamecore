@@ -47,7 +47,7 @@ namespace RyanMillerGameCore.Interactions {
 		private void TeleportThisToThere(Transform t) {
 			Character character = t.GetComponent<Character>();
 			if (character) {
-				character.CharacterMovement.Teleport(teleportPosition, teleportRotation);
+				character.characterMovement.Teleport(teleportPosition, teleportRotation);
 			}
 		}
 	}

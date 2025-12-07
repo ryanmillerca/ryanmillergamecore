@@ -59,7 +59,7 @@ namespace RyanMillerGameCore.Character
             var checkPoint = DataManager.Instance.TryGetCheckpoint();
             if (checkPoint != null) {
                 //Debug.Log("Moving player to saved checkpoint at " + checkPoint.position);
-                Player.CharacterMovement.Teleport(checkPoint.position, checkPoint.rotation);
+                Player.characterMovement.Teleport(checkPoint.position, checkPoint.rotation);
                 return;
             }
             var setCheckpoints = FindObjectsByType<Checkpoint>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
@@ -67,13 +67,13 @@ namespace RyanMillerGameCore.Character
             foreach (var setCheck in setCheckpoints) {
                 if (setCheck.IsSpawnPoint) {
                     //Debug.Log("Found spawn point at " + setCheck.transform.position + ", moving player.");
-                    Player.CharacterMovement.Teleport(setCheck.transform.position, setCheck.transform.rotation);
+                    Player.characterMovement.Teleport(setCheck.transform.position, setCheck.transform.rotation);
                     return;
                 }
             }
             //Debug.Log("No spawn point found, using first SetCheckpoint in scene.");
             var setCheckPoint = FindFirstObjectByType<Checkpoint>();
-            Player.CharacterMovement.Teleport(setCheckPoint.transform.position, setCheckPoint.transform.rotation);
+            Player.characterMovement.Teleport(setCheckPoint.transform.position, setCheckPoint.transform.rotation);
         }
 
         public void RegisterCharacter(Character character)

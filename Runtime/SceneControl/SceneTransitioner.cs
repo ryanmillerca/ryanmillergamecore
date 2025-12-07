@@ -108,7 +108,7 @@ namespace RyanMillerGameCore.SceneControl {
 
 		private void SetPlayerInputEnabled(bool inputEnabled) {
 			if (freezePlayerOnTransition) {
-				CharacterManager.Instance?.Player.Brain.SetInputEnabled(inputEnabled);
+				CharacterManager.Instance?.Player.brain.SetInputEnabled(inputEnabled);
 			}
 		}
 
