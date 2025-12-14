@@ -3,8 +3,10 @@ namespace RyanMillerGameCore.Interactions {
 	using UnityEngine;
 	using UnityEngine.Events;
 	using Character;
+	using RyanMillerGameCore.UI;
 
 	public class Interactive : MonoBehaviour, IInteractive {
+
 		public event Action<bool> WasSelected;
 
 		public UnityEvent OnInteract;

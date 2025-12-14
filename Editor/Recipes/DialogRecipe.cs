@@ -3,6 +3,7 @@ namespace RyanMillerGameCore.Editor.Recipes {
 	using Dialog;
 	using Interactions;
 	using UnityEditor;
+	using UI;
 
 	public class DialogRecipe : AbstractRecipe {
 
@@ -19,8 +20,10 @@ namespace RyanMillerGameCore.Editor.Recipes {
 			go.AddComponent<SphereCollider>();
 			go.layer = LayerMask.NameToLayer("Interactive");
 			PlayDialog playDialog = go.AddComponent<PlayDialog>();
+			playDialog.Setup(TriggerDialogOn.Interact, false, false);
 			Interactive interactive = go.AddComponent<Interactive>();
 			DisplayButtonPrompt displayButtonPrompt = go.AddComponent<DisplayButtonPrompt>();
+			displayButtonPrompt.Setup(PromptAction.Interact);
 
 			FinishCreation(go, ToolName);
 		}

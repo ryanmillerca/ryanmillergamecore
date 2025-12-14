@@ -3,6 +3,17 @@ namespace RyanMillerGameCore.Interactions {
 	using UI;
 
 	public class DisplayButtonPrompt : MonoBehaviour {
+
+
+		#region Setup
+
+		public void Setup(PromptAction promptAction) {
+			this._promptAction = promptAction;
+		}
+
+		#endregion
+
+
 		[SerializeField] private Vector3 promptOffset = new Vector3(0f, 0.5f, 0f);
 		[SerializeField] private PromptAction _promptAction;
 
