@@ -18,6 +18,15 @@ namespace RyanMillerGameCore.Editor.Recipes {
 			return Vector3.zero;
 		}
 
+		protected static GameObject CreateGameObject(string name) {
+			GameObject go = new GameObject(name) {
+				transform = {
+					position = GetSpawnPosition()
+				}
+			};
+			return go;
+		}
+
 		protected static void FinishCreation(GameObject go, string name) {
 			Undo.RegisterCreatedObjectUndo(go, name);
 			Selection.activeGameObject = go;
