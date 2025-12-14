@@ -130,7 +130,7 @@ namespace RyanMillerGameCore.Character
             }
             foreach (Character character in activeCharacters)
             {
-                if (character && character.ID().Equals(ID))
+                if (character && character.ID() && character.ID().Equals(ID))
                 {
                     return character;
                 }
