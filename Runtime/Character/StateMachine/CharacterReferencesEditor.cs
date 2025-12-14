@@ -17,10 +17,10 @@ namespace RyanMillerGameCore.Character {
 
 			if (GUILayout.Button("Get References")) {
 				Undo.RecordObject(characterRefs, "Get References");
-				Transform charTransform = characterRefs.Character.Transform;
 
 				// ROOT components
 				characterRefs.Character = characterRefs.GetComponent<ICharacter>();
+				Transform charTransform = characterRefs.Character.Transform;
 				characterRefs.Movement = characterRefs.GetComponent<CharacterMovement>();
 				characterRefs.CharacterInput = characterRefs.GetComponent<CharacterInput>();
 				characterRefs.CharacterAnimation = characterRefs.GetComponent<CharacterAnimation>();

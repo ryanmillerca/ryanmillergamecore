@@ -78,8 +78,15 @@ namespace RyanMillerGameCore.Character {
 		}
 
 		public ICharacter Character {
-			get => (ICharacter)m_Character;
-			set => m_Character = (Component)value;
+			get {
+				if (m_Character is ICharacter character) {
+					return character;
+				}
+				return null;
+			}
+			set {
+				m_Character = (Component)value;
+			}
 		}
 
 		public CharacterBrain CharacterBrain {
