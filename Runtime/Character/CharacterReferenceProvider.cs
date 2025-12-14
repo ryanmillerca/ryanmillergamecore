@@ -1,6 +1,6 @@
 namespace RyanMillerGameCore.Character {
 	using UnityEngine;
-	using Animation;
+	using RyanMillerGameCore.Animation;
 	using Interactions;
 	using SMB;
 

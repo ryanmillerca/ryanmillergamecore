@@ -1,7 +1,7 @@
 namespace RyanMillerGameCore.Character {
 	using UnityEngine;
-	using Animation;
 	using Interactions;
+	using RyanMillerGameCore.Animation;
 
 	public interface ICharacterReferenceProvider {
 		CharacterMovement Movement { get; set; }

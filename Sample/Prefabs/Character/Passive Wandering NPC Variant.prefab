@@ -288,6 +288,50 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.378
       objectReference: {fileID: 0}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: m_DamageDealer
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: m_CharacterBrain
+      value: 
+      objectReference: {fileID: 4430282769527696820}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: m_CharacterPathfind
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: m_AggroColliderSensor
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: m_AttackColliderSensor
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: m_Renderers.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: m_InteractColliderSensor
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: 'm_Renderers.Array.data[2]'
+      value: 
+      objectReference: {fileID: 276651034778684117}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: 'm_Renderers.Array.data[3]'
+      value: 
+      objectReference: {fileID: 4703780123201183668}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: 'm_Renderers.Array.data[4]'
+      value: 
+      objectReference: {fileID: 5947856297709565904}
+    - target: {fileID: 7739612737763839827, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
+      propertyPath: 'm_Renderers.Array.data[5]'
+      value: 
+      objectReference: {fileID: 4803295039696470690}
     - target: {fileID: 8302141704080009450, guid: 0ec9c1e9d0d864c388f3ea8476ab7549, type: 3}
       propertyPath: maxSpeed
       value: 4

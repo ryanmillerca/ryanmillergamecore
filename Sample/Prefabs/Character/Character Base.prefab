@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7277062597521267908}
   - component: {fileID: 3170426812257226178}
   - component: {fileID: 6092074166571465732}
-  - component: {fileID: 3785551034004355221}
   - component: {fileID: 6583291971729094936}
+  - component: {fileID: 9085786418629978980}
   m_Layer: 0
   m_Name: CapsuleCharArt
   m_TagString: Untagged
@@ -98,43 +98,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3785551034004355221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 795929302272456673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecea5804e998b4d7c83125f0bf3817e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Movement: {fileID: 8302141704080009450}
-  m_MainCollider: {fileID: 6276998569089883695}
-  m_CharacterInput: {fileID: 0}
-  m_CharacterAnimation: {fileID: 4281931283517321042}
-  m_Character: {fileID: 1791461654542484843}
-  m_CharacterBrain: {fileID: 4883974804810804768}
-  m_PlayerCharacter: {fileID: 0}
-  m_AttackColliderSensor: {fileID: 6507270822162368684}
-  m_AggroColliderSensor: {fileID: 6507270822162368684}
-  m_InteractColliderSensor: {fileID: 4907828329546544004}
-  m_Rb: {fileID: 7619823330534572677}
-  m_DamageDealer: {fileID: 9167538621912994157}
-  m_Animator: {fileID: 6583291971729094936}
-  m_Renderers:
-  - {fileID: 6092074166571465732}
-  - {fileID: 5927816787916160020}
-  - {fileID: 4250925253235643915}
-  - {fileID: 7545764847667014868}
-  - {fileID: 3037117857438316981}
-  - {fileID: 4173194502051484113}
-  - {fileID: 3011103731500000419}
-  - {fileID: 3335747619943947792}
-  m_CharacterPathfind: {fileID: 1205099524361834224}
-  m_CharacterAnimParamMappings: {fileID: 11400000, guid: 60660c9c877e744649e62daad754ad58, type: 2}
-  m_AttackDashForce: 500
 --- !u!95 &6583291971729094936
 Animator:
   serializedVersion: 7
@@ -157,6 +120,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &9085786418629978980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 795929302272456673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66fa4908cda84615a835abbd034bb39f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RyanMillerGameCore::RyanMillerGameCore.Character.CharacterReferenceRedirectProvider
+  m_ReferenceProvider: {fileID: 7739612737763839827}
 --- !u!1 &1013980909450201388
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,6 +240,7 @@ GameObject:
   - component: {fileID: 1351514551044399748}
   - component: {fileID: 6276998569089883695}
   - component: {fileID: 1205099524361834224}
+  - component: {fileID: 7739612737763839827}
   m_Layer: 8
   m_Name: Character Base
   m_TagString: Character
@@ -363,24 +340,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7328b60cfad13414ba2123443087c222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  identifier: {fileID: 0}
-  maxHealth: 3
-  currentHealth: 3
-  isPlayer: 1
-  spawnAtCheckpoint: 0
-  damageCooldown: 1
-  receivedDamage:
+  m_ReceivedDamage:
     m_PersistentCalls:
       m_Calls: []
-  receivedHeal:
+  m_ReceivedHeal:
     m_PersistentCalls:
       m_Calls: []
-  knockedBack:
+  m_KnockedBack:
     m_PersistentCalls:
       m_Calls: []
-  died:
+  m_Died:
     m_PersistentCalls:
       m_Calls: []
+  m_Identifier: {fileID: 0}
+  m_MaxHealth: 10
+  m_CurrentHealth: 10
+  m_DamageCooldown: 1
+  m_Stats: {fileID: 0}
+  m_IsPlayer: 0
+  m_SpawnAtCheckpoint: 0
 --- !u!114 &4883974804810804768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -476,6 +454,43 @@ MonoBehaviour:
   stuckFailAfterSeconds: 3
   invalidPathFailSeconds: 1
   debugDrawPath: 0
+--- !u!114 &7739612737763839827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1975680716783051113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecea5804e998b4d7c83125f0bf3817e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Movement: {fileID: 8302141704080009450}
+  m_MainCollider: {fileID: 6276998569089883695}
+  m_CharacterInput: {fileID: 0}
+  m_CharacterAnimation: {fileID: 4281931283517321042}
+  m_Character: {fileID: 1791461654542484843}
+  m_CharacterBrain: {fileID: 4883974804810804768}
+  m_PlayerCharacter: {fileID: 0}
+  m_AttackColliderSensor: {fileID: 6507270822162368684}
+  m_AggroColliderSensor: {fileID: 6507270822162368684}
+  m_InteractColliderSensor: {fileID: 4907828329546544004}
+  m_Rb: {fileID: 7619823330534572677}
+  m_DamageDealer: {fileID: 9167538621912994157}
+  m_Animator: {fileID: 6583291971729094936}
+  m_Renderers:
+  - {fileID: 6092074166571465732}
+  - {fileID: 5927816787916160020}
+  - {fileID: 4250925253235643915}
+  - {fileID: 7545764847667014868}
+  - {fileID: 3037117857438316981}
+  - {fileID: 4173194502051484113}
+  - {fileID: 3011103731500000419}
+  - {fileID: 3335747619943947792}
+  m_CharacterPathfind: {fileID: 1205099524361834224}
+  m_CharacterAnimParamMappings: {fileID: 11400000, guid: 60660c9c877e744649e62daad754ad58, type: 2}
+  m_AttackDashForce: 500
 --- !u!1 &4405122431459673267
 GameObject:
   m_ObjectHideFlags: 0

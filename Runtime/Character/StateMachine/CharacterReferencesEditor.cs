@@ -1,8 +1,8 @@
-namespace RyanMillerGameCore.Character.SMB {
+namespace RyanMillerGameCore.Character {
 #if UNITY_EDITOR
 	using UnityEditor;
 	using UnityEngine;
-	using Animation;
+	using RyanMillerGameCore.Animation;
 	using Interactions;
 
 	/// <summary>
@@ -15,27 +15,37 @@ namespace RyanMillerGameCore.Character.SMB {
 
 			var characterRefs = (CharacterReferenceProvider)target;
 
-			if (!characterRefs.Animator && GUILayout.Button("Auto Assign Animator")) {
-				characterRefs.Animator = characterRefs.GetComponent<Animator>();
-				EditorUtility.SetDirty(characterRefs);
-			}
 			if (GUILayout.Button("Get References")) {
-				characterRefs.Character = characterRefs.GetComponentInParent<ICharacter>();
-				Transform root = characterRefs.Character.Transform;
-				characterRefs.Movement = root.GetComponentInChildren<CharacterMovement>();
-				characterRefs.MainCollider = root.GetComponent<Collider>();
-				characterRefs.CharacterInput = root.GetComponent<CharacterInput>();
-				characterRefs.CharacterAnimation = root.GetComponent<CharacterAnimation>();
-				characterRefs.CharacterBrain = root.GetComponent<CharacterBrain>();
-				characterRefs.PlayerCharacter = root.GetComponent<PlayerCharacter>();
-				characterRefs.Rb = root.GetComponent<Rigidbody>();
-				characterRefs.Animator = root.GetComponentInChildren<Animator>();
-				characterRefs.DamageDealer = root.GetComponentInChildren<DamageDealer>();
-				characterRefs.CharacterPathfind = root.GetComponent<CharacterPathfind>();
+				Undo.RecordObject(characterRefs, "Get References");
+				Transform charTransform = characterRefs.Character.Transform;
+
+				// ROOT components
+				characterRefs.Character = characterRefs.GetComponent<ICharacter>();
+				characterRefs.Movement = characterRefs.GetComponent<CharacterMovement>();
+				characterRefs.CharacterInput = characterRefs.GetComponent<CharacterInput>();
+				characterRefs.CharacterAnimation = characterRefs.GetComponent<CharacterAnimation>();
+				characterRefs.CharacterBrain = characterRefs.GetComponent<CharacterBrain>();
+				characterRefs.PlayerCharacter = characterRefs.GetComponent<PlayerCharacter>();
+				characterRefs.Rb = characterRefs.GetComponent<Rigidbody>();
+				characterRefs.CharacterPathfind = characterRefs.GetComponent<CharacterPathfind>();
+
+				// CHILD components
+				characterRefs.Animator = characterRefs.GetComponentInChildren<Animator>();
+				characterRefs.DamageDealer = characterRefs.GetComponentInChildren<DamageDealer>();
 				characterRefs.Renderers = characterRefs.gameObject.GetComponentsInChildren<Renderer>();
-				characterRefs.InteractColliderSensor = root.GetComponentInChildren<InteractiveObjectColliderSensor>();
-				var colliderSensors = root.GetComponentsInChildren<Collider>();
+				characterRefs.InteractColliderSensor = characterRefs.GetComponentInChildren<InteractiveObjectColliderSensor>();
+
+				// ROOT colliders (Main Collider)
+				var colliderSensors = characterRefs.GetComponentsInChildren<Collider>();
 				foreach (var collider in colliderSensors) {
+					if (!collider.isTrigger) {
+						characterRefs.MainCollider = characterRefs.GetComponent<Collider>();
+					}
+				}
+
+				// CHILD colliders (Sensors)
+				var childColliders = characterRefs.GetComponentsInChildren<Collider>();
+				foreach (var collider in childColliders) {
 					if (collider.name.ToLowerInvariant().Contains("aggro")) {
 						characterRefs.AggroColliderSensor = collider.GetComponent<ColliderSensor>();
 					}
@@ -43,6 +53,7 @@ namespace RyanMillerGameCore.Character.SMB {
 						characterRefs.AttackColliderSensor = collider.GetComponent<ColliderSensor>();
 					}
 				}
+
 				EditorUtility.SetDirty(characterRefs);
 			}
 		}
