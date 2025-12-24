@@ -12,25 +12,25 @@ namespace RyanMillerGameCore.Character.SMB
     /// </summary>
     public static class AnimatorExtensions
     {
-        private static readonly Dictionary<Animator, CharacterReferences> _characterRefs = new();
+        private static readonly Dictionary<Animator, ICharacterReferenceProvider> CharacterRefs = new Dictionary<Animator, ICharacterReferenceProvider>();
 
-        public static void SetComponentReference(this Animator animator, CharacterReferences references)
+        public static void SetComponentReference(this Animator animator, ICharacterReferenceProvider referenceProvider)
         {
-            _characterRefs[animator] = references;
+            CharacterRefs[animator] = referenceProvider;
         }
 
-        public static CharacterReferences GetComponentReference(this Animator animator)
+        public static ICharacterReferenceProvider GetComponentReference(this Animator animator)
         {
             if (animator == null) {
                 return null;
             }
-            _characterRefs.TryGetValue(animator, out var reference);
+            CharacterRefs.TryGetValue(animator, out ICharacterReferenceProvider reference);
             return reference;
         }
 
         public static void ClearComponentReference(this Animator animator)
         {
-            _characterRefs.Remove(animator);
+            CharacterRefs.Remove(animator);
         }
         
         #if UNITY_EDITOR

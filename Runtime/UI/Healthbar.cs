@@ -55,7 +55,7 @@ namespace RyanMillerGameCore.UI
             }
             _flashHealthBarCoroutine = StartCoroutine(FlashHealthbar());
             _targetSizeDelta = new Vector2(
-                _healthBarSize.x * _playerCharacter.PercentHealth, 
+                _healthBarSize.x * _playerCharacter.percentHealth, 
                 _healthBarSize.y);
         }
         
@@ -67,7 +67,7 @@ namespace RyanMillerGameCore.UI
             }
             _flashHealthBarCoroutine = StartCoroutine(FlashHealthbar());
             _targetSizeDelta = new Vector2(
-                _healthBarSize.x * _playerCharacter.PercentHealth, 
+                _healthBarSize.x * _playerCharacter.percentHealth, 
                 _healthBarSize.y);
         }
 

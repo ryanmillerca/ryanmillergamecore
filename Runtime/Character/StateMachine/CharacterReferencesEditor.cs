@@ -1,49 +1,60 @@
-namespace RyanMillerGameCore.Character.SMB {
+namespace RyanMillerGameCore.Character {
 #if UNITY_EDITOR
 	using UnityEditor;
 	using UnityEngine;
+	using RyanMillerGameCore.Animation;
+	using Interactions;
 
 	/// <summary>
 	/// Custom editor for CharacterReferences component.
 	/// </summary>
-	[CustomEditor(typeof(CharacterReferences))]
+	[CustomEditor(typeof(CharacterReferenceProvider))]
 	public class CharacterReferencesEditor : Editor {
 		public override void OnInspectorGUI() {
 			DrawDefaultInspector();
 
-			var characterRefs = (CharacterReferences)target;
+			var characterRefs = (CharacterReferenceProvider)target;
 
-			if (characterRefs.animator == null && GUILayout.Button("Auto Assign Animator")) {
-				characterRefs.animator = characterRefs.GetComponent<Animator>();
-				EditorUtility.SetDirty(characterRefs);
-			}
 			if (GUILayout.Button("Get References")) {
-				AssignComponentIfNull(ref characterRefs.movement, characterRefs);
-				AssignComponentIfNull(ref characterRefs.mainCollider, characterRefs);
-				AssignComponentIfNull(ref characterRefs.characterInput, characterRefs);
-				AssignComponentIfNull(ref characterRefs.characterAnimation, characterRefs);
-				AssignComponentIfNull(ref characterRefs.character, characterRefs);
-				AssignComponentIfNull(ref characterRefs.characterBrain, characterRefs);
-				AssignComponentIfNull(ref characterRefs.playerCharacter, characterRefs);
-				AssignComponentIfNull(ref characterRefs.attackColliderSensor, characterRefs);
-				AssignComponentIfNull(ref characterRefs.interactColliderSensor, characterRefs);
-				AssignComponentIfNull(ref characterRefs.aggroColliderSensor, characterRefs);
-				AssignComponentIfNull(ref characterRefs.rb, characterRefs);
-				AssignComponentIfNull(ref characterRefs.animator, characterRefs);
-				AssignComponentIfNull(ref characterRefs.damageDealer, characterRefs);
-				AssignComponentIfNull(ref characterRefs.characterPathfind, characterRefs);
-				characterRefs.renderers = characterRefs.gameObject.GetComponentsInChildren<Renderer>();
-				EditorUtility.SetDirty(characterRefs);
-			}
-		}
+				Undo.RecordObject(characterRefs, "Get References");
 
-		private void AssignComponentIfNull<T>(ref T field, CharacterReferences context) where T : Component {
-			if (!field) {
-				field = context.transform.GetComponentInParent<T>();
-				if (!field) {
-					var charRoot = context.transform.GetComponentInParent<Character>();
-					field = charRoot.GetComponentInChildren<T>();
+				// ROOT components
+				characterRefs.Character = characterRefs.GetComponent<ICharacter>();
+				Transform charTransform = characterRefs.Character.Transform;
+				characterRefs.Movement = characterRefs.GetComponent<CharacterMovement>();
+				characterRefs.CharacterInput = characterRefs.GetComponent<CharacterInput>();
+				characterRefs.CharacterAnimation = characterRefs.GetComponent<CharacterAnimation>();
+				characterRefs.CharacterBrain = characterRefs.GetComponent<CharacterBrain>();
+				characterRefs.PlayerCharacter = characterRefs.GetComponent<PlayerCharacter>();
+				characterRefs.Rb = characterRefs.GetComponent<Rigidbody>();
+				characterRefs.CharacterPathfind = characterRefs.GetComponent<CharacterPathfind>();
+
+				// CHILD components
+				characterRefs.Animator = characterRefs.GetComponentInChildren<Animator>();
+				characterRefs.DamageDealer = characterRefs.GetComponentInChildren<DamageDealer>();
+				characterRefs.Renderers = characterRefs.gameObject.GetComponentsInChildren<Renderer>();
+				characterRefs.InteractColliderSensor = characterRefs.GetComponentInChildren<InteractiveObjectColliderSensor>();
+
+				// ROOT colliders (Main Collider)
+				var colliderSensors = characterRefs.GetComponentsInChildren<Collider>();
+				foreach (var collider in colliderSensors) {
+					if (!collider.isTrigger) {
+						characterRefs.MainCollider = characterRefs.GetComponent<Collider>();
+					}
 				}
+
+				// CHILD colliders (Sensors)
+				var childColliders = characterRefs.GetComponentsInChildren<Collider>();
+				foreach (var collider in childColliders) {
+					if (collider.name.ToLowerInvariant().Contains("aggro")) {
+						characterRefs.AggroColliderSensor = collider.GetComponent<ColliderSensor>();
+					}
+					else if (collider.name.ToLowerInvariant().Contains("attack")) {
+						characterRefs.AttackColliderSensor = collider.GetComponent<ColliderSensor>();
+					}
+				}
+
+				EditorUtility.SetDirty(characterRefs);
 			}
 		}
 	}

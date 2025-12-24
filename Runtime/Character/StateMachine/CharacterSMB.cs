@@ -4,11 +4,11 @@ namespace RyanMillerGameCore.Character.SMB {
 	/// <summary>
 	/// Base/Abstract class for all character state machine behaviours.
 	/// </summary>
-	public abstract class CharacterSMB : StateMachineBehaviour {
+	abstract public class CharacterSMB : StateMachineBehaviour {
 		protected Animator animator;
-		protected CharacterReferences References {
+		protected CharacterReferenceProvider referenceProvider {
 			get {
-				return animator.GetComponentReference();
+				return (CharacterReferenceProvider)animator.GetComponentReference();
 			}
 		}
 

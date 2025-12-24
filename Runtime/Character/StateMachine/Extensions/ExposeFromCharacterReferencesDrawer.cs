@@ -26,14 +26,14 @@ namespace RyanMillerGameCore.Character.SMB
                 return;
             }
 
-            var characterReferences = animator.GetComponent<CharacterReferences>();
+            ICharacterReferenceProvider characterReferences = animator.GetComponent<ICharacterReferenceProvider>();
             if (characterReferences == null)
             {
                 EditorGUI.LabelField(position, label.text, "No CharacterReferences found");
                 return;
             }
 
-            var field = typeof(CharacterReferences).GetField(attr.ReferenceFieldName,
+            var field = typeof(ICharacterReferenceProvider).GetField(attr.ReferenceFieldName,
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (field == null)
             {
@@ -50,9 +50,9 @@ namespace RyanMillerGameCore.Character.SMB
                 float newVal = EditorGUI.FloatField(position, label, floatVal);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RecordObject(characterReferences, "Modify CharacterReferences field");
+                    Undo.RecordObject((Component)characterReferences, "Modify CharacterReferences field");
                     field.SetValue(characterReferences, newVal);
-                    EditorUtility.SetDirty(characterReferences);
+                    EditorUtility.SetDirty((Component)characterReferences);
                 }
             }
             else if (value is int intVal)
@@ -60,9 +60,9 @@ namespace RyanMillerGameCore.Character.SMB
                 int newVal = EditorGUI.IntField(position, label, intVal);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RecordObject(characterReferences, "Modify CharacterReferences field");
+                    Undo.RecordObject((Component)characterReferences, "Modify CharacterReferences field");
                     field.SetValue(characterReferences, newVal);
-                    EditorUtility.SetDirty(characterReferences);
+                    EditorUtility.SetDirty((Component)characterReferences);
                 }
             }
             else if (value is bool boolVal)
@@ -70,9 +70,9 @@ namespace RyanMillerGameCore.Character.SMB
                 bool newVal = EditorGUI.Toggle(position, label, boolVal);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RecordObject(characterReferences, "Modify CharacterReferences field");
+                    Undo.RecordObject((Component)characterReferences, "Modify CharacterReferences field");
                     field.SetValue(characterReferences, newVal);
-                    EditorUtility.SetDirty(characterReferences);
+                    EditorUtility.SetDirty((Component)characterReferences);
                 }
             }
             else

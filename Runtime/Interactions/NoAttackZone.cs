@@ -10,7 +10,7 @@ namespace RyanMillerGameCore.Interactions
             base.ItemEnteredTrigger(item);
             Character character = TryGetCharacterFromCollider(item);
             if (character) {
-                CharacterBrain characterBrain = character.Brain;
+                CharacterBrain characterBrain = character.brain;
                 if (characterBrain) {
                     characterBrain.AskToSetAttackEnabled(gameObject.GetInstanceID(), false);
                 }
@@ -22,7 +22,7 @@ namespace RyanMillerGameCore.Interactions
             base.ItemExitedTrigger(item);
             Character character = TryGetCharacterFromCollider(item);
             if (character) {
-                CharacterBrain characterBrain = character.Brain;
+                CharacterBrain characterBrain = character.brain;
                 characterBrain.AskToSetAttackEnabled(gameObject.GetInstanceID(), true);
             }
         }

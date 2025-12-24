@@ -17,23 +17,23 @@ namespace RyanMillerGameCore.Character.SMB
 
         protected override void OnCharacterStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            _attackParamHash = Animator.StringToHash(References.paramTriggerAttack);
-            _interactParamHash = Animator.StringToHash(References.paramTriggerInteract);
+            _attackParamHash = Animator.StringToHash(referenceProvider.CharacterAnimParamMappings.m_ParamTriggerAttack);
+            _interactParamHash = Animator.StringToHash(referenceProvider.CharacterAnimParamMappings.m_ParamTriggerInteract);
             base.OnCharacterStateEnter(animator, stateInfo, layerIndex);
-            if (References.characterBrain) {
-                References.characterBrain.OnAttackAction += AttackAction;
-                References.characterBrain.OnInteractAction += InteractAction;
+            if (referenceProvider.CharacterBrain) {
+                referenceProvider.CharacterBrain.OnAttackAction += AttackAction;
+                referenceProvider.CharacterBrain.OnInteractAction += InteractAction;
             }
         }
         
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            if (References == null) {
+            if (referenceProvider == null) {
                 return;
             }
-            if (References.characterBrain) {
-                References.characterBrain.OnAttackAction -= AttackAction;
-                References.characterBrain.OnInteractAction -= InteractAction;
+            if (referenceProvider.CharacterBrain) {
+                referenceProvider.CharacterBrain.OnAttackAction -= AttackAction;
+                referenceProvider.CharacterBrain.OnInteractAction -= InteractAction;
             }
             base.OnStateExit(animator, stateInfo, layerIndex);
         }
@@ -56,10 +56,10 @@ namespace RyanMillerGameCore.Character.SMB
             }
             animator.ResetTrigger(_interactParamHash);
             animator.SetTrigger(_interactParamHash);
-            IInteractive interactive = References.interactColliderSensor.CurrentInteractive;
+            IInteractive interactive = referenceProvider.InteractColliderSensor.CurrentInteractive;
             if ((Component)interactive)
             {
-                interactive.Interact(References.character);
+                interactive.Interact(referenceProvider.Character);
             }
         }
     }

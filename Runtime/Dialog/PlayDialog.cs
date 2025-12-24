@@ -7,6 +7,17 @@ namespace RyanMillerGameCore.Dialog {
 
 	public class PlayDialog : MonoBehaviour {
 
+		#region Setup
+
+		public void Setup(TriggerDialogOn triggerDialogOn, bool triggerOnce, bool disableOnComplete) {
+			this.triggerDialogOn = triggerDialogOn;
+			this.triggerOnlyOnce =  triggerOnce;
+			this.disableOnComplete = disableOnComplete;
+		}
+
+		#endregion
+
+
 		public UnityEvent DialogCompleteEvent {
 			get { return dialogCompleteEvent; }
 			set { dialogCompleteEvent = value; }

@@ -8,62 +8,62 @@ namespace RyanMillerGameCore.LevelToys {
 	using Utilities;
 
 	public class Breakable : MonoBehaviour, ITakesDamage {
-		[SerializeField] private UnityEvent OnBroken;
+		[SerializeField] private UnityEvent m_OnBroken;
 
         #pragma warning disable CS0067
 		public event Action Died;
 		public event Action Spawned;
 
-		[SerializeField] private bool isBroken = false;
-		[SerializeField] private Rigidbody _rigidbody;
-		[SerializeField] private Collider _collider;
-		[SerializeField] private float maxDurability = 1;
-		[SerializeField] private Rigidbody[] passOnForceToThese;
-		[SerializeField] private bool unparentForceTakers = true;
-		[SerializeField] private float randomAngularForce = 100;
-		[SerializeField] private WeightedIDTable dropTable;
+		[SerializeField] private bool m_IsBroken = false;
+		[SerializeField] private Rigidbody m_Rigidbody;
+		[SerializeField] private Collider m_Collider;
+		[SerializeField] private float m_MaxDurability = 1;
+		[SerializeField] private Rigidbody[] m_PassOnForceToThese;
+		[SerializeField] private bool m_UnparentForceTakers = true;
+		[SerializeField] private float m_RandomAngularForce = 100;
+		[SerializeField] private WeightedIDTable m_DropTable;
 
-		private EnableDisabler _enableDisabler;
-		private float currentDurability;
-		private Vector3 _storedVelocity;
+		private EnableDisabler m_enableDisabler;
+		private float m_currentDurability;
+		private Vector3 m_storedVelocity;
 
 		private void Awake() {
-			_enableDisabler = GetComponent<EnableDisabler>();
-			if (_enableDisabler) {
-				_enableDisabler.Completed += EnableDisablerCompleted;
+			m_enableDisabler = GetComponent<EnableDisabler>();
+			if (m_enableDisabler) {
+				m_enableDisabler.Completed += EnableDisablerCompleted;
 			}
-			currentDurability = maxDurability;
-			_rigidbody = GetComponent<Rigidbody>();
-			_collider = GetComponent<Collider>();
+			m_currentDurability = m_MaxDurability;
+			m_Rigidbody = GetComponent<Rigidbody>();
+			m_Collider = GetComponent<Collider>();
 		}
 
 		private void OnDestroy() {
-			if (_enableDisabler) {
-				_enableDisabler.Completed -= EnableDisablerCompleted;
+			if (m_enableDisabler) {
+				m_enableDisabler.Completed -= EnableDisablerCompleted;
 			}
 		}
 
 		private void EnableDisablerCompleted() {
-			if (unparentForceTakers) {
-				foreach (Rigidbody rb in passOnForceToThese) {
+			if (m_UnparentForceTakers) {
+				foreach (Rigidbody rb in m_PassOnForceToThese) {
 					rb.transform.SetParent(null);
 				}
 			}
-			foreach (Rigidbody rb in passOnForceToThese) {
-				rb.AddForce(_storedVelocity, ForceMode.Impulse);
+			foreach (Rigidbody rb in m_PassOnForceToThese) {
+				rb.AddForce(m_storedVelocity, ForceMode.Impulse);
 			}
 		}
 
 		public bool CanReceiveDamage() {
-			return !isBroken;
+			return !m_IsBroken;
 		}
 
 		public bool ReceiveDamage(float damageAmount, Component attacker = null) {
-			if (isBroken) {
+			if (m_IsBroken) {
 				return false;
 			}
-			currentDurability -= damageAmount;
-			if (currentDurability <= 0) {
+			m_currentDurability -= damageAmount;
+			if (m_currentDurability <= 0) {
 				Break();
 			}
 
@@ -71,17 +71,17 @@ namespace RyanMillerGameCore.LevelToys {
 		}
 
 		private void Break() {
-			isBroken = true;
+			m_IsBroken = true;
 
-			if (_collider) {
-				_collider.enabled = false;
+			if (m_Collider) {
+				m_Collider.enabled = false;
 			}
-			if (_rigidbody) {
-				_rigidbody.isKinematic = true;
-				_rigidbody.useGravity = false;
+			if (m_Rigidbody) {
+				m_Rigidbody.isKinematic = true;
+				m_Rigidbody.useGravity = false;
 			}
 
-			OnBroken?.Invoke();
+			m_OnBroken?.Invoke();
 
 			DropItem();
 
@@ -89,8 +89,8 @@ namespace RyanMillerGameCore.LevelToys {
 
 		private void DropItem() {
 			ID dropID = null;
-			if (dropTable != null) {
-				dropID = dropTable.GetRandomID();
+			if (m_DropTable != null) {
+				dropID = m_DropTable.GetRandomID();
 			}
 			if (dropID != null && ItemManager.Instance) {
 				GameObject item = ItemManager.Instance.GetItem(dropID);
@@ -102,15 +102,15 @@ namespace RyanMillerGameCore.LevelToys {
 		}
 
 		public bool ReceiveKnockback(Vector3 direction) {
-			_storedVelocity = direction;
-			if (_rigidbody) {
-				_rigidbody.AddForce(direction, ForceMode.Impulse);
+			m_storedVelocity = direction;
+			if (m_Rigidbody) {
+				m_Rigidbody.AddForce(direction, ForceMode.Impulse);
 				return true;
 			}
-			if (randomAngularForce > 0) {
-				_rigidbody.AddTorque(Random.Range(-randomAngularForce, randomAngularForce),
-					Random.Range(-randomAngularForce, randomAngularForce),
-					Random.Range(-randomAngularForce, randomAngularForce), ForceMode.Impulse);
+			if (m_RandomAngularForce > 0) {
+				m_Rigidbody.AddTorque(Random.Range(-m_RandomAngularForce, m_RandomAngularForce),
+					Random.Range(-m_RandomAngularForce, m_RandomAngularForce),
+					Random.Range(-m_RandomAngularForce, m_RandomAngularForce), ForceMode.Impulse);
 			}
 			return false;
 		}

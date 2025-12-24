@@ -20,9 +20,9 @@ namespace RyanMillerGameCore.Character.SMB
         {
             base.OnCharacterStateEnter(animator, stateInfo, layerIndex);
             _attacked = false;
-            if (References.attackDashForce > 0)
+            if (referenceProvider.m_AttackDashForce > 0)
             {
-                References.movement.PushForward(References.attackDashForce);
+                referenceProvider.Movement.PushForward(referenceProvider.m_AttackDashForce);
             }
         }
 
@@ -44,7 +44,7 @@ namespace RyanMillerGameCore.Character.SMB
         private void PerformAttack()
         {
             _attacked = true;
-            References.damageDealer.DealDamage(References.character.gameObject);
+            referenceProvider.DamageDealer.DealDamage(referenceProvider.Character.Transform.gameObject);
         }
     }
 }

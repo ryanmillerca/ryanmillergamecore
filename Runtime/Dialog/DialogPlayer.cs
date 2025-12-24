@@ -187,13 +187,15 @@ namespace RyanMillerGameCore.Dialog {
 						var line = dialogContent.Lines[li];
 						LogLineHeader(li, line);
 
-						if (line.portrait && portraitImage) {
-							portraitImage.sprite = line.portrait;
-							portraitImage.enabled = true;
-						}
-						else {
-							portraitImage.sprite = null;
-							portraitImage.enabled = false;
+						if (portraitImage) {
+							if (line.portrait) {
+								portraitImage.sprite = line.portrait;
+								portraitImage.enabled = true;
+							}
+							else {
+								portraitImage.sprite = null;
+								portraitImage.enabled = false;
+							}
 						}
 
 						Character speakingCharacter;
@@ -273,7 +275,7 @@ namespace RyanMillerGameCore.Dialog {
 
 				if (dialogContent.freezeInputs) {
 					if (CharacterManager.Instance) {
-						CharacterManager.Instance.Player.Brain.SetInputEnabled(true);
+						CharacterManager.Instance.Player.brain.SetInputEnabled(true);
 						Log("Inputs re-enabled.");
 					}
 				}
@@ -434,7 +436,7 @@ namespace RyanMillerGameCore.Dialog {
 				if (nav.faceID != null) {
 					Transform faceTr = IDService.Instance.GetTransformWithID(nav.faceID);
 					if (faceTr != null) {
-						speaker.CharacterMovement.LookAt(faceTr.position);
+						speaker.characterMovement.LookAt(faceTr.position);
 						Log($"Faced towards '{nav.faceID?.name}'.");
 					}
 				}
@@ -505,7 +507,7 @@ namespace RyanMillerGameCore.Dialog {
 		private void ApplyFreezeInput(DialogContent dialogContent) {
 			if (dialogContent.freezeInputs) {
 				if (CharacterManager.Instance) {
-					CharacterManager.Instance.Player.Brain.SetInputEnabled(false);
+					CharacterManager.Instance.Player.brain.SetInputEnabled(false);
 					Log("Inputs disabled (freezeInputs).");
 				}
 			}
@@ -559,7 +561,7 @@ namespace RyanMillerGameCore.Dialog {
 				if (speakingCharacter != null) {
 					lookTarget = IDService.Instance.GetGameObjectWithID(line.lookAt);
 					if (lookTarget != null) {
-						speakingCharacter.CharacterMovement.LookAt(lookTarget.transform.position);
+						speakingCharacter.characterMovement.LookAt(lookTarget.transform.position);
 					}
 				}
 
@@ -599,7 +601,7 @@ namespace RyanMillerGameCore.Dialog {
 			if (line.focusCameraOnSpeaker && speakingCharacter != null) {
 				CameraController.Instance.SetTemporaryCameraTarget(
 					speakingCharacter.transform,
-					speakingCharacter.CharacterMovement.ForwardTransform.eulerAngles.y + line.cameraOffsetRotation);
+					speakingCharacter.characterMovement.ForwardTransform.eulerAngles.y + line.cameraOffsetRotation);
 			}
 
 			if (line.voiceOver != null && _audioSource != null) {

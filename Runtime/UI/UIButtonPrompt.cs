@@ -36,7 +36,7 @@ namespace RyanMillerGameCore.UI
             var player = CharacterManager.Instance.Player;
             if (player)
             {
-                player.References.characterInput.FireInteractFromUI();
+                player.referenceProvider.CharacterInput.FireInteractFromUI();
             }
         }
 

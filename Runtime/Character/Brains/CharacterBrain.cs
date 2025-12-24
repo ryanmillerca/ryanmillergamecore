@@ -44,12 +44,12 @@ namespace RyanMillerGameCore.Character
 
         public void GoToHurt()
         {
-            CharacterReferences.animator.SetTrigger(_hurtTriggerHash);
+            iCharacterReferenceProvider.Animator.SetTrigger(_hurtTriggerHash);
         }
 
         public void GoToDead()
         {
-            CharacterReferences.animator.SetBool(_deadBoolStringHash, true);
+            iCharacterReferenceProvider.Animator.SetBool(_deadBoolStringHash, true);
             if (turnOffColliderOnDeath)
             {
                 SetCollision(false);
@@ -68,7 +68,7 @@ namespace RyanMillerGameCore.Character
             {
                 SetCollision(true);
             }
-            CharacterReferences.animator.SetBool(_deadBoolStringHash, false);
+            iCharacterReferenceProvider.Animator.SetBool(_deadBoolStringHash, false);
         }
 
         public void LookAt(Vector3 point)
@@ -78,25 +78,25 @@ namespace RyanMillerGameCore.Character
 
         public void SetInputEnabled(bool inputEnabled)
         {
-            if (CharacterReferences.characterInput)
+            if (iCharacterReferenceProvider.CharacterInput)
             {
-                CharacterReferences.characterInput.SetInputEnabled(inputEnabled);
+                iCharacterReferenceProvider.CharacterInput.SetInputEnabled(inputEnabled);
             }
         }
 
         public void SetMovementEnabled(bool movementEnabled)
         {
-            if (CharacterReferences.characterInput)
+            if (iCharacterReferenceProvider.CharacterInput)
             {
-                CharacterReferences.characterInput.SetMovementEnabled(movementEnabled);
+                iCharacterReferenceProvider.CharacterInput.SetMovementEnabled(movementEnabled);
             }
         }
 
         public void SetAttackEnabled(bool attackEnabled)
         {
-            if (CharacterReferences.characterInput)
+            if (iCharacterReferenceProvider.CharacterInput)
             {
-                CharacterReferences.characterInput.SetAttackEnabled(attackEnabled);
+                iCharacterReferenceProvider.CharacterInput.SetAttackEnabled(attackEnabled);
             }
         }
 
@@ -122,9 +122,9 @@ namespace RyanMillerGameCore.Character
         
         public void SetInteractEnabled(bool interactEnabled)
         {
-            if (CharacterReferences.characterInput)
+            if (iCharacterReferenceProvider.CharacterInput)
             {
-                CharacterReferences.characterInput.SetInteractEnabled(interactEnabled);
+                iCharacterReferenceProvider.CharacterInput.SetInteractEnabled(interactEnabled);
             }
         }
 
@@ -152,7 +152,7 @@ namespace RyanMillerGameCore.Character
             }
 
             // change to aggro state
-            CharacterReferences.animator.SetBool(_hasAggroHash, hasAggro);
+            iCharacterReferenceProvider.Animator.SetBool(_hasAggroHash, hasAggro);
         }
 
         protected virtual void AggroTargetDied()
@@ -182,15 +182,15 @@ namespace RyanMillerGameCore.Character
         
         #region Serialized Fields
 
-        protected CharacterReferences CharacterReferences {
+        protected ICharacterReferenceProvider iCharacterReferenceProvider {
             get {
-                if (characterReferences == null) {
-                    characterReferences = GetComponentInChildren<CharacterReferences>();
+                if (m_ICharacterReferenceProvider == null) {
+                    m_ICharacterReferenceProvider = GetComponentInChildren<ICharacterReferenceProvider>();
                 }
-                return characterReferences;
+                return m_ICharacterReferenceProvider;
             }
         }
-        protected CharacterReferences characterReferences;
+        protected ICharacterReferenceProvider m_ICharacterReferenceProvider;
 
         [Tooltip("This is a 0-1 Dot Product for a frontal cone"), SerializeField, Range(0, 1)]
         private float bumpFrontAngle = 0.33f;
@@ -233,9 +233,9 @@ namespace RyanMillerGameCore.Character
         {
             _collisionHandler = GetComponent<CollisionHandler>();
             _movable = GetComponent<IMovable>();
-            _hurtTriggerHash = Animator.StringToHash(CharacterReferences.paramTriggerHurt);
-            _deadBoolStringHash = Animator.StringToHash(CharacterReferences.paramBoolDead);
-            _hasAggroHash = Animator.StringToHash(CharacterReferences.paramBoolAggro);
+            _hurtTriggerHash = Animator.StringToHash(iCharacterReferenceProvider.CharacterAnimParamMappings.m_ParamTriggerHurt);
+            _deadBoolStringHash = Animator.StringToHash(iCharacterReferenceProvider.CharacterAnimParamMappings.m_ParamBoolDead);
+            _hasAggroHash = Animator.StringToHash(iCharacterReferenceProvider.CharacterAnimParamMappings.m_ParamBoolAggro);
             _path = new NavMeshPath();
         }
 
@@ -247,7 +247,7 @@ namespace RyanMillerGameCore.Character
                 _collisionHandler.TriggerEnter += OnTrigger;
             }
 
-            CharacterReferences.character.Spawned += GoToRespawn;
+            iCharacterReferenceProvider.Character.Spawned += GoToRespawn;
             
             if (_movable != null)
             {
@@ -264,7 +264,7 @@ namespace RyanMillerGameCore.Character
                 _collisionHandler.TriggerEnter -= OnTrigger;
             }
             
-            CharacterReferences.character.Spawned -= GoToRespawn;
+            iCharacterReferenceProvider.Character.Spawned -= GoToRespawn;
 
             if (_movable != null)
             {
@@ -350,8 +350,8 @@ namespace RyanMillerGameCore.Character
 
         private void SetCollision(bool collisionEnabled)
         {
-            CharacterReferences.mainCollider.enabled = collisionEnabled;
-            CharacterReferences.rb.isKinematic = !collisionEnabled;
+            iCharacterReferenceProvider.MainCollider.enabled = collisionEnabled;
+            iCharacterReferenceProvider.Rb.isKinematic = !collisionEnabled;
         }
 
         #endregion

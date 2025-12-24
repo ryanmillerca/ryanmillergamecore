@@ -1,3 +1,4 @@
+using UnityEngine.Serialization;
 namespace RyanMillerGameCore.Character
 {
     using System;
@@ -21,10 +22,7 @@ namespace RyanMillerGameCore.Character
         #endregion
 
         #region Serialized Fields
-
-        [Tooltip("Character-wide references container.")] [SerializeField]
-        private CharacterReferences references;
-
+        
         [Tooltip("Meters to consider arrived at the final goal.")] [SerializeField]
         private float arrivalRadius = 0.4f;
 
@@ -71,6 +69,7 @@ namespace RyanMillerGameCore.Character
 
         #region Private Fields
 
+        private ICharacterReferenceProvider m_referenceProvider;
         private NavMeshPath _path;
         private int _currentCornerIndex = 1;
         private int _lastCornerCount = 0;
@@ -111,17 +110,8 @@ namespace RyanMillerGameCore.Character
 
         #region Unity
 
-        private void OnEnable()
-        {
-            if (references == null)
-            {
-                references = GetComponentInChildren<CharacterReferences>();
-            }
-
-            if (references == null)
-            {
-                Debug.LogError($"{nameof(CharacterPathfind)}: 'references' not assigned.", this);
-            }
+        private void Awake() {
+            m_referenceProvider = GetComponentInChildren<ICharacterReferenceProvider>();
         }
 
         private void OnValidate()
@@ -150,7 +140,7 @@ namespace RyanMillerGameCore.Character
 
             Transform effectiveTarget = _explicitTargetTransform != null
                 ? _explicitTargetTransform
-                : (references != null && references.characterBrain != null ? references.characterBrain.Target : null);
+                : (m_referenceProvider != null && m_referenceProvider.CharacterBrain != null ? m_referenceProvider.CharacterBrain.Target : null);
 
             if (effectiveTarget == null)
             {
@@ -217,17 +207,17 @@ namespace RyanMillerGameCore.Character
                 moveDir = Vector3.zero;
             }
 
-            if (references && references.movement)
+            if (m_referenceProvider != null && m_referenceProvider.Movement)
             {
                 if (_forceful)
                 {
                     // Decisive cinematic movement (MovePosition) using CharacterMovement's forceful method
-                    references.movement.MoveForcefulTowards(next, Time.deltaTime);
+                    m_referenceProvider.Movement.MoveForcefulTowards(next, Time.deltaTime);
                 }
                 else
                 {
                     // Gameplay style (forces)
-                    references.movement.Move(moveDir);
+                    m_referenceProvider.Movement.Move(moveDir);
                 }
             }
 
@@ -303,7 +293,7 @@ namespace RyanMillerGameCore.Character
         /// </summary>
         public void StartPath(StartOptions options)
         {
-            if (references == null)
+            if (m_referenceProvider == null)
             {
                 Fail("invalid");
                 return;
@@ -311,7 +301,7 @@ namespace RyanMillerGameCore.Character
 
             Transform effective = options.targetTransform != null
                 ? options.targetTransform
-                : (references.characterBrain != null ? references.characterBrain.Target : null);
+                : (m_referenceProvider.CharacterBrain != null ? m_referenceProvider.CharacterBrain.Target : null);
 
             if (effective == null)
             {
@@ -324,9 +314,9 @@ namespace RyanMillerGameCore.Character
 
             _path ??= new NavMeshPath();
 
-            if (references.movement != null)
+            if (m_referenceProvider.Movement != null)
             {
-                references.movement.CanMove(true);
+                m_referenceProvider.Movement.CanMove(true);
             }
 
             _currentCornerIndex = 1;
@@ -351,9 +341,9 @@ namespace RyanMillerGameCore.Character
         public void Cancel()
         {
             _isNavigating = false;
-            if (references != null && references.movement != null)
+            if (m_referenceProvider != null && m_referenceProvider.Movement != null)
             {
-                references.movement.Move(Vector3.zero);
+                m_referenceProvider.Movement.Move(Vector3.zero);
             }
         }
 
@@ -439,7 +429,7 @@ namespace RyanMillerGameCore.Character
         private float GetApproxSpeakerRadius()
         {
             // approximate radius as half the min dimension in XZ
-            var size = references.mainCollider.bounds.size;
+            var size = m_referenceProvider.MainCollider.bounds.size;
             return 0.5f * Mathf.Min(size.x, size.z);
         }
 
@@ -474,11 +464,11 @@ namespace RyanMillerGameCore.Character
         private void RecalculateExpectedDuration()
         {
             float moveSpeed = 100f;
-            if (references != null && references.movement != null && references.movement.maxSpeed > 0f)
+            if (m_referenceProvider != null && m_referenceProvider.Movement != null && m_referenceProvider.Movement.maxSpeed > 0f)
             {
-                moveSpeed = references.movement.maxSpeed;
-                if (_forceful && references.movement.forcefulSpeed > 0f)
-                    moveSpeed = references.movement.forcefulSpeed;
+                moveSpeed = m_referenceProvider.Movement.maxSpeed;
+                if (_forceful && m_referenceProvider.Movement.forcefulSpeed > 0f)
+                    moveSpeed = m_referenceProvider.Movement.forcefulSpeed;
             }
 
             if (!HasUsablePath())
@@ -499,9 +489,9 @@ namespace RyanMillerGameCore.Character
         private void Complete()
         {
             _isNavigating = false;
-            if (references != null && references.movement != null)
+            if (m_referenceProvider != null && m_referenceProvider.Movement != null)
             {
-                references.movement.Move(Vector3.zero);
+                m_referenceProvider.Movement.Move(Vector3.zero);
             }
 
             PathCompleted?.Invoke(Time.time - _startTime);
@@ -510,9 +500,9 @@ namespace RyanMillerGameCore.Character
         private void Fail(string reason)
         {
             _isNavigating = false;
-            if (references != null && references.movement != null)
+            if (m_referenceProvider != null && m_referenceProvider.Movement != null)
             {
-                references.movement.Move(Vector3.zero);
+                m_referenceProvider.Movement.Move(Vector3.zero);
             }
 
             PathFailed?.Invoke(reason);

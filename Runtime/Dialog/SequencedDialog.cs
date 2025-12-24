@@ -3,6 +3,7 @@ namespace RyanMillerGameCore.Dialog {
 	using System;
 	using Interactions;
 	using UnityEngine.Events;
+	using Character;
 
 	public class SequencedDialog : MonoBehaviour, IInteractive {
 		[Tooltip("Leave empty to use child objects")]
@@ -54,7 +55,7 @@ namespace RyanMillerGameCore.Dialog {
 		}
 
 
-		public virtual void Interact(Character.Character character) {
+		public virtual void Interact(ICharacter character) {
 			OnInteract?.Invoke();
 			dialogs[currentDialogIndex].TriggerDialog();
 		}

@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2688612833995090, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_CharacterBrain
+      value: 
+      objectReference: {fileID: 8594500704859223734}
     - target: {fileID: 206915972607412185, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
       propertyPath: m_Radius
       value: 1.9
@@ -68,9 +72,17 @@ PrefabInstance:
       propertyPath: characterBrain
       value: 
       objectReference: {fileID: 8594500704859223734}
+    - target: {fileID: 6911291618395496084, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: _characterBrain
+      value: 
+      objectReference: {fileID: 8594500704859223734}
+    - target: {fileID: 6911291618395496084, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
+      propertyPath: m_CharacterBrain
+      value: 
+      objectReference: {fileID: 8594500704859223734}
     - target: {fileID: 8073312169503573864, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
       propertyPath: m_Name
-      value: Static Talkable NPC Variant
+      value: Static NPC Variant
       objectReference: {fileID: 0}
     - target: {fileID: 8764188299942020229, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
       propertyPath: m_Enabled
@@ -87,17 +99,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 8594500704859223734}
   m_SourcePrefab: {fileID: 100100000, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
---- !u!114 &1402545498744832525 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6911291618395496084, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
-  m_PrefabInstance: {fileID: 5521132393082870937}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecea5804e998b4d7c83125f0bf3817e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4365441645362158577 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8073312169503573864, guid: 5d50c51dcfc3148168eb6c96663d3740, type: 3}
@@ -115,7 +116,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ce09917d037e443cb33cdc1729ee28d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RyanMillerGameCore::RyanMillerGameCore.Character.CharacterBrain
-  characterReferences: {fileID: 1402545498744832525}
   bumpFrontAngle: 0.33
   seeFrontAngle: 0.33
   turnOffColliderOnDeath: 1

@@ -1,281 +1,325 @@
-namespace RyanMillerGameCore.Character
-{
-    using UnityEngine;
-    using System;
-    using UnityEngine.Events;
-    using SaveSystem;
-    using Camera;
-    using Interactions;
-    using Utilities;
-    using SMB;
+using UnityEngine.Serialization;
+namespace RyanMillerGameCore.Character {
+	using UnityEngine;
+	using System;
+	using UnityEngine.Events;
+	using SaveSystem;
+	using Camera;
+	using Interactions;
+	using Utilities;
 
-    /// <summary>
-    /// Represents a general character in the game, managing health, damage, player status, and related events.
-    /// </summary>
-    [RequireComponent(typeof(AutoRegisterID))]
-    public class Character : MonoBehaviour, ICharacter, ITakesDamage, IHasID
-    {
-        [Header("Parameters")]
-        [SerializeField] private CharacterID identifier;
-        [SerializeField] private float maxHealth = 10;
-        [SerializeField] private float currentHealth = 10;
-        [SerializeField] private bool isPlayer;
-        [SerializeField] private bool spawnAtCheckpoint = false;
-        [SerializeField] private float damageCooldown = 1f;
-        
-        [Foldout("Unity Events"), SerializeField] private UnityEvent<float> receivedDamage;
-        [Foldout("Unity Events"), SerializeField] private UnityEvent<float> receivedHeal;
-        [Foldout("Unity Events"), SerializeField] private UnityEvent knockedBack;
-        [Foldout("Unity Events"), SerializeField] private UnityEvent died;
+	/// <summary>
+	/// Represents a general character in the game, managing health, damage, player status, and related events.
+	/// </summary>
+	[RequireComponent(typeof(AutoRegisterID))]
+	public class Character : MonoBehaviour, ICharacter, ITakesDamage, IHasID {
 
-        public CharacterReferences References
-        {
-            get
-            {
-                if (_characterReferences == null)
-                {
-                    _characterReferences = GetComponentInChildren<CharacterReferences>();
-                }
-                return _characterReferences;
-            }
-        }
-        
-        public event Action<float> OnReceiveDamage;
-        public event Action<float> OnReceiveHeal;
-        public event Action<Character> OnDied;
-        public event Action<Vector3> OnKnockedBack;
-        public event Action Died;
-        public event Action Spawned;
 
-        private CharacterReferences _characterReferences;
-        private CharacterMovement _characterMovement;
-        private CharacterBrain _characterBrain;
-        private static bool isQuitting = false;
-        private float lastDamageTime = -Mathf.Infinity;
-        
-        public CharacterMovement CharacterMovement
-        {
-            get
-            {
-                if (!_characterMovement)
-                {
-                    _characterMovement = GetComponent<CharacterMovement>();
-                }
-                return _characterMovement;
-            }
-        }
+		#region Events
 
-        public CharacterBrain Brain
-        {
-            get
-            {
-                if (_characterBrain == null)
-                {
-                    _characterBrain = GetComponent<CharacterBrain>();
-                }
-                return _characterBrain;
-            }
-        }
+		[Foldout("Unity Events"), SerializeField]
+		private UnityEvent<float> m_ReceivedDamage;
+		[Foldout("Unity Events"), SerializeField]
+		private UnityEvent<float> m_ReceivedHeal;
+		[Foldout("Unity Events"), SerializeField]
+		private UnityEvent m_KnockedBack;
+		[Foldout("Unity Events"), SerializeField]
+		private UnityEvent m_Died;
 
-        public float PercentHealth
-        {
-            get { return currentHealth / maxHealth; }
-        }
-        
-        public bool IsPlayer()
-        {
-            return isPlayer;
-        }
-        
-        public CharacterID ID()
-        {
-            return identifier;
-        }
+		public event Action<float> OnReceiveDamage;
+		public event Action<float> OnReceiveHeal;
+		public event Action<Character> OnDied;
+		public event Action<Vector3> OnKnockedBack;
+		public event Action Died;
+		public event Action Spawned;
 
-        public bool Respawn()
-        {
-            if (currentHealth > 0)
-            {
-                return false;
-            }
-            GoToCheckpoint();
-            Reset();
-            Spawned?.Invoke();
-            
-            return true;
-        }
+		#endregion
 
-        public void GoToCheckpoint(CheckpointData checkpointData = null) {
-            if (!DataManager.Instance) {
-                Debug.LogWarning("GoToCheckpoint failed: No DataManager in scene");
-                return;
-            }
-            checkpointData ??= DataManager.Instance.TryGetCheckpoint();
-            if (checkpointData == null) {
-                //Debug.LogWarning("GoToCheckpoint failed: No checkpoint data found");
-                return;
-            }
-            //Debug.Log("GoToCheckpoint: Found a checkpoint at " + checkpointData.position + ", teleporting player");
-            
-            CharacterMovement.Teleport(checkpointData.position, checkpointData.rotation);
-            
-            if (!CameraController.Instance) {
-                Debug.LogWarning("GoToCheckpoint issue: No Camera Controller in scene");
-                return;
-            }
-            CameraController.Instance.TargetYRotation = checkpointData.cameraRotation;
-            CameraController.Instance.transform.position = checkpointData.position;
-        }
-        
 
-        public void Reset()
-        {
-            currentHealth = maxHealth;
-        }
+		#region Public Properties
 
-        public void Interact(IInteractive interactive)
-        {
-            interactive.Interact(this);
-        }
+		public CharacterID identifier {
+			get {
+				if (m_Stats != null) {
+					return m_Stats.m_Identifier;
+				}
+				return m_Identifier;
+			}
+		}
 
-        public bool CanReceiveDamage()
-        {
-            // cannot, in damage cooldown period / iframes
-            if (Time.time < lastDamageTime + damageCooldown) {
-                return false;
-            }
-            // cannot, if dead
-            if (currentHealth <= 0) {
-                return false;
-            }
-            // well we must be alive, then
-            lastDamageTime = Time.time;
-            return true;
-        }
+		public float maxHealth {
+			get {
+				if (m_Stats) {
+					return m_Stats.m_MaxHealth;
+				}
+				return m_MaxHealth;
+			}
+			set {
+				if (m_Stats) {
+					m_Stats.m_MaxHealth = value;
+				}
+				m_MaxHealth = value;
+			}
+		}
 
-        public bool CanReceiveHealing()
-        {
-            return currentHealth < maxHealth;
-        }
+		public float currentHealth {
+			get {
+				if (m_Stats) {
+					return m_Stats.m_CurrentHealth;
+				}
+				return m_CurrentHealth;
+			}
+			set {
+				if (m_Stats) {
+					m_Stats.m_CurrentHealth = value;
+				}
+				m_CurrentHealth = value;
+			}
+		}
 
-        public bool ReceiveDamage(float damageAmount, Component attacker = null)
-        {
-            if (damageAmount == 0 || currentHealth <= 0)
-            {
-                return false;
-            }
+		public float damageCooldown {
+			get {
+				if (m_Stats != null) {
+					return m_Stats.m_DamageCooldown;
+				}
+				return m_DamageCooldown;
+			}
+		}
 
-            currentHealth -= damageAmount;
-            OnReceiveDamage?.Invoke(damageAmount);
-            receivedDamage?.Invoke(damageAmount);
-            if (currentHealth <= 0)
-            {
-                Brain.GoToDead();
-                OnDied?.Invoke(this);
-                Died?.Invoke();
-                died?.Invoke();
-            }
-            else
-            {
-                Brain.GoToHurt();
-            }
+		public Transform Transform {
+			get {
+				return transform;
+			}
+		}
 
-            return true;
-        }
-        
-        public bool ReceiveHeal(float healAmount, bool overHeal = false)
-        {
-            if (healAmount == 0)
-            {
-                return false;
-            }
+		public CharacterReferenceProvider referenceProvider {
+			get {
+				if (m_characterReferenceProvider == null) {
+					m_characterReferenceProvider = GetComponentInChildren<CharacterReferenceProvider>();
+				}
+				return m_characterReferenceProvider;
+			}
+		}
 
-            currentHealth += healAmount;
-            if (overHeal == false)
-            {
-                currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-            }
+		public CharacterMovement characterMovement {
+			get {
+				if (!m_characterMovement) {
+					m_characterMovement = GetComponent<CharacterMovement>();
+				}
+				return m_characterMovement;
+			}
+		}
 
-            OnReceiveHeal?.Invoke(healAmount);
-            receivedHeal?.Invoke(healAmount);
-            return true;
-        }
+		public CharacterBrain brain {
+			get {
+				if (!m_characterBrain) {
+					m_characterBrain = GetComponent<CharacterBrain>();
+				}
+				return m_characterBrain;
+			}
+		}
 
-        public bool ReceiveKnockback(Vector3 direction)
-        {
-            if (direction.magnitude <= 0.01f)
-            {
-                return false;
-            }
+		public float percentHealth {
+			get { return currentHealth / maxHealth; }
+		}
 
-            OnKnockedBack?.Invoke(direction);
-            knockedBack?.Invoke();
-            return true;
-        }
+		#endregion
 
-        public void GetKnockback(Vector3 direction)
-        {
-            ReceiveKnockback(direction); 
-        }
 
-        private void Awake()
-        {
-            currentHealth = maxHealth;
-        }
+		#region Stats If No ScriptableObject
 
-        private void Start()
-        {
-            if (transform.parent != null)
-            {
-                //transform.SetParent(null);
-            }
-            
-            RegisterToCharacterManager();
+		[Foldout("Stats (if no ScriptableObject)"), SerializeField]
+		private CharacterID m_Identifier;
+		[Foldout("Stats (if no ScriptableObject)"), SerializeField]
+		private float m_MaxHealth = 10;
+		[Foldout("Stats (if no ScriptableObject)"), SerializeField]
+		private float m_CurrentHealth = 10;
+		[Foldout("Stats (if no ScriptableObject)"), SerializeField]
+		private float m_DamageCooldown = 1f;
 
-            if (spawnAtCheckpoint)
-            {
-                Respawn();
-            }
-            else
-            {
-                Spawned?.Invoke();
-            }
-        }
-        
-        [RuntimeInitializeOnLoadMethod]
-        private static void Init()
-        {
-            isQuitting = false;
-        }
+		#endregion
 
-        private void OnApplicationQuit()
-        {
-            isQuitting = true;
-        }
 
-        private void OnDestroy()
-        {
-            if (!isQuitting && Application.isPlaying)
-            {
-                if (CharacterManager.Instance)
-                {
-                    CharacterManager.Instance.RemoveCharacter(this);
-                }
-            }
-        }
+		#region Serialized Fields
 
-        private void RegisterToCharacterManager()
-        {
-            if (CharacterManager.Instance == null)
-            {
-                return;
-            }
-            CharacterManager.Instance.RegisterCharacter(this);
-        }
+		[SerializeField] private CharacterStats m_Stats;
+		[SerializeField] private bool m_IsPlayer;
+		[SerializeField] private bool m_SpawnAtCheckpoint = false;
 
-        public ID GetID()
-        {
-            return identifier;
-        }
-    }
+		#endregion
+
+
+		#region Private Fields
+
+		private CharacterReferenceProvider m_characterReferenceProvider;
+		private CharacterMovement m_characterMovement;
+		private CharacterBrain m_characterBrain;
+		private static bool _IsQuitting = false;
+		private float m_lastDamageTime = -Mathf.Infinity;
+
+		#endregion
+
+
+		#region Public Methods
+
+		public ID GetID() {
+			return identifier;
+		}
+		public bool IsPlayer() {
+			return m_IsPlayer;
+		}
+
+		public CharacterID ID() {
+			return m_Identifier;
+		}
+
+		public bool Respawn() {
+			if (currentHealth > 0) {
+				return false;
+			}
+			GoToCheckpoint();
+			Reset();
+			Spawned?.Invoke();
+			return true;
+		}
+
+		public void GoToCheckpoint(CheckpointData checkpointData = null) {
+			if (!DataManager.Instance) {
+				Debug.LogWarning("GoToCheckpoint failed: No DataManager in scene");
+				return;
+			}
+			checkpointData ??= DataManager.Instance.TryGetCheckpoint();
+			if (checkpointData == null) {
+				return;
+			}
+			characterMovement.Teleport(checkpointData.position, checkpointData.rotation);
+			if (!CameraController.Instance) {
+				Debug.LogWarning("GoToCheckpoint issue: No Camera Controller in scene");
+				return;
+			}
+			CameraController.Instance.TargetYRotation = checkpointData.cameraRotation;
+			CameraController.Instance.transform.position = checkpointData.position;
+		}
+
+
+		public void Reset() {
+			currentHealth = maxHealth;
+		}
+
+		public void Interact(IInteractive interactive) {
+			interactive.Interact(this);
+		}
+
+		public bool CanReceiveDamage() {
+			// cannot, in damage cooldown period / iframes
+			if (Time.time < m_lastDamageTime + damageCooldown) {
+				return false;
+			}
+			// cannot, if dead
+			if (currentHealth <= 0) {
+				return false;
+			}
+			// well we must be alive, then
+			m_lastDamageTime = Time.time;
+			return true;
+		}
+
+		public bool CanReceiveHealing() {
+			return currentHealth < maxHealth;
+		}
+
+		public bool ReceiveDamage(float damageAmount, Component attacker = null) {
+			if (damageAmount == 0 || currentHealth <= 0) {
+				return false;
+			}
+
+			currentHealth -= damageAmount;
+			OnReceiveDamage?.Invoke(damageAmount);
+			m_ReceivedDamage?.Invoke(damageAmount);
+			if (currentHealth <= 0) {
+				brain.GoToDead();
+				OnDied?.Invoke(this);
+				Died?.Invoke();
+				m_Died?.Invoke();
+			}
+			else {
+				brain.GoToHurt();
+			}
+
+			return true;
+		}
+
+		public bool ReceiveHeal(float healAmount, bool overHeal = false) {
+			if (healAmount == 0) {
+				return false;
+			}
+			currentHealth += healAmount;
+			if (overHeal == false) {
+				currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+			}
+			OnReceiveHeal?.Invoke(healAmount);
+			m_ReceivedHeal?.Invoke(healAmount);
+			return true;
+		}
+
+		public bool ReceiveKnockback(Vector3 direction) {
+			if (direction.magnitude <= 0.01f) {
+				return false;
+			}
+			OnKnockedBack?.Invoke(direction);
+			m_KnockedBack?.Invoke();
+			return true;
+		}
+
+		public void GetKnockback(Vector3 direction) {
+			ReceiveKnockback(direction);
+		}
+
+		#endregion
+
+
+		#region Private Methods
+
+		private void Awake() {
+			m_CurrentHealth = m_MaxHealth;
+		}
+
+		private void Start() {
+			RegisterToCharacterManager();
+			if (m_SpawnAtCheckpoint) {
+				Respawn();
+			}
+			else {
+				Spawned?.Invoke();
+			}
+		}
+
+		[RuntimeInitializeOnLoadMethod]
+		private static void Init() {
+			_IsQuitting = false;
+		}
+
+		private void OnApplicationQuit() {
+			_IsQuitting = true;
+		}
+
+		private void OnDestroy() {
+			if (!_IsQuitting && Application.isPlaying) {
+				if (CharacterManager.Instance) {
+					CharacterManager.Instance.RemoveCharacter(this);
+				}
+			}
+		}
+
+		private void RegisterToCharacterManager() {
+			if (CharacterManager.Instance == null) {
+				return;
+			}
+			CharacterManager.Instance.RegisterCharacter(this);
+		}
+
+		#endregion
+
+
+	}
 }

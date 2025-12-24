@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: ecea5804e998b4d7c83125f0bf3817e9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_Movement: {instanceID: 0}
+  - m_MainCollider: {instanceID: 0}
+  - m_CharacterInput: {instanceID: 0}
+  - m_CharacterAnimation: {instanceID: 0}
+  - m_CharacterBrain: {instanceID: 0}
+  - m_PlayerCharacter: {instanceID: 0}
+  - m_AttackColliderSensor: {instanceID: 0}
+  - m_AggroColliderSensor: {instanceID: 0}
+  - m_InteractColliderSensor: {instanceID: 0}
+  - m_Rb: {instanceID: 0}
+  - m_DamageDealer: {instanceID: 0}
+  - m_Animator: {instanceID: 0}
+  - m_CharacterPathfind: {instanceID: 0}
+  - m_CharacterAnimParamMappings: {fileID: 11400000, guid: 60660c9c877e744649e62daad754ad58, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
